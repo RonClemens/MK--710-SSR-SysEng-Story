@@ -1,0 +1,114 @@
+import type {
+  AbCompatibilityRow,
+  ConfigurationItem,
+  CotsRecord,
+  DeltaMatrixRow,
+  Recommendation,
+} from "../types";
+
+interface Props {
+  ci: ConfigurationItem;
+  deltaRows: DeltaMatrixRow[];
+  abRows: AbCompatibilityRow[];
+  cotsRecords: CotsRecord[];
+  recommendations: Recommendation[];
+  onBack: () => void;
+}
+
+export function CiDetailPage({ ci, deltaRows, abRows, cotsRecords, recommendations, onBack }: Props) {
+  return (
+    <div className="page">
+      <button className="link-button" onClick={onBack}>
+        ← Back to CI Inventory
+      </button>
+      <div className="page-header">
+        <h2>{ci.name}</h2>
+        <span className={`badge tier-${ci.tier.replace(/\s/g, "")}`}>{ci.tier}</span>
+        {ci.overDecompositionFlag && <span className="badge badge-warning">Over-decomposition flagged</span>}
+      </div>
+      <dl className="detail-grid">
+        <dt>Type</dt>
+        <dd>{ci.type}</dd>
+        <dt>Status</dt>
+        <dd>{ci.status || "—"}</dd>
+        <dt>Notes</dt>
+        <dd>{ci.notes || "—"}</dd>
+        {ci.overDecompositionFlag && (
+          <>
+            <dt>Consolidation notes</dt>
+            <dd>{ci.consolidationNotes || "—"}</dd>
+          </>
+        )}
+      </dl>
+
+      <section>
+        <h3>Delta / Traceability Matrix</h3>
+        {deltaRows.length === 0 ? (
+          <p className="hint">No delta matrix rows for this CI.</p>
+        ) : (
+          deltaRows.map((row) => (
+            <div className="detail-card" key={row.id}>
+              <p><strong>SFR allocation:</strong> {row.sfrAllocation}</p>
+              <p><strong>Actual decomposition:</strong> {row.actualDecomposition}</p>
+              <p><strong>Delta:</strong> {row.delta}</p>
+              <p><strong>Delta source:</strong> {row.deltaSource}</p>
+              <p><strong>Rationale:</strong> {row.rationale}</p>
+              <p><strong>Disposition:</strong> {row.disposition}</p>
+            </div>
+          ))
+        )}
+      </section>
+
+      <section>
+        <h3>A/B Compatibility</h3>
+        {abRows.length === 0 ? (
+          <p className="hint">No A/B compatibility rows for this CI.</p>
+        ) : (
+          abRows.map((row) => (
+            <div className="detail-card" key={row.id}>
+              <p><strong>Baseline A state:</strong> {row.baselineAState}</p>
+              <p><strong>Baseline B intent:</strong> {row.baselineBIntent}</p>
+              <p><strong>Status:</strong> {row.compatibilityStatus}</p>
+              <p><strong>Risk note:</strong> {row.riskNote}</p>
+              <p><strong>Last reviewed:</strong> {row.lastReviewedDate}</p>
+            </div>
+          ))
+        )}
+      </section>
+
+      <section>
+        <h3>COTS Record</h3>
+        {cotsRecords.length === 0 ? (
+          <p className="hint">No COTS record for this CI.</p>
+        ) : (
+          cotsRecords.map((row) => (
+            <div className="detail-card" key={row.id}>
+              <p><strong>Functional requirement:</strong> {row.functionalRequirement}</p>
+              <p><strong>Interface requirement:</strong> {row.interfaceRequirement}</p>
+              <p><strong>Form & fit:</strong> {row.formFitConstraints}</p>
+              <p><strong>Verification method:</strong> {row.verificationMethod}</p>
+              <p><strong>Rationale:</strong> {row.rationale}</p>
+              <p><strong>Parts list entry:</strong> {row.partsListEntry}</p>
+              <p><strong>Obsolescence notes:</strong> {row.obsolescenceMonitoringNotes}</p>
+            </div>
+          ))
+        )}
+      </section>
+
+      <section>
+        <h3>Related Recommendations</h3>
+        {recommendations.length === 0 ? (
+          <p className="hint">No recommendations reference this CI.</p>
+        ) : (
+          <ul>
+            {recommendations.map((r) => (
+              <li key={r.id}>
+                <strong>[{r.status}]</strong> {r.text}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}
