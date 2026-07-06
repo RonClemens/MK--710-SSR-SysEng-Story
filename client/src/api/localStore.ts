@@ -1,0 +1,73 @@
+import { SEED_DATA } from "../data/seed";
+import type { Database } from "../types";
+import type { Crud } from "./client";
+
+const STORAGE_KEY = "pdr-workbench.local-db";
+
+function load(): Database {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) {
+    const seeded = structuredClone(SEED_DATA);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+    return seeded;
+  }
+  return JSON.parse(raw) as Database;
+}
+
+function persist(db: Database) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+}
+
+export function getLocalDb(): Database {
+  return load();
+}
+
+export function replaceLocalDb(next: Database) {
+  persist(next);
+}
+
+function randomId(): string {
+  return crypto.randomUUID();
+}
+
+export function makeLocalCrud<T extends { id: string }>(collection: keyof Database): Crud<T> {
+  return {
+    async list() {
+      const db = load();
+      return db[collection] as unknown as T[];
+    },
+    async create(row) {
+      const db = load();
+      const now = new Date().toISOString();
+      const created = { ...row, id: randomId(), createdAt: now, updatedAt: now } as unknown as T;
+      (db[collection] as unknown as T[]).push(created);
+      persist(db);
+      return created;
+    },
+    async update(id, row) {
+      const db = load();
+      const list = db[collection] as unknown as T[];
+      const idx = list.findIndex((r) => r.id === id);
+      if (idx === -1) throw new Error(`${String(collection)} row not found`);
+      const existing = list[idx] as unknown as Record<string, unknown>;
+      const updated = {
+        ...existing,
+        ...row,
+        id: existing.id,
+        createdAt: existing.createdAt,
+        updatedAt: new Date().toISOString(),
+      } as unknown as T;
+      list[idx] = updated;
+      persist(db);
+      return updated;
+    },
+    async remove(id) {
+      const db = load();
+      const list = db[collection] as unknown as T[];
+      const idx = list.findIndex((r) => r.id === id);
+      if (idx === -1) throw new Error(`${String(collection)} row not found`);
+      list.splice(idx, 1);
+      persist(db);
+    },
+  };
+}

@@ -94,6 +94,41 @@ Independent of the AI features: "Export JSON" downloads the entire dataset;
 a full overwrite). Use this for backup/portability, or to move data between
 machines.
 
+## Static demo deployment (GitHub Pages)
+
+`.github/workflows/deploy-pages.yml` builds and publishes the `client/` app
+(only) to GitHub Pages on every push to `main` or the active working branch.
+This is a **temporary, interim deployment** for iterating together before the
+app moves to a CUI-capable environment (e.g. an internal GitLab instance) —
+it is not the intended long-term home for this tool.
+
+Because GitHub Pages is static hosting, there is no backend in this build:
+
+- **Data** lives in the browser's `localStorage` instead of the server's JSON
+  file. Seeded from `client/src/data/seed.ts` (same illustrative data as
+  `server/data/seed.json`) on first load. Data does not sync between devices
+  or browsers, and clearing site data resets it back to the seed.
+- **AI Assistant** calls `api.anthropic.com` directly from the browser using
+  a "bring your own key" flow (`client/src/api/directAi.ts`) — you paste your
+  own Anthropic API key into the panel, it's stored only in your browser's
+  `localStorage`, and it's sent only to Anthropic, never to any server this
+  app controls. This uses Anthropic's documented
+  `anthropic-dangerous-direct-browser-access` opt-in for browser-side
+  prototyping. **Anyone with devtools open on the page can read the key out
+  of network requests** — only use a key you're fine exposing that way, and
+  don't treat the Pages URL as if it were a hosted service with a shared key.
+- Everything else (server, `AI_PROVIDER=public`/`bedrock`, `.env`) is
+  unaffected — that's still how you'd run this for real, non-demo use.
+
+Which mode the client builds in is controlled by `VITE_DEPLOY_MODE` at build
+time (`static` → localStorage + BYOK; anything else/unset → normal server
+mode). See `client/src/api/deployMode.ts`.
+
+One manual, one-time step is required that isn't scriptable via the GitHub
+API used in this repo: in the repo's **Settings → Pages**, set **Source** to
+**GitHub Actions**. Once that's set, every push triggers a new deploy
+automatically.
+
 ## Non-goals (v1)
 
 No multi-user auth, no real-time collaboration, no integration with

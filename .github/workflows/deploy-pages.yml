@@ -1,0 +1,57 @@
+name: Deploy static demo to GitHub Pages
+
+# Builds and publishes ONLY the client, in "static" mode: no backend, data in
+# browser localStorage, and the AI Assistant calls Anthropic directly from the
+# visitor's browser using a key they supply themselves (see
+# client/src/api/directAi.ts). This is a public demo deployment of
+# illustrative/placeholder data only — see README.md and the AI Assistant
+# panel's in-app banner for the data-handling caveats that still apply.
+
+on:
+  push:
+    branches:
+      - main
+      - claude/coding-session-j9t6v5
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build client (static mode)
+        env:
+          VITE_DEPLOY_MODE: static
+        run: npm run build -w client -- --base=/${{ github.event.repository.name }}/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: client/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

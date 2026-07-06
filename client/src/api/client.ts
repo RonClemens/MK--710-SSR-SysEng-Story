@@ -1,3 +1,9 @@
+import { IS_STATIC_MODE } from "./deployMode";
+import { getLocalDb, replaceLocalDb } from "./localStore";
+import { buildSystemPrompt, SUMMARY_PROMPT } from "./aiContext";
+import { sendDirectMessage } from "./directAi";
+import type { Database } from "../types";
+
 const BASE = "/api";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -29,12 +35,40 @@ export function makeCrud<T extends { id: string }>(path: string): Crud<T> {
   };
 }
 
+type ChatMessage = { role: "user" | "assistant"; content: string };
+
 export const api = {
-  config: () => request<{ aiEnabled: boolean; aiProvider: string }>("/config"),
-  exportData: () => request<Record<string, unknown>>("/data/export"),
-  importData: (data: unknown) =>
-    request<{ ok: boolean }>("/data/import", { method: "POST", body: JSON.stringify(data) }),
-  chat: (messages: { role: "user" | "assistant"; content: string }[]) =>
-    request<{ reply: string }>("/ai/chat", { method: "POST", body: JSON.stringify({ messages }) }),
-  summary: () => request<{ summary: string }>("/ai/summary", { method: "POST" }),
+  config: async () => {
+    if (IS_STATIC_MODE) return { aiEnabled: true, aiProvider: "direct-browser (bring your own key)" };
+    return request<{ aiEnabled: boolean; aiProvider: string }>("/config");
+  },
+  exportData: async () => {
+    if (IS_STATIC_MODE) return getLocalDb() as unknown as Record<string, unknown>;
+    return request<Record<string, unknown>>("/data/export");
+  },
+  importData: async (data: unknown) => {
+    if (IS_STATIC_MODE) {
+      replaceLocalDb(data as Database);
+      return { ok: true };
+    }
+    return request<{ ok: boolean }>("/data/import", { method: "POST", body: JSON.stringify(data) });
+  },
+  chat: async (messages: ChatMessage[]) => {
+    if (IS_STATIC_MODE) {
+      const reply = await sendDirectMessage({ system: buildSystemPrompt(), messages });
+      return { reply };
+    }
+    return request<{ reply: string }>("/ai/chat", { method: "POST", body: JSON.stringify({ messages }) });
+  },
+  summary: async () => {
+    if (IS_STATIC_MODE) {
+      const summary = await sendDirectMessage({
+        system: buildSystemPrompt(),
+        messages: [{ role: "user", content: SUMMARY_PROMPT }],
+        maxTokens: 3000,
+      });
+      return { summary };
+    }
+    return request<{ summary: string }>("/ai/summary", { method: "POST" });
+  },
 };
