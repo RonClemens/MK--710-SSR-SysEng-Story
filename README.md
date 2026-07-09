@@ -63,10 +63,20 @@ even if it's misconfigured.
 
 ## Data model
 
-Five related entities (see `server/src/types.ts` / `client/src/types/index.ts`):
+Six related entities (see `server/src/types.ts` / `client/src/types/index.ts`):
 
-- **Configuration Items (CIs)** — inventory with Tier 1/2/3 classification and
-  over-decomposition flagging.
+- **Logical Subsystems** — the functional/behavioral decomposition layer this
+  program's CI allocation skipped (it went straight from system-level
+  requirements to physical CI allocation, organized around rack enclosures —
+  see the existing SSDD). Each subsystem carries a `source`: `Validated`,
+  `Proposed`, or `Inherited from SSDD structure — unverified` (i.e. lifted
+  from the physical/rack grouping without independent functional validation).
+- **Configuration Items (CIs)** — inventory with Tier 1/2/3 classification,
+  over-decomposition flagging, and a **many-to-many** link to the subsystem(s)
+  a CI serves (`subsystemIds: string[]` on the CI — not a single foreign key,
+  since one CI legitimately can serve more than one subsystem). The UI
+  visually flags CIs serving 2+ subsystems rather than hiding the overlap —
+  that overlap is signal, not noise.
 - **Delta / Traceability Matrix** — SFR-agreed allocation vs. as-built vs.
   disposition, scoped to Baseline A's internal reconciliation.
 - **A/B Compatibility Matrix** — Baseline A vs. Baseline B state at
@@ -76,7 +86,9 @@ Five related entities (see `server/src/types.ts` / `client/src/types/index.ts`):
 - **Recommendations / Action Items** — optionally linked back to a CI.
 
 All entities are fully CRUD-editable in the UI (add/edit/delete, no page
-reloads). The CI Detail view rolls up every related row for a given CI.
+reloads). The CI Detail view rolls up every related row for a given CI,
+including its linked subsystems and which other CIs also serve them; the
+Subsystem Detail view is the mirror image (which CIs serve this subsystem).
 
 ## AI Assistant
 

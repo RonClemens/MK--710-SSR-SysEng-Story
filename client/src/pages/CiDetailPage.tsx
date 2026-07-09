@@ -3,19 +3,35 @@ import type {
   ConfigurationItem,
   CotsRecord,
   DeltaMatrixRow,
+  LogicalSubsystem,
   Recommendation,
 } from "../types";
 
 interface Props {
   ci: ConfigurationItem;
+  subsystems: LogicalSubsystem[];
+  allCis: ConfigurationItem[];
   deltaRows: DeltaMatrixRow[];
   abRows: AbCompatibilityRow[];
   cotsRecords: CotsRecord[];
   recommendations: Recommendation[];
   onBack: () => void;
+  onSelectSubsystem: (id: string) => void;
 }
 
-export function CiDetailPage({ ci, deltaRows, abRows, cotsRecords, recommendations, onBack }: Props) {
+export function CiDetailPage({
+  ci,
+  subsystems,
+  allCis,
+  deltaRows,
+  abRows,
+  cotsRecords,
+  recommendations,
+  onBack,
+  onSelectSubsystem,
+}: Props) {
+  const linkedSubsystems = subsystems.filter((s) => ci.subsystemIds.includes(s.id));
+
   return (
     <div className="page">
       <button className="link-button" onClick={onBack}>
@@ -40,6 +56,38 @@ export function CiDetailPage({ ci, deltaRows, abRows, cotsRecords, recommendatio
           </>
         )}
       </dl>
+
+      <section>
+        <h3>Logical Subsystems Served{linkedSubsystems.length >= 2 ? ` (${linkedSubsystems.length})` : ""}</h3>
+        {linkedSubsystems.length === 0 ? (
+          <p className="hint">Not yet linked to a logical subsystem.</p>
+        ) : (
+          <>
+            {linkedSubsystems.length >= 2 && (
+              <p className="hint">
+                This CI serves multiple subsystems — that overlap is useful signal, not necessarily a problem.
+              </p>
+            )}
+            {linkedSubsystems.map((s) => {
+              const siblings = allCis.filter((c) => c.id !== ci.id && c.subsystemIds.includes(s.id));
+              return (
+                <div className="detail-card" key={s.id}>
+                  <p>
+                    <button className="link-button" onClick={() => onSelectSubsystem(s.id)}>
+                      <strong>{s.name}</strong>
+                    </button>{" "}
+                    <span className="badge">{s.source}</span>
+                  </p>
+                  <p>{s.description}</p>
+                  {siblings.length > 0 && (
+                    <p className="hint">Also served by: {siblings.map((c) => c.name).join(", ")}</p>
+                  )}
+                </div>
+              );
+            })}
+          </>
+        )}
+      </section>
 
       <section>
         <h3>Delta / Traceability Matrix</h3>

@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 export interface FieldDef<T> {
   key: keyof T & string;
   label: string;
-  type: "text" | "textarea" | "select" | "boolean" | "date";
+  type: "text" | "textarea" | "select" | "multiselect" | "boolean" | "date";
   options?: string[];
   optionLabels?: Record<string, string>;
   placeholder?: string;
@@ -74,6 +74,32 @@ export function EntityForm<T>({
                 </option>
               ))}
             </select>
+          ) : field.type === "multiselect" ? (
+            <div className="multiselect-list">
+              {field.options?.length ? (
+                field.options.map((opt) => {
+                  const selected = ((values[field.key] as string[] | undefined) ?? []).includes(opt);
+                  return (
+                    <label key={opt} className="multiselect-option">
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={(e) => {
+                          const current = (values[field.key] as string[] | undefined) ?? [];
+                          const next = e.target.checked
+                            ? [...current, opt]
+                            : current.filter((v) => v !== opt);
+                          setField(field.key, next);
+                        }}
+                      />
+                      <span>{field.optionLabels?.[opt] ?? opt}</span>
+                    </label>
+                  );
+                })
+              ) : (
+                <p className="hint">No options available yet.</p>
+              )}
+            </div>
           ) : field.type === "boolean" ? (
             <input
               type="checkbox"

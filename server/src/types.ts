@@ -1,3 +1,17 @@
+export type LogicalSubsystemSource =
+  | "Validated"
+  | "Proposed"
+  | "Inherited from SSDD structure — unverified";
+
+export interface LogicalSubsystem {
+  id: string;
+  name: string;
+  description: string;
+  source: LogicalSubsystemSource;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type CiType = "developmental" | "COTS";
 export type CiTier = "Tier 1" | "Tier 2" | "Tier 3";
 
@@ -6,6 +20,9 @@ export interface ConfigurationItem {
   name: string;
   type: CiType;
   tier: CiTier;
+  // Many-to-many: a CI can legitimately serve more than one logical subsystem
+  // (see LogicalSubsystem) — not modeled as a single foreign key.
+  subsystemIds: string[];
   overDecompositionFlag: boolean;
   consolidationNotes: string;
   status: string;
@@ -85,6 +102,7 @@ export interface Recommendation {
 }
 
 export interface Database {
+  logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];
   abCompatibility: AbCompatibilityRow[];

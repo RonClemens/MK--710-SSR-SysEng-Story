@@ -310,6 +310,34 @@ button {
   width: fit-content;
 }
 
+.multiselect-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 0.7rem;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.multiselect-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.multiselect-option input[type="checkbox"] {
+  width: fit-content;
+}
+
+.badge-info {
+  background: var(--ice);
+  color: var(--navy-dark);
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;

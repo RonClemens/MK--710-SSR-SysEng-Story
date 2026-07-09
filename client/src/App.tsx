@@ -5,9 +5,12 @@ import {
   cisApi,
   cotsRecordsApi,
   deltaMatrixApi,
+  logicalSubsystemsApi,
   recommendationsApi,
 } from "./api/entities";
 import { api } from "./api/client";
+import { SubsystemsPage } from "./pages/SubsystemsPage";
+import { SubsystemDetailPage } from "./pages/SubsystemDetailPage";
 import { CisPage } from "./pages/CisPage";
 import { DeltaMatrixPage } from "./pages/DeltaMatrixPage";
 import { AbCompatibilityPage } from "./pages/AbCompatibilityPage";
@@ -17,9 +20,10 @@ import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { ExportImport } from "./components/ExportImport";
 
-type Tab = "cis" | "delta" | "ab" | "cots" | "recommendations";
+type Tab = "subsystems" | "cis" | "delta" | "ab" | "cots" | "recommendations";
 
 const TABS: { key: Tab; label: string }[] = [
+  { key: "subsystems", label: "Subsystems" },
   { key: "cis", label: "CI Inventory" },
   { key: "delta", label: "Delta Matrix" },
   { key: "ab", label: "A/B Compatibility" },
@@ -28,14 +32,16 @@ const TABS: { key: Tab; label: string }[] = [
 ];
 
 export default function App() {
+  const logicalSubsystems = useEntity(logicalSubsystemsApi);
   const cis = useEntity(cisApi);
   const deltaMatrix = useEntity(deltaMatrixApi);
   const abCompatibility = useEntity(abCompatibilityApi);
   const cotsRecords = useEntity(cotsRecordsApi);
   const recommendations = useEntity(recommendationsApi);
 
-  const [tab, setTab] = useState<Tab>("cis");
+  const [tab, setTab] = useState<Tab>("subsystems");
   const [selectedCiId, setSelectedCiId] = useState<string | null>(null);
+  const [selectedSubsystemId, setSelectedSubsystemId] = useState<string | null>(null);
   const [serverAiEnabled, setServerAiEnabled] = useState(false);
 
   useEffect(() => {
@@ -43,6 +49,7 @@ export default function App() {
   }, []);
 
   function refreshAll() {
+    logicalSubsystems.refresh();
     cis.refresh();
     deltaMatrix.refresh();
     abCompatibility.refresh();
@@ -50,7 +57,25 @@ export default function App() {
     recommendations.refresh();
   }
 
+  function selectCi(id: string) {
+    setSelectedSubsystemId(null);
+    setSelectedCiId(id);
+  }
+
+  function selectSubsystem(id: string) {
+    setSelectedCiId(null);
+    setSelectedSubsystemId(id);
+  }
+
+  function clearSelection() {
+    setSelectedCiId(null);
+    setSelectedSubsystemId(null);
+  }
+
   const selectedCi = selectedCiId ? cis.rows.find((c) => c.id === selectedCiId) : null;
+  const selectedSubsystem = selectedSubsystemId
+    ? logicalSubsystems.rows.find((s) => s.id === selectedSubsystemId)
+    : null;
 
   return (
     <div className="app-shell">
@@ -69,11 +94,21 @@ export default function App() {
           {selectedCi ? (
             <CiDetailPage
               ci={selectedCi}
+              subsystems={logicalSubsystems.rows}
+              allCis={cis.rows}
               deltaRows={deltaMatrix.rows.filter((r) => r.ciId === selectedCi.id)}
               abRows={abCompatibility.rows.filter((r) => r.ciId === selectedCi.id)}
               cotsRecords={cotsRecords.rows.filter((r) => r.ciId === selectedCi.id)}
               recommendations={recommendations.rows.filter((r) => r.relatedCiId === selectedCi.id)}
-              onBack={() => setSelectedCiId(null)}
+              onBack={clearSelection}
+              onSelectSubsystem={selectSubsystem}
+            />
+          ) : selectedSubsystem ? (
+            <SubsystemDetailPage
+              subsystem={selectedSubsystem}
+              servingCis={cis.rows.filter((c) => c.subsystemIds.includes(selectedSubsystem.id))}
+              onBack={clearSelection}
+              onSelectCi={selectCi}
             />
           ) : (
             <>
@@ -88,7 +123,10 @@ export default function App() {
                   </button>
                 ))}
               </nav>
-              {tab === "cis" && <CisPage entity={cis} onSelectCi={setSelectedCiId} />}
+              {tab === "subsystems" && (
+                <SubsystemsPage entity={logicalSubsystems} cis={cis.rows} onSelectSubsystem={selectSubsystem} />
+              )}
+              {tab === "cis" && <CisPage entity={cis} subsystems={logicalSubsystems.rows} onSelectCi={selectCi} />}
               {tab === "delta" && <DeltaMatrixPage entity={deltaMatrix} cis={cis.rows} />}
               {tab === "ab" && <AbCompatibilityPage entity={abCompatibility} cis={cis.rows} />}
               {tab === "cots" && <CotsRecordsPage entity={cotsRecords} cis={cis.rows} />}

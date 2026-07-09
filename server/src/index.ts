@@ -33,6 +33,7 @@ async function start() {
     res.json({ aiEnabled, aiProvider: process.env.AI_PROVIDER || "public" });
   });
 
+  app.use("/api/subsystems", crudRouter("logicalSubsystems"));
   app.use("/api/cis", crudRouter("cis"));
   app.use("/api/delta-matrix", crudRouter("deltaMatrix"));
   app.use("/api/ab-compatibility", crudRouter("abCompatibility"));

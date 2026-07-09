@@ -4,12 +4,51 @@ import type { Database } from "../types";
 // server/data/seed.json for the static (GitHub Pages) build, which has no
 // backend to serve it from. Not real program data.
 export const SEED_DATA: Database = {
+  logicalSubsystems: [
+    {
+      id: "sub-001",
+      name: "UUT Stimulus/Response",
+      description:
+        "Generates and captures electrical stimulus/response signals exchanged with the Unit Under Test during automated test sequences.",
+      source: "Validated",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "sub-002",
+      name: "Diagnostic Messaging",
+      description:
+        "Formats and transports diagnostic status/health messages between the Test Set and UUT test scripts.",
+      source: "Validated",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "sub-003",
+      name: "Power Conditioning & Distribution",
+      description:
+        "Regulates and distributes DC power to Test Set sub-assemblies. Hypothesis based on IPS's apparent role; not yet confirmed against design-engineer knowledge.",
+      source: "Proposed",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "sub-004",
+      name: "Rack 3 Assembly (legacy grouping)",
+      description:
+        "Pulled directly from the existing physical/rack-organized SSDD as a placeholder grouping. Captures which enclosure a CI physically sits in, not a functional boundary — not yet independently validated as a true logical subsystem.",
+      source: "Inherited from SSDD structure — unverified",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+  ],
   cis: [
     {
       id: "ci-001",
       name: "Test Set (MHC/MCC/IPS Assembly)",
       type: "developmental",
       tier: "Tier 1",
+      subsystemIds: ["sub-001", "sub-002", "sub-003"],
       overDecompositionFlag: false,
       consolidationNotes: "",
       status: "In reconciliation",
@@ -23,6 +62,7 @@ export const SEED_DATA: Database = {
       name: "MHC (Multi-Head Controller)",
       type: "developmental",
       tier: "Tier 1",
+      subsystemIds: ["sub-001", "sub-002"],
       overDecompositionFlag: false,
       consolidationNotes: "",
       status: "In reconciliation",
@@ -35,6 +75,7 @@ export const SEED_DATA: Database = {
       name: "MCC (Module Control Card)",
       type: "COTS",
       tier: "Tier 1",
+      subsystemIds: ["sub-001"],
       overDecompositionFlag: true,
       consolidationNotes:
         "Should be absorbed into Test Set CI; currently tracked as a standalone CI despite being a COTS sub-assembly with no independent verification path.",
@@ -48,6 +89,7 @@ export const SEED_DATA: Database = {
       name: "IPS (Interface Power Supply)",
       type: "COTS",
       tier: "Tier 1",
+      subsystemIds: ["sub-003"],
       overDecompositionFlag: true,
       consolidationNotes:
         "Candidate for reclassification as a COTS item record under the Test Set CI rather than a standalone CI.",
@@ -61,6 +103,7 @@ export const SEED_DATA: Database = {
       name: "Legacy Diagnostic Bus Adapter",
       type: "developmental",
       tier: "Tier 3",
+      subsystemIds: ["sub-004"],
       overDecompositionFlag: false,
       consolidationNotes: "",
       status: "Slated for replacement",

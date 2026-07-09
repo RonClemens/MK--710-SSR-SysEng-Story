@@ -6,6 +6,7 @@ import type {
   ConfigurationItem,
   CotsRecord,
   DeltaMatrixRow,
+  LogicalSubsystem,
   Recommendation,
 } from "../types";
 
@@ -13,6 +14,7 @@ function entity<T extends { id: string }>(path: string, collection: Parameters<t
   return IS_STATIC_MODE ? makeLocalCrud<T>(collection) : makeCrud<T>(path);
 }
 
+export const logicalSubsystemsApi = entity<LogicalSubsystem>("/subsystems", "logicalSubsystems");
 export const cisApi = entity<ConfigurationItem>("/cis", "cis");
 export const deltaMatrixApi = entity<DeltaMatrixRow>("/delta-matrix", "deltaMatrix");
 export const abCompatibilityApi = entity<AbCompatibilityRow>("/ab-compatibility", "abCompatibility");
