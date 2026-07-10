@@ -4,6 +4,25 @@ import type { Crud } from "./client";
 
 const STORAGE_KEY = "pdr-workbench.local-db";
 
+// Backfills fields/collections added after a visitor's browser may have already
+// cached a Database blob in localStorage (or after an old "Export JSON" file is
+// re-imported), so older cached/imported data can't crash rendering by missing
+// a field the current code assumes is always present (e.g. subsystemIds).
+function normalize(db: Partial<Database>): Database {
+  const cis = (db.cis ?? []).map((ci) => ({
+    ...ci,
+    subsystemIds: ci.subsystemIds ?? [],
+  }));
+  return {
+    logicalSubsystems: db.logicalSubsystems ?? [],
+    cis,
+    deltaMatrix: db.deltaMatrix ?? [],
+    abCompatibility: db.abCompatibility ?? [],
+    cotsRecords: db.cotsRecords ?? [],
+    recommendations: db.recommendations ?? [],
+  };
+}
+
 function load(): Database {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
@@ -11,7 +30,7 @@ function load(): Database {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
     return seeded;
   }
-  return JSON.parse(raw) as Database;
+  return normalize(JSON.parse(raw) as Partial<Database>);
 }
 
 function persist(db: Database) {
@@ -22,8 +41,8 @@ export function getLocalDb(): Database {
   return load();
 }
 
-export function replaceLocalDb(next: Database) {
-  persist(next);
+export function replaceLocalDb(next: Partial<Database>) {
+  persist(normalize(next));
 }
 
 function randomId(): string {
