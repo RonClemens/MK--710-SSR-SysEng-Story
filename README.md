@@ -63,7 +63,7 @@ even if it's misconfigured.
 
 ## Data model
 
-Six related entities (see `server/src/types.ts` / `client/src/types/index.ts`):
+Seven related entities (see `server/src/types.ts` / `client/src/types/index.ts`):
 
 - **Logical Subsystems** — the functional/behavioral decomposition layer this
   program's CI allocation skipped (it went straight from system-level
@@ -84,6 +84,16 @@ Six related entities (see `server/src/types.ts` / `client/src/types/index.ts`):
 - **COTS Item Records** — capability-based requirements, parts list, qualified
   alternates, obsolescence monitoring.
 - **Recommendations / Action Items** — optionally linked back to a CI.
+- **Interfaces** — a documented edge between two elements of the same type
+  (`scope: "subsystem" | "ci"`, `aId`, `bId`, `description`), for the N²
+  Diagram tab. Two N² grids are generated: Subsystem×Subsystem and CI×CI.
+  Off-diagonal cells that share a linking CI (subsystem grid) or a linking
+  subsystem (CI grid) are shown as a "derived" hint (○) — this is computed
+  live from existing data, not stored. Clicking any cell opens an editor
+  pre-filled with that hint where you can write and save a real documented
+  interface, which persists as an `Interface` record and flips the cell to
+  "documented" (●). Derived hints are a starting point, not a substitute for
+  an actual documented interface.
 
 All entities are fully CRUD-editable in the UI (add/edit/delete, no page
 reloads). The CI Detail view rolls up every related row for a given CI,

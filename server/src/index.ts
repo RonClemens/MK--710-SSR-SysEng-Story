@@ -39,6 +39,7 @@ async function start() {
   app.use("/api/ab-compatibility", crudRouter("abCompatibility"));
   app.use("/api/cots-records", crudRouter("cotsRecords"));
   app.use("/api/recommendations", crudRouter("recommendations"));
+  app.use("/api/interfaces", crudRouter("interfaces"));
   app.use("/api/data", dataRouter);
 
   if (aiEnabled) {

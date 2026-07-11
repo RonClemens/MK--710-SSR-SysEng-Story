@@ -237,4 +237,25 @@ export const SEED_DATA: Database = {
       updatedAt: "2026-06-15T00:00:00.000Z",
     },
   ],
+  interfaces: [
+    {
+      id: "iface-001",
+      scope: "subsystem",
+      aId: "sub-001",
+      bId: "sub-002",
+      description:
+        "MHC correlates captured stimulus/response signal state into the diagnostic message stream in real time; documented interface, not just an artifact of sharing the MHC CI.",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "iface-002",
+      scope: "ci",
+      aId: "ci-002",
+      bId: "ci-003",
+      description: "MHC issues module-level control commands to MCC over the internal Test Set backplane.",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+  ],
 };

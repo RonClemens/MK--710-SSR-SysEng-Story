@@ -101,6 +101,23 @@ export interface Recommendation {
   updatedAt: string;
 }
 
+// A documented interface between two elements of the same type, for N² diagrams.
+// "Derived" links (two subsystems sharing a CI, or two CIs sharing a subsystem)
+// are computed live from existing data and only used to pre-fill a suggested
+// description when a cell has no InterfaceRecord yet — they are hints, not a
+// substitute for an actual documented interface.
+export type InterfaceScope = "subsystem" | "ci";
+
+export interface InterfaceRecord {
+  id: string;
+  scope: InterfaceScope;
+  aId: string;
+  bId: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Database {
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
@@ -108,6 +125,7 @@ export interface Database {
   abCompatibility: AbCompatibilityRow[];
   cotsRecords: CotsRecord[];
   recommendations: Recommendation[];
+  interfaces: InterfaceRecord[];
 }
 
 export const LOGICAL_SUBSYSTEM_SOURCES: LogicalSubsystemSource[] = [

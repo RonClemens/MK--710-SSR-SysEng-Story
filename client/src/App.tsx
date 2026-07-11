@@ -5,12 +5,14 @@ import {
   cisApi,
   cotsRecordsApi,
   deltaMatrixApi,
+  interfacesApi,
   logicalSubsystemsApi,
   recommendationsApi,
 } from "./api/entities";
 import { api } from "./api/client";
 import { SubsystemsPage } from "./pages/SubsystemsPage";
 import { SubsystemDetailPage } from "./pages/SubsystemDetailPage";
+import { NSquaredPage } from "./pages/NSquaredPage";
 import { CisPage } from "./pages/CisPage";
 import { DeltaMatrixPage } from "./pages/DeltaMatrixPage";
 import { AbCompatibilityPage } from "./pages/AbCompatibilityPage";
@@ -20,10 +22,11 @@ import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { ExportImport } from "./components/ExportImport";
 
-type Tab = "subsystems" | "cis" | "delta" | "ab" | "cots" | "recommendations";
+type Tab = "subsystems" | "n2" | "cis" | "delta" | "ab" | "cots" | "recommendations";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "subsystems", label: "Subsystems" },
+  { key: "n2", label: "N² Diagram" },
   { key: "cis", label: "CI Inventory" },
   { key: "delta", label: "Delta Matrix" },
   { key: "ab", label: "A/B Compatibility" },
@@ -38,6 +41,7 @@ export default function App() {
   const abCompatibility = useEntity(abCompatibilityApi);
   const cotsRecords = useEntity(cotsRecordsApi);
   const recommendations = useEntity(recommendationsApi);
+  const interfaces = useEntity(interfacesApi);
 
   const [tab, setTab] = useState<Tab>("subsystems");
   const [selectedCiId, setSelectedCiId] = useState<string | null>(null);
@@ -55,6 +59,7 @@ export default function App() {
     abCompatibility.refresh();
     cotsRecords.refresh();
     recommendations.refresh();
+    interfaces.refresh();
   }
 
   function selectCi(id: string) {
@@ -125,6 +130,15 @@ export default function App() {
               </nav>
               {tab === "subsystems" && (
                 <SubsystemsPage entity={logicalSubsystems} cis={cis.rows} onSelectSubsystem={selectSubsystem} />
+              )}
+              {tab === "n2" && (
+                <NSquaredPage
+                  subsystems={logicalSubsystems.rows}
+                  cis={cis.rows}
+                  interfacesEntity={interfaces}
+                  onSelectSubsystem={selectSubsystem}
+                  onSelectCi={selectCi}
+                />
               )}
               {tab === "cis" && <CisPage entity={cis} subsystems={logicalSubsystems.rows} onSelectCi={selectCi} />}
               {tab === "delta" && <DeltaMatrixPage entity={deltaMatrix} cis={cis.rows} />}

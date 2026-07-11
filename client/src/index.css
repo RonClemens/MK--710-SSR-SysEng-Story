@@ -338,6 +338,83 @@ button {
   color: var(--navy-dark);
 }
 
+.n2-table {
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.n2-table th,
+.n2-table td {
+  border: 1px solid var(--border);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.n2-corner {
+  background: var(--surface);
+  border: none !important;
+}
+
+.n2-axis-label {
+  background: var(--ice-light);
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.6rem;
+  min-width: 2.4rem;
+}
+
+.n2-diagonal {
+  background: var(--navy);
+  color: white;
+  font-size: 0.72rem;
+  padding: 0.4rem;
+  width: 110px;
+  max-width: 110px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.n2-diagonal .link-button {
+  color: white;
+  text-decoration: underline;
+}
+
+.n2-documented,
+.n2-derived,
+.n2-empty {
+  min-width: 42px;
+  cursor: pointer;
+}
+
+.n2-documented {
+  background: #fbe9dd;
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.n2-documented:hover {
+  background: #f6d9c0;
+}
+
+.n2-derived {
+  background: var(--ice-light);
+  color: var(--navy);
+}
+
+.n2-derived:hover {
+  background: var(--ice);
+}
+
+.n2-empty {
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.n2-empty:hover {
+  background: var(--ice-light);
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;

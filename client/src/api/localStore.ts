@@ -20,6 +20,7 @@ function normalize(db: Partial<Database>): Database {
     abCompatibility: db.abCompatibility ?? [],
     cotsRecords: db.cotsRecords ?? [],
     recommendations: db.recommendations ?? [],
+    interfaces: db.interfaces ?? [],
   };
 }
 

@@ -9,6 +9,7 @@ const REQUIRED_KEYS: (keyof Database)[] = [
   "abCompatibility",
   "cotsRecords",
   "recommendations",
+  "interfaces",
 ];
 
 export const dataRouter = Router();
