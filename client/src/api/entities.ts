@@ -9,6 +9,7 @@ import type {
   InterfaceRecord,
   LogicalSubsystem,
   Recommendation,
+  Specification,
 } from "../types";
 
 function entity<T extends { id: string }>(path: string, collection: Parameters<typeof makeLocalCrud>[0]): Crud<T> {
@@ -17,6 +18,7 @@ function entity<T extends { id: string }>(path: string, collection: Parameters<t
 
 export const logicalSubsystemsApi = entity<LogicalSubsystem>("/subsystems", "logicalSubsystems");
 export const interfacesApi = entity<InterfaceRecord>("/interfaces", "interfaces");
+export const specificationsApi = entity<Specification>("/specifications", "specifications");
 export const cisApi = entity<ConfigurationItem>("/cis", "cis");
 export const deltaMatrixApi = entity<DeltaMatrixRow>("/delta-matrix", "deltaMatrix");
 export const abCompatibilityApi = entity<AbCompatibilityRow>("/ab-compatibility", "abCompatibility");

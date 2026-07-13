@@ -8,6 +8,7 @@ import {
   interfacesApi,
   logicalSubsystemsApi,
   recommendationsApi,
+  specificationsApi,
 } from "./api/entities";
 import { api } from "./api/client";
 import { SubsystemsPage } from "./pages/SubsystemsPage";
@@ -18,11 +19,13 @@ import { DeltaMatrixPage } from "./pages/DeltaMatrixPage";
 import { AbCompatibilityPage } from "./pages/AbCompatibilityPage";
 import { CotsRecordsPage } from "./pages/CotsRecordsPage";
 import { RecommendationsPage } from "./pages/RecommendationsPage";
+import { SpecificationsPage } from "./pages/SpecificationsPage";
+import { SpecificationDetailPage } from "./pages/SpecificationDetailPage";
 import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { ExportImport } from "./components/ExportImport";
 
-type Tab = "subsystems" | "n2" | "cis" | "delta" | "ab" | "cots" | "recommendations";
+type Tab = "subsystems" | "n2" | "cis" | "delta" | "ab" | "cots" | "specifications" | "recommendations";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "subsystems", label: "Subsystems" },
@@ -31,6 +34,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "delta", label: "Delta Matrix" },
   { key: "ab", label: "A/B Compatibility" },
   { key: "cots", label: "COTS Records" },
+  { key: "specifications", label: "Specifications" },
   { key: "recommendations", label: "Recommendations" },
 ];
 
@@ -42,10 +46,12 @@ export default function App() {
   const cotsRecords = useEntity(cotsRecordsApi);
   const recommendations = useEntity(recommendationsApi);
   const interfaces = useEntity(interfacesApi);
+  const specifications = useEntity(specificationsApi);
 
   const [tab, setTab] = useState<Tab>("subsystems");
   const [selectedCiId, setSelectedCiId] = useState<string | null>(null);
   const [selectedSubsystemId, setSelectedSubsystemId] = useState<string | null>(null);
+  const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
   const [serverAiEnabled, setServerAiEnabled] = useState(false);
 
   useEffect(() => {
@@ -60,27 +66,38 @@ export default function App() {
     cotsRecords.refresh();
     recommendations.refresh();
     interfaces.refresh();
+    specifications.refresh();
   }
 
   function selectCi(id: string) {
     setSelectedSubsystemId(null);
+    setSelectedSpecId(null);
     setSelectedCiId(id);
   }
 
   function selectSubsystem(id: string) {
     setSelectedCiId(null);
+    setSelectedSpecId(null);
     setSelectedSubsystemId(id);
+  }
+
+  function selectSpecification(id: string) {
+    setSelectedCiId(null);
+    setSelectedSubsystemId(null);
+    setSelectedSpecId(id);
   }
 
   function clearSelection() {
     setSelectedCiId(null);
     setSelectedSubsystemId(null);
+    setSelectedSpecId(null);
   }
 
   const selectedCi = selectedCiId ? cis.rows.find((c) => c.id === selectedCiId) : null;
   const selectedSubsystem = selectedSubsystemId
     ? logicalSubsystems.rows.find((s) => s.id === selectedSubsystemId)
     : null;
+  const selectedSpec = selectedSpecId ? specifications.rows.find((s) => s.id === selectedSpecId) : null;
 
   return (
     <div className="app-shell">
@@ -105,14 +122,32 @@ export default function App() {
               abRows={abCompatibility.rows.filter((r) => r.ciId === selectedCi.id)}
               cotsRecords={cotsRecords.rows.filter((r) => r.ciId === selectedCi.id)}
               recommendations={recommendations.rows.filter((r) => r.relatedCiId === selectedCi.id)}
+              specifications={specifications.rows.filter((s) => s.linkedCiId === selectedCi.id)}
               onBack={clearSelection}
               onSelectSubsystem={selectSubsystem}
+              onSelectSpecification={selectSpecification}
             />
           ) : selectedSubsystem ? (
             <SubsystemDetailPage
               subsystem={selectedSubsystem}
               servingCis={cis.rows.filter((c) => c.subsystemIds.includes(selectedSubsystem.id))}
+              specifications={specifications.rows.filter((s) => s.linkedSubsystemId === selectedSubsystem.id)}
               onBack={clearSelection}
+              onSelectCi={selectCi}
+              onSelectSpecification={selectSpecification}
+            />
+          ) : selectedSpec ? (
+            <SpecificationDetailPage
+              spec={selectedSpec}
+              subsystems={logicalSubsystems.rows}
+              cis={cis.rows}
+              onBack={clearSelection}
+              onUpdate={specifications.update}
+              onDelete={async (id) => {
+                await specifications.remove(id);
+                clearSelection();
+              }}
+              onSelectSubsystem={selectSubsystem}
               onSelectCi={selectCi}
             />
           ) : (
@@ -144,6 +179,14 @@ export default function App() {
               {tab === "delta" && <DeltaMatrixPage entity={deltaMatrix} cis={cis.rows} />}
               {tab === "ab" && <AbCompatibilityPage entity={abCompatibility} cis={cis.rows} />}
               {tab === "cots" && <CotsRecordsPage entity={cotsRecords} cis={cis.rows} />}
+              {tab === "specifications" && (
+                <SpecificationsPage
+                  entity={specifications}
+                  subsystems={logicalSubsystems.rows}
+                  cis={cis.rows}
+                  onSelectSpecification={selectSpecification}
+                />
+              )}
               {tab === "recommendations" && (
                 <RecommendationsPage entity={recommendations} cis={cis.rows} />
               )}

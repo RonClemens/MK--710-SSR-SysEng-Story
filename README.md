@@ -63,7 +63,7 @@ even if it's misconfigured.
 
 ## Data model
 
-Seven related entities (see `server/src/types.ts` / `client/src/types/index.ts`):
+Eight related entities (see `server/src/types.ts` / `client/src/types/index.ts`):
 
 - **Logical Subsystems** — the functional/behavioral decomposition layer this
   program's CI allocation skipped (it went straight from system-level
@@ -97,11 +97,33 @@ Seven related entities (see `server/src/types.ts` / `client/src/types/index.ts`)
   a CI×CI view filtered to just the CIs behind that subsystem pair — useful
   for showing how many CI-level interfaces actually implement what looks like
   one clean subsystem-level interface (integration bloat).
+- **Specifications** — DID-style HRS/SRS requirement specification templates
+  (see `client/src/data/didGuidance.ts`), adapted from MIL-STD-961E System/
+  Subsystem/CI specification conventions and the DI-IPSC-8143x SRS/SSS DIDs.
+  Each spec has a `level` (System / Subsystem / CI), `domain` (Hardware /
+  Software), `specType` (Development / Production), `baseline` (Baseline A /
+  Baseline B), a `status`, an optional link to a Subsystem or CI (System-level
+  specs aren't linked to either), and 12 DID-structured sections (scope,
+  applicable documents, functional/performance, interfaces, environmental,
+  design constraints, safety, security, human factors, logistics,
+  verification provisions, notes). The Specifications tab surfaces the
+  pros/cons of documenting requirements at each of the three levels and the
+  distinction between Development specs (pre-CDR/TRR, requirements-based) and
+  Production specs (post-qualification, references the validated design) —
+  grounded in this program's own known issues (missing subsystem layer,
+  over-decomposition, delta-matrix drift) rather than generic boilerplate.
+  Section relevance (Required / Recommended / Typically N/A) is shown
+  per-section based on the spec's level, as guidance rather than a hard gate.
+  Baseline A and Baseline B are expected to mature through Development →
+  Production at different rates while influencing each other at UUT-relevant
+  interfaces — track that relationship via the A/B Compatibility Matrix, not
+  by duplicating content across specs.
 
 All entities are fully CRUD-editable in the UI (add/edit/delete, no page
 reloads). The CI Detail view rolls up every related row for a given CI,
-including its linked subsystems and which other CIs also serve them; the
-Subsystem Detail view is the mirror image (which CIs serve this subsystem).
+including its linked subsystems (and which other CIs also serve them) and
+any linked specifications; the Subsystem Detail view is the mirror image
+(which CIs and specifications are linked to this subsystem).
 
 ## AI Assistant
 

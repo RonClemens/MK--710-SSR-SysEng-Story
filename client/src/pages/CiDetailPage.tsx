@@ -5,6 +5,7 @@ import type {
   DeltaMatrixRow,
   LogicalSubsystem,
   Recommendation,
+  Specification,
 } from "../types";
 
 interface Props {
@@ -15,8 +16,10 @@ interface Props {
   abRows: AbCompatibilityRow[];
   cotsRecords: CotsRecord[];
   recommendations: Recommendation[];
+  specifications: Specification[];
   onBack: () => void;
   onSelectSubsystem: (id: string) => void;
+  onSelectSpecification: (id: string) => void;
 }
 
 export function CiDetailPage({
@@ -27,8 +30,10 @@ export function CiDetailPage({
   abRows,
   cotsRecords,
   recommendations,
+  specifications,
   onBack,
   onSelectSubsystem,
+  onSelectSpecification,
 }: Props) {
   const linkedSubsystems = subsystems.filter((s) => ci.subsystemIds.includes(s.id));
 
@@ -138,6 +143,25 @@ export function CiDetailPage({
               <p><strong>Rationale:</strong> {row.rationale}</p>
               <p><strong>Parts list entry:</strong> {row.partsListEntry}</p>
               <p><strong>Obsolescence notes:</strong> {row.obsolescenceMonitoringNotes}</p>
+            </div>
+          ))
+        )}
+      </section>
+
+      <section>
+        <h3>Requirement Specifications</h3>
+        {specifications.length === 0 ? (
+          <p className="hint">No specifications linked to this CI yet.</p>
+        ) : (
+          specifications.map((spec) => (
+            <div className="detail-card" key={spec.id}>
+              <p>
+                <button className="link-button" onClick={() => onSelectSpecification(spec.id)}>
+                  <strong>{spec.title}</strong>
+                </button>{" "}
+                <span className="badge">{spec.domain}</span> <span className="badge">{spec.specType}</span>{" "}
+                <span className="badge">{spec.baseline}</span> <span className="badge badge-info">{spec.status}</span>
+              </p>
             </div>
           ))
         )}

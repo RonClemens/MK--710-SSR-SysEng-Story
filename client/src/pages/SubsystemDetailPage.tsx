@@ -1,13 +1,22 @@
-import type { ConfigurationItem, LogicalSubsystem } from "../types";
+import type { ConfigurationItem, LogicalSubsystem, Specification } from "../types";
 
 interface Props {
   subsystem: LogicalSubsystem;
   servingCis: ConfigurationItem[];
+  specifications: Specification[];
   onBack: () => void;
   onSelectCi: (id: string) => void;
+  onSelectSpecification: (id: string) => void;
 }
 
-export function SubsystemDetailPage({ subsystem, servingCis, onBack, onSelectCi }: Props) {
+export function SubsystemDetailPage({
+  subsystem,
+  servingCis,
+  specifications,
+  onBack,
+  onSelectCi,
+  onSelectSpecification,
+}: Props) {
   return (
     <div className="page">
       <button className="link-button" onClick={onBack}>
@@ -49,6 +58,25 @@ export function SubsystemDetailPage({ subsystem, servingCis, onBack, onSelectCi 
               ))}
             </ul>
           </>
+        )}
+      </section>
+
+      <section>
+        <h3>Requirement Specifications</h3>
+        {specifications.length === 0 ? (
+          <p className="hint">No specifications linked to this subsystem yet.</p>
+        ) : (
+          specifications.map((spec) => (
+            <div className="detail-card" key={spec.id}>
+              <p>
+                <button className="link-button" onClick={() => onSelectSpecification(spec.id)}>
+                  <strong>{spec.title}</strong>
+                </button>{" "}
+                <span className="badge">{spec.domain}</span> <span className="badge">{spec.specType}</span>{" "}
+                <span className="badge">{spec.baseline}</span> <span className="badge badge-info">{spec.status}</span>
+              </p>
+            </div>
+          ))
         )}
       </section>
     </div>

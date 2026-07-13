@@ -1,0 +1,154 @@
+import { useState } from "react";
+import { DataTable, type ColumnDef } from "../components/DataTable";
+import { Modal } from "../components/Modal";
+import { SpecMetadataForm, type SpecMetadataValues } from "../components/SpecMetadataForm";
+import { LEVEL_GUIDANCE, SPEC_TYPE_GUIDANCE, emptySections } from "../data/didGuidance";
+import {
+  SPEC_BASELINES,
+  SPEC_DOMAINS,
+  SPEC_LEVELS,
+  SPEC_STATUSES,
+  SPEC_TYPES,
+  type ConfigurationItem,
+  type LogicalSubsystem,
+  type Specification,
+} from "../types";
+import type { useEntity } from "../hooks/useEntity";
+
+interface Props {
+  entity: ReturnType<typeof useEntity<Specification>>;
+  subsystems: LogicalSubsystem[];
+  cis: ConfigurationItem[];
+  onSelectSpecification: (id: string) => void;
+}
+
+export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecification }: Props) {
+  const { rows, loading, error, create, remove } = entity;
+  const [showGuidance, setShowGuidance] = useState(true);
+  const [creating, setCreating] = useState(false);
+
+  const subsystemNames = Object.fromEntries(subsystems.map((s) => [s.id, s.name]));
+  const ciNames = Object.fromEntries(cis.map((c) => [c.id, c.name]));
+
+  function linkedTo(spec: Specification): string {
+    if (spec.level === "Subsystem" && spec.linkedSubsystemId) return subsystemNames[spec.linkedSubsystemId] ?? "—";
+    if (spec.level === "CI" && spec.linkedCiId) return ciNames[spec.linkedCiId] ?? "—";
+    if (spec.level === "System") return "(whole system)";
+    return "(not yet linked)";
+  }
+
+  const columns: ColumnDef<Specification>[] = [
+    {
+      key: "title",
+      label: "Title",
+      sortValue: (r) => r.title,
+      render: (r) => (
+        <button className="link-button" onClick={() => onSelectSpecification(r.id)}>
+          {r.title}
+        </button>
+      ),
+    },
+    { key: "level", label: "Level", filterOptions: SPEC_LEVELS, filterValue: (r) => r.level },
+    { key: "domain", label: "Domain", filterOptions: SPEC_DOMAINS, filterValue: (r) => r.domain },
+    { key: "specType", label: "Spec Type", filterOptions: SPEC_TYPES, filterValue: (r) => r.specType },
+    { key: "baseline", label: "Baseline", filterOptions: SPEC_BASELINES, filterValue: (r) => r.baseline },
+    { key: "status", label: "Status", filterOptions: SPEC_STATUSES, filterValue: (r) => r.status },
+    { key: "linkedTo", label: "Linked to", render: linkedTo },
+  ];
+
+  return (
+    <div className="page">
+      <div className="page-header">
+        <h2>Requirement Specifications</h2>
+        <span className="hint">DID-style templates for HRS/SRS at System, Subsystem, and CI level.</span>
+        <button className="button-primary" onClick={() => setCreating(true)}>
+          + Add Specification
+        </button>
+      </div>
+
+      <button className="link-button" onClick={() => setShowGuidance((v) => !v)}>
+        {showGuidance ? "Hide" : "Show"} level & spec-type guidance
+      </button>
+
+      {showGuidance && (
+        <div className="did-guidance">
+          <div className="did-guidance-grid">
+            {SPEC_LEVELS.map((level) => (
+              <div className="detail-card" key={level}>
+                <h4>{level}</h4>
+                <p>{LEVEL_GUIDANCE[level].summary}</p>
+                <p className="did-guidance-label did-pro">Pros</p>
+                <ul>
+                  {LEVEL_GUIDANCE[level].pros.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ul>
+                <p className="did-guidance-label did-con">Cons</p>
+                <ul>
+                  {LEVEL_GUIDANCE[level].cons.map((c, i) => (
+                    <li key={i}>{c}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="did-guidance-grid">
+            {SPEC_TYPES.map((type) => (
+              <div className="detail-card" key={type}>
+                <h4>{type} Specification</h4>
+                <p>{SPEC_TYPE_GUIDANCE[type].summary}</p>
+                <p className="hint">{SPEC_TYPE_GUIDANCE[type].whenUsed}</p>
+              </div>
+            ))}
+          </div>
+          <p className="hint">
+            Baseline A and Baseline B mature through Development → Production at different rates while
+            influencing each other at UUT-relevant interfaces — track that relationship on the A/B Compatibility
+            tab, not by duplicating content across specs.
+          </p>
+        </div>
+      )}
+
+      {error && <p className="form-error">{error}</p>}
+      {loading ? (
+        <p>Loading…</p>
+      ) : (
+        <DataTable
+          columns={columns}
+          rows={rows}
+          onEdit={(row) => onSelectSpecification(row.id)}
+          onDelete={(row) => {
+            if (confirm(`Delete specification "${row.title}"?`)) remove(row.id);
+          }}
+          emptyMessage="No specifications yet."
+        />
+      )}
+
+      {creating && (
+        <Modal title="Add Specification" onClose={() => setCreating(false)}>
+          <SpecMetadataForm
+            initial={{
+              title: "",
+              level: "CI",
+              domain: "Hardware",
+              specType: "Development",
+              baseline: "Baseline A",
+              status: "Draft",
+              linkedSubsystemId: null,
+              linkedCiId: null,
+            }}
+            subsystems={subsystems}
+            cis={cis}
+            onCancel={() => setCreating(false)}
+            onSubmit={async (values: SpecMetadataValues) => {
+              const created = await create({ ...values, sections: emptySections() });
+              setCreating(false);
+              onSelectSpecification(created.id);
+            }}
+          />
+        </Modal>
+      )}
+    </div>
+  );
+}

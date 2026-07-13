@@ -40,6 +40,7 @@ async function start() {
   app.use("/api/cots-records", crudRouter("cotsRecords"));
   app.use("/api/recommendations", crudRouter("recommendations"));
   app.use("/api/interfaces", crudRouter("interfaces"));
+  app.use("/api/specifications", crudRouter("specifications"));
   app.use("/api/data", dataRouter);
 
   if (aiEnabled) {

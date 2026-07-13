@@ -118,6 +118,52 @@ export interface InterfaceRecord {
   updatedAt: string;
 }
 
+// DID-style requirement specification templates (see MIL-STD-961E System/
+// Subsystem/CI specification conventions and DI-IPSC-8143x SRS/SSS DIDs,
+// adapted). Level determines which physical/logical element (if any) the
+// spec is scoped to; specType distinguishes a still-evolving Development
+// specification from a design-validated Production specification, per
+// baseline, since Baseline A and Baseline B mature through these states on
+// different timelines while influencing each other (see A/B Compatibility).
+export type SpecLevel = "System" | "Subsystem" | "CI";
+export type SpecDomain = "Hardware" | "Software";
+export type SpecType = "Development" | "Production";
+export type SpecBaseline = "Baseline A" | "Baseline B";
+export type SpecStatus = "Draft" | "In Review" | "Approved" | "Under ECP";
+
+export const SPEC_SECTION_KEYS = [
+  "scope",
+  "applicableDocuments",
+  "functionalPerformance",
+  "interfaces",
+  "environmental",
+  "designConstraints",
+  "safety",
+  "security",
+  "humanFactors",
+  "logistics",
+  "verificationProvisions",
+  "notes",
+] as const;
+export type SpecSectionKey = (typeof SPEC_SECTION_KEYS)[number];
+
+export type SpecSections = Record<SpecSectionKey, string>;
+
+export interface Specification {
+  id: string;
+  title: string;
+  level: SpecLevel;
+  domain: SpecDomain;
+  specType: SpecType;
+  baseline: SpecBaseline;
+  status: SpecStatus;
+  linkedSubsystemId: string | null;
+  linkedCiId: string | null;
+  sections: SpecSections;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Database {
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
@@ -126,6 +172,7 @@ export interface Database {
   cotsRecords: CotsRecord[];
   recommendations: Recommendation[];
   interfaces: InterfaceRecord[];
+  specifications: Specification[];
 }
 
 export const LOGICAL_SUBSYSTEM_SOURCES: LogicalSubsystemSource[] = [
@@ -155,3 +202,9 @@ export const RECOMMENDATION_CATEGORIES: RecommendationCategory[] = [
   "other",
 ];
 export const RECOMMENDATION_STATUSES: RecommendationStatus[] = ["open", "in progress", "done"];
+
+export const SPEC_LEVELS: SpecLevel[] = ["System", "Subsystem", "CI"];
+export const SPEC_DOMAINS: SpecDomain[] = ["Hardware", "Software"];
+export const SPEC_TYPES: SpecType[] = ["Development", "Production"];
+export const SPEC_BASELINES: SpecBaseline[] = ["Baseline A", "Baseline B"];
+export const SPEC_STATUSES: SpecStatus[] = ["Draft", "In Review", "Approved", "Under ECP"];

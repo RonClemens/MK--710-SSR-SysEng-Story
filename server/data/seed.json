@@ -234,5 +234,88 @@
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     }
+  ],
+  "specifications": [
+    {
+      "id": "spec-001",
+      "title": "System Requirements Specification — Baseline A",
+      "level": "System",
+      "domain": "Hardware",
+      "specType": "Development",
+      "baseline": "Baseline A",
+      "status": "Approved",
+      "linkedSubsystemId": null,
+      "linkedCiId": null,
+      "sections": {
+        "scope": "Establishes top-level operational and performance requirements for Baseline A as a whole, independent of physical decomposition into CIs.",
+        "applicableDocuments": "Capability Development Document (CDD); program ConOps; SFR-agreed requirements baseline.",
+        "functionalPerformance": "Shall provide automated stimulus/response testing of the UUT across the defined operational envelope; shall report diagnostic status within program-specified latency bounds.",
+        "interfaces": "External interfaces to the UUT and to organic support equipment; internal decomposition is intentionally left to subsystem/CI-level specs, not restated here.",
+        "environmental": "Per program environmental design reference mission profile (temperature, vibration, EMI) — inherited by all subsystem/CI specs unless a tailored exception is documented at that level.",
+        "designConstraints": "None prescribed at this level by design — system spec intentionally avoids design-solution language to preserve subsystem/CI trade space.",
+        "safety": "System shall fail to a safe state on loss of UUT communication.",
+        "security": "N/A for this illustrative dataset.",
+        "humanFactors": "Test operator workload shall not exceed program-defined thresholds during nominal test sequences.",
+        "logistics": "Deferred to CI-level specs; not meaningfully allocable at system level.",
+        "verificationProvisions": "System-level requirements verified via integrated DT&E; subsystem/CI-level verification methods are specified in those respective specs.",
+        "notes": "Illustrative/demo content only — not real program data."
+      },
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "spec-002",
+      "title": "Test Set (MHC/MCC/IPS Assembly) — CI Development Specification",
+      "level": "CI",
+      "domain": "Hardware",
+      "specType": "Development",
+      "baseline": "Baseline A",
+      "status": "In Review",
+      "linkedSubsystemId": null,
+      "linkedCiId": "ci-001",
+      "sections": {
+        "scope": "Development specification for the Test Set CI, covering the MHC/MCC/IPS assembly as currently decomposed pending the CI-structure consolidation recommendation.",
+        "applicableDocuments": "System Requirements Specification (spec-001); ICD-TS-014.",
+        "functionalPerformance": "Shall generate and capture UUT stimulus/response signals per SFR-4.2.1; shall format diagnostic messages for transport to test scripts.",
+        "interfaces": "Per ICD-TS-014; internal sub-module interfaces tracked in the CI x CI N² diagram (see MHC ↔ MCC).",
+        "environmental": "Conduction-cooled per chassis spec; see Delta Matrix for as-built vs. SFR-agreed allocation discrepancy on sub-module decomposition.",
+        "designConstraints": "Must fit existing Test Set card cage; COTS sub-assemblies (MCC, IPS) tracked as separate COTS item records pending consolidation.",
+        "safety": "No hazardous voltages exposed at UUT interface under single-fault conditions.",
+        "security": "N/A for this illustrative dataset.",
+        "humanFactors": "N/A beyond system-level allocation.",
+        "logistics": "MCC and IPS obsolescence monitored via their COTS item records, not restated here.",
+        "verificationProvisions": "Stimulus/response timing verified by test; COTS sub-assembly capability verified by inspection of vendor data sheet (see COTS Records).",
+        "notes": "This CI is flagged for over-decomposition consolidation — see CI Inventory and rec-001. Keep this spec's scope tight to avoid re-litigating requirements already captured in COTS item records once consolidation happens."
+      },
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-06-10T00:00:00.000Z"
+    },
+    {
+      "id": "spec-003",
+      "title": "System Requirements Specification — Baseline B (early draft)",
+      "level": "System",
+      "domain": "Hardware",
+      "specType": "Development",
+      "baseline": "Baseline B",
+      "status": "Draft",
+      "linkedSubsystemId": null,
+      "linkedCiId": null,
+      "sections": {
+        "scope": "Early-draft top-level requirements for Baseline B. Content is intentionally sparse — Baseline B is still in concept/early design and should not be treated as stable.",
+        "applicableDocuments": "TBD pending Baseline B CDD update.",
+        "functionalPerformance": "TBD — see A/B Compatibility Matrix for the specific UUT-relevant interfaces already being tracked ahead of full requirements definition.",
+        "interfaces": "Baseline B intends to standardize on Ethernet-based diagnostic messaging where Baseline A uses a proprietary serial protocol (see ab-001) — this is the leading edge of what this spec will need to formalize.",
+        "environmental": "TBD.",
+        "designConstraints": "TBD.",
+        "safety": "TBD.",
+        "security": "TBD.",
+        "humanFactors": "TBD.",
+        "logistics": "TBD.",
+        "verificationProvisions": "TBD.",
+        "notes": "Illustrative/demo content only. This spec should mature roughly in step with Baseline A's transition from Development to Production specs — track that relationship via the A/B Compatibility Matrix, not by duplicating content here."
+      },
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    }
   ]
 }

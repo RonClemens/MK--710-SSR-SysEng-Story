@@ -482,6 +482,66 @@ button {
   align-items: center;
 }
 
+.did-guidance {
+  margin: 1rem 0 1.5rem;
+}
+
+.did-guidance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.did-guidance-grid-2 {
+  grid-template-columns: 1fr 1fr;
+  margin: 0.6rem 0;
+}
+
+.did-guidance-grid h4 {
+  margin: 0 0 0.4rem;
+  color: var(--navy);
+}
+
+.did-guidance-grid ul {
+  margin: 0.2rem 0 0.6rem;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+}
+
+.did-guidance-grid li {
+  margin-bottom: 0.3rem;
+}
+
+.did-guidance-label {
+  margin: 0.5rem 0 0;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.did-pro {
+  color: #2f7a3a;
+}
+
+.did-con {
+  color: var(--danger);
+}
+
+.spec-section {
+  border-top: 1px solid var(--border);
+  padding-top: 0.9rem;
+}
+
+.spec-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
 /* AI Assistant panel */
 
 .ai-panel {
