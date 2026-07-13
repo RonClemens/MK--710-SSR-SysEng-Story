@@ -93,7 +93,10 @@ Seven related entities (see `server/src/types.ts` / `client/src/types/index.ts`)
   pre-filled with that hint where you can write and save a real documented
   interface, which persists as an `Interface` record and flips the cell to
   "documented" (●). Derived hints are a starting point, not a substitute for
-  an actual documented interface.
+  an actual documented interface. Any Subsystem×Subsystem cell can drill into
+  a CI×CI view filtered to just the CIs behind that subsystem pair — useful
+  for showing how many CI-level interfaces actually implement what looks like
+  one clean subsystem-level interface (integration bloat).
 
 All entities are fully CRUD-editable in the UI (add/edit/delete, no page
 reloads). The CI Detail view rolls up every related row for a given CI,

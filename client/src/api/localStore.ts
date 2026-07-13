@@ -24,6 +24,24 @@ function normalize(db: Partial<Database>): Database {
   };
 }
 
+// For a browser's own previously-cached blob only (not for explicit JSON
+// imports, which should be honored exactly as given): if a whole collection
+// key is missing entirely (undefined, as opposed to an intentionally emptied
+// []), the cache predates that feature shipping. Seed it with the
+// illustrative starter content instead of leaving it empty, since the
+// alternative is this demo silently losing features on a stale cache.
+function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Database>; changed: boolean } {
+  const changed = db.logicalSubsystems === undefined || db.interfaces === undefined;
+  return {
+    db: {
+      ...db,
+      logicalSubsystems: db.logicalSubsystems ?? SEED_DATA.logicalSubsystems,
+      interfaces: db.interfaces ?? SEED_DATA.interfaces,
+    },
+    changed,
+  };
+}
+
 function load(): Database {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
@@ -31,7 +49,10 @@ function load(): Database {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
     return seeded;
   }
-  return normalize(JSON.parse(raw) as Partial<Database>);
+  const { db: backfilled, changed } = backfillNewCollectionsFromSeed(JSON.parse(raw) as Partial<Database>);
+  const normalized = normalize(backfilled);
+  if (changed) persist(normalized);
+  return normalized;
 }
 
 function persist(db: Database) {

@@ -15,6 +15,8 @@ interface N2GridProps {
   onSave: (params: { id?: string; aId: string; bId: string; description: string }) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onSelectElement: (id: string) => void;
+  /** Subsystem-scope grids only: drill into the CI×CI grid filtered to the CIs serving these two subsystems. */
+  onDrillDown?: (aId: string, bId: string) => void;
 }
 
 function shortCode(index: number): string {
@@ -25,7 +27,16 @@ function findInterface(interfaces: InterfaceRecord[], aId: string, bId: string):
   return interfaces.find((r) => (r.aId === aId && r.bId === bId) || (r.aId === bId && r.bId === aId));
 }
 
-export function N2Grid({ scope, elements, interfaces, getDerivedHint, onSave, onDelete, onSelectElement }: N2GridProps) {
+export function N2Grid({
+  scope,
+  elements,
+  interfaces,
+  getDerivedHint,
+  onSave,
+  onDelete,
+  onSelectElement,
+  onDrillDown,
+}: N2GridProps) {
   const [editingPair, setEditingPair] = useState<{ aId: string; bId: string } | null>(null);
   const [draft, setDraft] = useState("");
   const [saving, setSaving] = useState(false);
@@ -164,6 +175,11 @@ export function N2Grid({ scope, elements, interfaces, getDerivedHint, onSave, on
                   <button className="link-button" onClick={() => openCell(a.id, b.id)}>
                     Edit
                   </button>
+                  {onDrillDown && (
+                    <button className="link-button" onClick={() => onDrillDown(a.id, b.id)}>
+                      View CI-level interfaces →
+                    </button>
+                  )}
                 </p>
                 <p>{r.description}</p>
               </div>
@@ -180,6 +196,18 @@ export function N2Grid({ scope, elements, interfaces, getDerivedHint, onSave, on
               <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={4} />
             </label>
             {error && <p className="form-error">{error}</p>}
+            {onDrillDown && editingPair && (
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => {
+                  onDrillDown(editingPair.aId, editingPair.bId);
+                  setEditingPair(null);
+                }}
+              >
+                View CI-level interfaces for these subsystems →
+              </button>
+            )}
             <div className="form-actions">
               {editingExisting && (
                 <button type="button" className="link-button danger" onClick={handleDelete} disabled={saving}>
