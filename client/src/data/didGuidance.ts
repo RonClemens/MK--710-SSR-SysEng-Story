@@ -1,10 +1,22 @@
-import type { SpecLevel, SpecSectionKey, SpecSections, SpecType } from "../types";
+import type { SpecDomain, SpecLevel, SpecSectionKey, SpecSections, SpecType } from "../types";
 import { SPEC_SECTION_KEYS } from "../types";
 
 export type SectionRelevance = "Required" | "Recommended" | "Typically N/A";
 
 export function emptySections(): SpecSections {
   return Object.fromEntries(SPEC_SECTION_KEYS.map((key) => [key, ""])) as SpecSections;
+}
+
+// "CI" reads ambiguously on its own (and is a real word in French/Italian,
+// which machine-translation tools happily mangle) — spell out the
+// domain-specific DoD term instead: HWCI (Hardware Configuration Item) or
+// CSCI (Computer Software Configuration Item). Falls back to "HWCI / CSCI"
+// when the domain isn't known yet (e.g. a domain-agnostic guidance card).
+export function levelLabel(level: SpecLevel, domain?: SpecDomain): string {
+  if (level !== "CI") return level;
+  if (domain === "Software") return "CSCI";
+  if (domain === "Hardware") return "HWCI";
+  return "HWCI / CSCI";
 }
 
 export const SECTION_META: Record<SpecSectionKey, { label: string; description: string }> = {

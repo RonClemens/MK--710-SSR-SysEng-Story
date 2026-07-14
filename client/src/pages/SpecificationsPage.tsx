@@ -2,7 +2,7 @@ import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
 import { Modal } from "../components/Modal";
 import { SpecMetadataForm, type SpecMetadataValues } from "../components/SpecMetadataForm";
-import { LEVEL_GUIDANCE, SPEC_TYPE_GUIDANCE, emptySections } from "../data/didGuidance";
+import { LEVEL_GUIDANCE, SPEC_TYPE_GUIDANCE, emptySections, levelLabel } from "../data/didGuidance";
 import {
   SPEC_BASELINES,
   SPEC_DOMAINS,
@@ -48,7 +48,14 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
         </button>
       ),
     },
-    { key: "level", label: "Level", filterOptions: SPEC_LEVELS, filterValue: (r) => r.level },
+    {
+      key: "level",
+      label: "Level",
+      render: (r) => levelLabel(r.level, r.domain),
+      filterOptions: SPEC_LEVELS,
+      filterOptionLabels: { CI: "HWCI / CSCI" },
+      filterValue: (r) => r.level,
+    },
     { key: "domain", label: "Domain", filterOptions: SPEC_DOMAINS, filterValue: (r) => r.domain },
     { key: "specType", label: "Spec Type", filterOptions: SPEC_TYPES, filterValue: (r) => r.specType },
     { key: "baseline", label: "Baseline", filterOptions: SPEC_BASELINES, filterValue: (r) => r.baseline },
@@ -60,7 +67,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
     <div className="page">
       <div className="page-header">
         <h2>Requirement Specifications</h2>
-        <span className="hint">DID-style templates for HRS/SRS at System, Subsystem, and CI level.</span>
+        <span className="hint">DID-style templates for HRS/SRS at System, Subsystem, and HWCI/CSCI level.</span>
         <button className="button-primary" onClick={() => setCreating(true)}>
           + Add Specification
         </button>
@@ -75,7 +82,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
           <div className="did-guidance-grid">
             {SPEC_LEVELS.map((level) => (
               <div className="detail-card" key={level}>
-                <h4>{level}</h4>
+                <h4>{levelLabel(level)}</h4>
                 <p>{LEVEL_GUIDANCE[level].summary}</p>
                 <p className="did-guidance-label did-pro">Pros</p>
                 <ul>

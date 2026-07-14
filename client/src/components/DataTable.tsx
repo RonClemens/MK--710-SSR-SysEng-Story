@@ -6,6 +6,7 @@ export interface ColumnDef<T> {
   render?: (row: T) => React.ReactNode;
   sortValue?: (row: T) => string | number;
   filterOptions?: string[];
+  filterOptionLabels?: Record<string, string>;
   filterValue?: (row: T) => string;
 }
 
@@ -78,7 +79,7 @@ export function DataTable<T extends { id: string }>({
                 <option value="">All</option>
                 {col.filterOptions!.map((opt) => (
                   <option key={opt} value={opt}>
-                    {opt}
+                    {col.filterOptionLabels?.[opt] ?? opt}
                   </option>
                 ))}
               </select>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { levelLabel } from "../data/didGuidance";
 import {
   SPEC_BASELINES,
   SPEC_DOMAINS,
@@ -79,7 +80,7 @@ export function SpecMetadataForm({ initial, subsystems, cis, onSubmit, onCancel,
         <select value={level} onChange={(e) => setLevel(e.target.value as SpecLevel)}>
           {SPEC_LEVELS.map((l) => (
             <option key={l} value={l}>
-              {l}
+              {levelLabel(l, domain)}
             </option>
           ))}
         </select>

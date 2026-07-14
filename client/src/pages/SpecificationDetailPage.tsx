@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { Modal } from "../components/Modal";
 import { SpecMetadataForm, type SpecMetadataValues } from "../components/SpecMetadataForm";
-import { LEVEL_GUIDANCE, SECTION_META, SECTION_RELEVANCE, SPEC_TYPE_GUIDANCE, ORDERED_SECTION_KEYS } from "../data/didGuidance";
+import {
+  LEVEL_GUIDANCE,
+  SECTION_META,
+  SECTION_RELEVANCE,
+  SPEC_TYPE_GUIDANCE,
+  ORDERED_SECTION_KEYS,
+  levelLabel,
+} from "../data/didGuidance";
 import type { ConfigurationItem, LogicalSubsystem, SpecSections, Specification } from "../types";
 
 interface Props {
@@ -52,7 +59,7 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
       </button>
       <div className="page-header">
         <h2>{spec.title}</h2>
-        <span className="badge">{spec.level}</span>
+        <span className="badge">{levelLabel(spec.level, spec.domain)}</span>
         <span className="badge">{spec.domain}</span>
         <span className="badge">{spec.specType}</span>
         <span className="badge">{spec.baseline}</span>
@@ -100,7 +107,7 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
       </div>
 
       <section>
-        <h3>Why {spec.level}-level?</h3>
+        <h3>Why {levelLabel(spec.level, spec.domain)}-level?</h3>
         <p>{LEVEL_GUIDANCE[spec.level].summary}</p>
         <div className="did-guidance-grid did-guidance-grid-2">
           <div>
