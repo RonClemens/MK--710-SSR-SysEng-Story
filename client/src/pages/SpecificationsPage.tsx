@@ -2,7 +2,14 @@ import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
 import { Modal } from "../components/Modal";
 import { SpecMetadataForm, type SpecMetadataValues } from "../components/SpecMetadataForm";
-import { LEVEL_GUIDANCE, SPEC_TYPE_GUIDANCE, emptySections, levelLabel } from "../data/didGuidance";
+import {
+  LEVEL_GUIDANCE,
+  SPEC_TYPE_GUIDANCE,
+  COMPETENCY_FRAMEWORK_INTRO,
+  COMPETENCY_CLASS,
+  emptySections,
+  levelLabel,
+} from "../data/didGuidance";
 import {
   SPEC_BASELINES,
   SPEC_DOMAINS,
@@ -79,11 +86,16 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
 
       {showGuidance && (
         <div className="did-guidance">
+          <p className="hint">{COMPETENCY_FRAMEWORK_INTRO}</p>
           <div className="did-guidance-grid">
             {SPEC_LEVELS.map((level) => (
               <div className="detail-card" key={level}>
                 <h4>{levelLabel(level)}</h4>
                 <p>{LEVEL_GUIDANCE[level].summary}</p>
+                <p className={`did-guidance-label ${COMPETENCY_CLASS[LEVEL_GUIDANCE[level].competency.weight]}`}>
+                  {LEVEL_GUIDANCE[level].competency.weight}
+                </p>
+                <p>{LEVEL_GUIDANCE[level].competency.note}</p>
                 <p className="did-guidance-label did-pro">Pros</p>
                 <ul>
                   {LEVEL_GUIDANCE[level].pros.map((p, i) => (

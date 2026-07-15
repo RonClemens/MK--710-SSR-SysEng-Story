@@ -7,6 +7,7 @@ import {
   SECTION_RELEVANCE,
   SPEC_TYPE_GUIDANCE,
   ORDERED_SECTION_KEYS,
+  COMPETENCY_CLASS,
   levelLabel,
 } from "../data/didGuidance";
 import type { ConfigurationItem, LogicalSubsystem, SpecSections, Specification } from "../types";
@@ -109,6 +110,10 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
       <section>
         <h3>Why {levelLabel(spec.level, spec.domain)}-level?</h3>
         <p>{LEVEL_GUIDANCE[spec.level].summary}</p>
+        <p className={`did-guidance-label ${COMPETENCY_CLASS[LEVEL_GUIDANCE[spec.level].competency.weight]}`}>
+          {LEVEL_GUIDANCE[spec.level].competency.weight}
+        </p>
+        <p>{LEVEL_GUIDANCE[spec.level].competency.note}</p>
         <div className="did-guidance-grid did-guidance-grid-2">
           <div>
             <p className="did-guidance-label did-pro">Pros</p>

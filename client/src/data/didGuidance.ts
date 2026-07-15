@@ -19,6 +19,12 @@ export function levelLabel(level: SpecLevel, domain?: SpecDomain): string {
   return "HWCI / CSCI";
 }
 
+export const COMPETENCY_CLASS: Record<CompetencyWeight, string> = {
+  "Process-led": "did-competency-process",
+  "Domain-led": "did-competency-domain",
+  "Process & domain in tension": "did-competency-tension",
+};
+
 export const SECTION_META: Record<SpecSectionKey, { label: string; description: string }> = {
   scope: { label: "1. Scope", description: "Identification and purpose of the item; what this spec governs." },
   applicableDocuments: {
@@ -58,7 +64,28 @@ export const SECTION_META: Record<SpecSectionKey, { label: string; description: 
   notes: { label: "5. Notes", description: "Glossary, acronyms, and any other supporting information." },
 };
 
-export const LEVEL_GUIDANCE: Record<SpecLevel, { summary: string; pros: string[]; cons: string[] }> = {
+export type CompetencyWeight = "Process-led" | "Domain-led" | "Process & domain in tension";
+
+// A strong systems engineer needs two distinct competencies: process
+// knowledge (the domain-independent "how" — requirements discipline,
+// decomposition, interface management, V&V, configuration management) and
+// domain/product knowledge (the "what" — deep familiarity with the actual
+// hardware, software, and operational context of this system). Process
+// without domain produces compliant-but-blind paperwork; domain without
+// process produces ad-hoc engineering that doesn't scale or survive
+// personnel turnover. Each spec level below leans on a different mix.
+export const COMPETENCY_FRAMEWORK_INTRO =
+  "A strong systems engineer needs two distinct competencies: process knowledge (the domain-independent \"how\" — " +
+  "requirements discipline, decomposition, interface management, V&V, configuration management) and domain/product " +
+  "knowledge (the \"what\" — deep familiarity with the actual hardware, software, and operational context of this " +
+  "system). Process without domain produces compliant-but-blind paperwork; domain without process produces ad-hoc " +
+  "engineering that doesn't scale or survive personnel turnover. Each specification level below leans on a " +
+  "different mix of the two.";
+
+export const LEVEL_GUIDANCE: Record<
+  SpecLevel,
+  { summary: string; pros: string[]; cons: string[]; competency: { weight: CompetencyWeight; note: string } }
+> = {
   System: {
     summary:
       "Defines what the overall system must do and how it interacts with its operational environment and external systems — independent of how it's physically decomposed.",
@@ -72,6 +99,11 @@ export const LEVEL_GUIDANCE: Record<SpecLevel, { summary: string; pros: string[]
       "Risk of scope creep into design-prescriptive language, which constrains subsystem/CI trade space unnecessarily.",
       "On this program specifically: with no validated logical subsystem layer until recently, system-to-CI traceability skipped a level, making system-spec requirements hard to verify without an intermediate allocation.",
     ],
+    competency: {
+      weight: "Process-led",
+      note:
+        "Drafting a competent System spec draws mainly on requirements-engineering discipline: decomposing a mission need into verifiable, allocable statements and holding the line against design-solution language. You can write a structurally sound System spec for a domain you don't deeply know yet, provided you rigorously capture what the people who do know it are telling you. The failure mode is process without domain grounding — internally consistent requirements that turn out to be operationally or physically wrong.",
+    },
   },
   Subsystem: {
     summary:
@@ -86,6 +118,11 @@ export const LEVEL_GUIDANCE: Record<SpecLevel, { summary: string; pros: string[]
       "A subsystem is often satisfied by multiple CIs jointly (many-to-many), so verification ownership isn't always a clean 1:1 — a subsystem-level requirement may need a qualification strategy spanning several CI specs (use the N² drill-down to see how many).",
       "Another document layer to keep synchronized if the logical architecture is still being validated concurrently with detailed design, as on this program.",
     ],
+    competency: {
+      weight: "Process & domain in tension",
+      note:
+        "Choosing a subsystem boundary that corresponds to a real coherent function — not just a box on a diagram — is a domain-knowledge judgment; no process technique derives it for you. Documenting, allocating, and maintaining that boundary once chosen is process discipline. This program's SSDD-inherited, unverified subsystems are what happens when the process step (independent functional decomposition) gets skipped and domain-knowledgeable engineers default to describing the system the way it's physically racked instead.",
+    },
   },
   CI: {
     summary:
@@ -100,6 +137,11 @@ export const LEVEL_GUIDANCE: Record<SpecLevel, { summary: string; pros: string[]
       "Hardest level to keep synchronized with as-built reality — this is exactly the Delta/Traceability Matrix problem already tracked elsewhere in this tool.",
       "Writing a full CI spec for something that should really be a COTS item record (capability-based requirement + vendor data sheet) is wasted effort — check the CI's type and over-decomposition flag before defaulting to a full spec.",
     ],
+    competency: {
+      weight: "Domain-led",
+      note:
+        "A genuinely correct HWCI/CSCI spec requires real product knowledge — actual form/fit, real environmental tolerances, verification methods that make sense for the specific part. Process discipline here mostly shows up as restraint: recognizing when something is really a COTS item rather than a from-scratch CI, and keeping the spec synchronized with as-built reality (the same problem the Delta Matrix tracks). Strong process skills without domain depth produce a well-structured but substantively hollow or wrong CI spec.",
+    },
   },
 };
 

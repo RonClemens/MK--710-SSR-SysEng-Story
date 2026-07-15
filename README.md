@@ -119,6 +119,18 @@ Eight related entities (see `server/src/types.ts` / `client/src/types/index.ts`)
   interfaces — track that relationship via the A/B Compatibility Matrix, not
   by duplicating content across specs.
 
+  The guidance also names which of the two core SE competencies each level
+  leans on — **process knowledge** (the domain-independent "how": requirements
+  discipline, decomposition, interface management, V&V, configuration
+  management) versus **domain/product knowledge** (the "what": actual
+  familiarity with this system's hardware, software, and operational
+  context). System-level specs are **process-led**; HWCI/CSCI-level specs are
+  **domain-led**; Subsystem-level specs sit where the two are **in tension** —
+  choosing a real functional boundary takes domain judgment no process
+  technique supplies, while documenting and maintaining it is process
+  discipline. This program's SSDD-inherited, unverified subsystems are what
+  happens when that process step gets skipped.
+
 All entities are fully CRUD-editable in the UI (add/edit/delete, no page
 reloads). The CI Detail view rolls up every related row for a given CI,
 including its linked subsystems (and which other CIs also serve them) and

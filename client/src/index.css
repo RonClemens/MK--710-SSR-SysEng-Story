@@ -529,6 +529,34 @@ button {
   color: var(--danger);
 }
 
+.did-competency-process,
+.did-competency-domain,
+.did-competency-tension {
+  display: inline-block;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-top: 0.6rem;
+}
+
+.did-competency-process {
+  background: var(--navy);
+  color: white;
+}
+
+.did-competency-domain {
+  background: var(--ice);
+  color: var(--navy-dark);
+}
+
+.did-competency-tension {
+  background: #fbe9dd;
+  color: var(--amber);
+}
+
 .spec-section {
   border-top: 1px solid var(--border);
   padding-top: 0.9rem;
