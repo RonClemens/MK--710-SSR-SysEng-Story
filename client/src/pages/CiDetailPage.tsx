@@ -1,3 +1,4 @@
+import { EditableText } from "../components/EditableText";
 import type {
   AbCompatibilityRow,
   ConfigurationItem,
@@ -69,9 +70,12 @@ export function CiDetailPage({
         ) : (
           <>
             {linkedSubsystems.length >= 2 && (
-              <p className="hint">
-                This CI serves multiple subsystems — that overlap is useful signal, not necessarily a problem.
-              </p>
+              <EditableText
+                contentKey="page.ciDetail.overlapNote"
+                defaultValue="This CI serves multiple subsystems — that overlap is useful signal, not necessarily a problem."
+                as="p"
+                className="hint"
+              />
             )}
             {linkedSubsystems.map((s) => {
               const siblings = allCis.filter((c) => c.id !== ci.id && c.subsystemIds.includes(s.id));

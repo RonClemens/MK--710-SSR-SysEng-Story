@@ -63,7 +63,9 @@ even if it's misconfigured.
 
 ## Data model
 
-Eight related entities (see `server/src/types.ts` / `client/src/types/index.ts`):
+Eight structured entities (see `server/src/types.ts` / `client/src/types/index.ts`),
+plus a ninth, `ContentEntry`, for editable site prose (see
+[Editable site content](#editable-site-content) below):
 
 - **Logical Subsystems** — the functional/behavioral decomposition layer this
   program's CI allocation skipped (it went straight from system-level
@@ -136,6 +138,32 @@ reloads). The CI Detail view rolls up every related row for a given CI,
 including its linked subsystems (and which other CIs also serve them) and
 any linked specifications; the Subsystem Detail view is the mirror image
 (which CIs and specifications are linked to this subsystem).
+
+## Editable site content
+
+Beyond the structured entity data above, most of the app's guidance prose
+(the DID level pros/cons/competency framing, spec-type guidance, section
+descriptions, page hints, and a few SE-judgment sentences on the CI/Subsystem
+detail views) is itself editable in place, versioned separately from the
+structured entities:
+
+- Toggle **Edit Mode** in the header (persisted per-browser via
+  `localStorage`). While on, editable prose is outlined with a pencil (✎)
+  button; click it to open an editor with Save/Cancel, a **Reset to
+  original** option (removes the override, reverting to the hardcoded
+  default), and a **version history** panel listing every prior value with a
+  **Revert to this** action per entry.
+- Backed by a ninth entity, `ContentEntry` (`key`, `value`, `history[]`,
+  `updatedAt`), stored the same way as the rest of the data — server-side
+  JSON in normal mode, `localStorage` in the static/Pages build — and
+  included in Export/Import.
+- Deliberately out of scope: structural UI (labels, button/tab text) and the
+  entire AI Assistant panel, including its CUI/security banner — those stay
+  fixed regardless of Edit Mode, since drifting security-relevant copy is a
+  risk this feature shouldn't introduce.
+- This is a content-versioning layer, not a program-data audit trail — it
+  exists so the app's own guidance text can be refined in place by whoever's
+  using it, with a way to see what changed and undo it.
 
 ## AI Assistant
 

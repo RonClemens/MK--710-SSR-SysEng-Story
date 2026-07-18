@@ -1,3 +1,4 @@
+import { EditableText } from "../components/EditableText";
 import type { ConfigurationItem, LogicalSubsystem, Specification } from "../types";
 
 interface Props {
@@ -39,8 +40,12 @@ export function SubsystemDetailPage({
           <>
             {servingCis.length >= 2 && (
               <p className="hint">
-                {servingCis.length} CIs serve this subsystem — that overlap is expected signal for a true
-                functional boundary, not necessarily a problem to resolve.
+                {servingCis.length} CIs serve this subsystem —{" "}
+                <EditableText
+                  contentKey="page.subsystemDetail.overlapNote"
+                  defaultValue="that overlap is expected signal for a true functional boundary, not necessarily a problem to resolve."
+                  as="span"
+                />
               </p>
             )}
             <ul>

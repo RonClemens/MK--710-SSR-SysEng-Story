@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
+import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { SpecMetadataForm, type SpecMetadataValues } from "../components/SpecMetadataForm";
 import {
@@ -74,7 +75,12 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
     <div className="page">
       <div className="page-header">
         <h2>Requirement Specifications</h2>
-        <span className="hint">DID-style templates for HRS/SRS at System, Subsystem, and HWCI/CSCI level.</span>
+        <EditableText
+          contentKey="page.specifications.hint"
+          defaultValue="DID-style templates for HRS/SRS at System, Subsystem, and HWCI/CSCI level."
+          as="span"
+          className="hint"
+        />
         <button className="button-primary" onClick={() => setCreating(true)}>
           + Add Specification
         </button>
@@ -86,26 +92,30 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
 
       {showGuidance && (
         <div className="did-guidance">
-          <p className="hint">{COMPETENCY_FRAMEWORK_INTRO}</p>
+          <EditableText contentKey="did.frameworkIntro" defaultValue={COMPETENCY_FRAMEWORK_INTRO} as="p" className="hint" />
           <div className="did-guidance-grid">
             {SPEC_LEVELS.map((level) => (
               <div className="detail-card" key={level}>
                 <h4>{levelLabel(level)}</h4>
-                <p>{LEVEL_GUIDANCE[level].summary}</p>
+                <EditableText contentKey={`did.level.${level}.summary`} defaultValue={LEVEL_GUIDANCE[level].summary} as="p" />
                 <p className={`did-guidance-label ${COMPETENCY_CLASS[LEVEL_GUIDANCE[level].competency.weight]}`}>
                   {LEVEL_GUIDANCE[level].competency.weight}
                 </p>
-                <p>{LEVEL_GUIDANCE[level].competency.note}</p>
+                <EditableText
+                  contentKey={`did.level.${level}.competencyNote`}
+                  defaultValue={LEVEL_GUIDANCE[level].competency.note}
+                  as="p"
+                />
                 <p className="did-guidance-label did-pro">Pros</p>
                 <ul>
                   {LEVEL_GUIDANCE[level].pros.map((p, i) => (
-                    <li key={i}>{p}</li>
+                    <EditableText key={i} contentKey={`did.level.${level}.pros.${i}`} defaultValue={p} as="li" />
                   ))}
                 </ul>
                 <p className="did-guidance-label did-con">Cons</p>
                 <ul>
                   {LEVEL_GUIDANCE[level].cons.map((c, i) => (
-                    <li key={i}>{c}</li>
+                    <EditableText key={i} contentKey={`did.level.${level}.cons.${i}`} defaultValue={c} as="li" />
                   ))}
                 </ul>
               </div>
@@ -116,16 +126,22 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
             {SPEC_TYPES.map((type) => (
               <div className="detail-card" key={type}>
                 <h4>{type} Specification</h4>
-                <p>{SPEC_TYPE_GUIDANCE[type].summary}</p>
-                <p className="hint">{SPEC_TYPE_GUIDANCE[type].whenUsed}</p>
+                <EditableText contentKey={`did.specType.${type}.summary`} defaultValue={SPEC_TYPE_GUIDANCE[type].summary} as="p" />
+                <EditableText
+                  contentKey={`did.specType.${type}.whenUsed`}
+                  defaultValue={SPEC_TYPE_GUIDANCE[type].whenUsed}
+                  as="p"
+                  className="hint"
+                />
               </div>
             ))}
           </div>
-          <p className="hint">
-            Baseline A and Baseline B mature through Development → Production at different rates while
-            influencing each other at UUT-relevant interfaces — track that relationship on the A/B Compatibility
-            tab, not by duplicating content across specs.
-          </p>
+          <EditableText
+            contentKey="did.baselineNote"
+            defaultValue="Baseline A and Baseline B mature through Development → Production at different rates while influencing each other at UUT-relevant interfaces — track that relationship on the A/B Compatibility tab, not by duplicating content across specs."
+            as="p"
+            className="hint"
+          />
         </div>
       )}
 

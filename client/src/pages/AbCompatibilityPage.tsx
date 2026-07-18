@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
+import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
 import { COMPATIBILITY_STATUSES, type AbCompatibilityRow, type ConfigurationItem } from "../types";
@@ -53,7 +54,12 @@ export function AbCompatibilityPage({ entity, cis }: Props) {
     <div className="page">
       <div className="page-header">
         <h2>A/B Compatibility Matrix</h2>
-        <span className="hint">Scoped to Tier 1 (UUT-relevant) interfaces</span>
+        <EditableText
+          contentKey="page.abCompatibility.hint"
+          defaultValue="Scoped to Tier 1 (UUT-relevant) interfaces"
+          as="span"
+          className="hint"
+        />
         <button className="button-primary" onClick={() => setEditing("new")} disabled={ciOptions.length === 0}>
           + Add Row
         </button>

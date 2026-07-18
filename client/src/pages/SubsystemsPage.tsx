@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
+import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
 import { LOGICAL_SUBSYSTEM_SOURCES, type ConfigurationItem, type LogicalSubsystem } from "../types";
@@ -62,7 +63,12 @@ export function SubsystemsPage({ entity, cis, onSelectSubsystem }: Props) {
     <div className="page">
       <div className="page-header">
         <h2>Logical Subsystems</h2>
-        <span className="hint">Functional decomposition layer — see §2.3 background on the missing SSDD functional layer</span>
+        <EditableText
+          contentKey="page.subsystems.hint"
+          defaultValue="Functional decomposition layer — see §2.3 background on the missing SSDD functional layer"
+          as="span"
+          className="hint"
+        />
         <button className="button-primary" onClick={() => setEditing("new")}>
           + Add Subsystem
         </button>

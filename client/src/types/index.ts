@@ -164,6 +164,24 @@ export interface Specification {
   updatedAt: string;
 }
 
+// A site-wide editable-prose entry. Keyed by a stable string `key` chosen at
+// each call site (not a random id), so a save is always an upsert: "does an
+// override for this key exist yet, or does the UI still fall back to the
+// hardcoded defaultValue at that call site." `history` holds every value this
+// entry has ever held before its current one, oldest first — full version
+// history rather than only last-edit-wins.
+export interface ContentEntryHistoryItem {
+  value: string;
+  updatedAt: string;
+}
+
+export interface ContentEntry {
+  key: string;
+  value: string;
+  history: ContentEntryHistoryItem[];
+  updatedAt: string;
+}
+
 export interface Database {
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
@@ -173,6 +191,7 @@ export interface Database {
   recommendations: Recommendation[];
   interfaces: InterfaceRecord[];
   specifications: Specification[];
+  content: ContentEntry[];
 }
 
 export const LOGICAL_SUBSYSTEM_SOURCES: LogicalSubsystemSource[] = [

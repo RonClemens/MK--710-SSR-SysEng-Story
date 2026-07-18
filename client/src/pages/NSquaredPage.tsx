@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { EditableText } from "../components/EditableText";
 import { N2Grid } from "../components/N2Grid";
 import type { ConfigurationItem, InterfaceRecord, LogicalSubsystem } from "../types";
 import type { useEntity } from "../hooks/useEntity";
@@ -61,10 +62,12 @@ export function NSquaredPage({ subsystems, cis, interfacesEntity, onSelectSubsys
     <div className="page">
       <div className="page-header">
         <h2>N² Diagrams</h2>
-        <span className="hint">
-          Click any off-diagonal cell to document a real interface. Derived-only cells (shared CI or shared
-          subsystem) are a starting hint, not a substitute for a documented interface.
-        </span>
+        <EditableText
+          contentKey="page.n2.hint"
+          defaultValue="Click any off-diagonal cell to document a real interface. Derived-only cells (shared CI or shared subsystem) are a starting hint, not a substitute for a documented interface."
+          as="span"
+          className="hint"
+        />
       </div>
       {error && <p className="form-error">{error}</p>}
 

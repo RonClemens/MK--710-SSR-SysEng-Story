@@ -23,7 +23,9 @@ import { SpecificationsPage } from "./pages/SpecificationsPage";
 import { SpecificationDetailPage } from "./pages/SpecificationDetailPage";
 import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
+import { EditableText } from "./components/EditableText";
 import { ExportImport } from "./components/ExportImport";
+import { useSiteContent } from "./contexts/SiteContentContext";
 
 type Tab = "subsystems" | "n2" | "cis" | "delta" | "ab" | "cots" | "specifications" | "recommendations";
 
@@ -53,6 +55,7 @@ export default function App() {
   const [selectedSubsystemId, setSelectedSubsystemId] = useState<string | null>(null);
   const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
   const [serverAiEnabled, setServerAiEnabled] = useState(false);
+  const { editMode, setEditMode } = useSiteContent();
 
   useEffect(() => {
     api.config().then((cfg) => setServerAiEnabled(cfg.aiEnabled));
@@ -104,11 +107,20 @@ export default function App() {
       <header className="app-header">
         <div>
           <h1>PDR Reconciliation & Baseline Alignment Workbench</h1>
-          <p className="subtitle">
-            Illustrative/demo data only — not a real program's CI names or requirements.
-          </p>
+          <EditableText
+            contentKey="app.subtitle"
+            defaultValue="Illustrative/demo data only — not a real program's CI names or requirements."
+            as="p"
+            className="subtitle"
+          />
         </div>
-        <ExportImport onImported={refreshAll} />
+        <div className="header-actions">
+          <label className="edit-mode-toggle">
+            <input type="checkbox" checked={editMode} onChange={(e) => setEditMode(e.target.checked)} />
+            Edit Mode
+          </label>
+          <ExportImport onImported={refreshAll} />
+        </div>
       </header>
 
       <div className="app-body">

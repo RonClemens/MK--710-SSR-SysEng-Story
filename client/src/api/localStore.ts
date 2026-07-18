@@ -22,6 +22,7 @@ function normalize(db: Partial<Database>): Database {
     recommendations: db.recommendations ?? [],
     interfaces: db.interfaces ?? [],
     specifications: db.specifications ?? [],
+    content: db.content ?? [],
   };
 }
 

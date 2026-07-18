@@ -159,6 +159,83 @@ button {
   color: var(--danger);
 }
 
+.editable-text {
+  outline: 1px dashed var(--ice);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.editable-text-pencil {
+  background: var(--ice-light);
+  border: 1px solid var(--ice);
+  color: var(--navy);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  line-height: 1;
+  padding: 0.1rem 0.3rem;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+
+.editable-text-pencil:hover {
+  background: var(--ice);
+}
+
+.editable-text-history {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+
+.editable-text-history summary {
+  cursor: pointer;
+  color: var(--navy);
+  font-size: 0.85rem;
+}
+
+.editable-text-history ul {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.editable-text-history li {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+
+.editable-text-history-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editable-text-history-value {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.edit-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--ice-light);
+}
+
 .data-table-wrap {
   background: var(--surface);
   border: 1px solid var(--border);

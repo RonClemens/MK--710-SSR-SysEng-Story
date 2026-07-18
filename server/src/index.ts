@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { crudRouter } from "./routes/crud.js";
 import { dataRouter } from "./routes/data.js";
+import { contentRouter } from "./routes/content.js";
 import { aiRouter } from "./routes/ai.js";
 import { getAiClient } from "./ai/index.js";
 
@@ -41,6 +42,7 @@ async function start() {
   app.use("/api/recommendations", crudRouter("recommendations"));
   app.use("/api/interfaces", crudRouter("interfaces"));
   app.use("/api/specifications", crudRouter("specifications"));
+  app.use("/api/content", contentRouter);
   app.use("/api/data", dataRouter);
 
   if (aiEnabled) {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { SpecMetadataForm, type SpecMetadataValues } from "../components/SpecMetadataForm";
 import {
@@ -109,17 +110,21 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
 
       <section>
         <h3>Why {levelLabel(spec.level, spec.domain)}-level?</h3>
-        <p>{LEVEL_GUIDANCE[spec.level].summary}</p>
+        <EditableText contentKey={`did.level.${spec.level}.summary`} defaultValue={LEVEL_GUIDANCE[spec.level].summary} as="p" />
         <p className={`did-guidance-label ${COMPETENCY_CLASS[LEVEL_GUIDANCE[spec.level].competency.weight]}`}>
           {LEVEL_GUIDANCE[spec.level].competency.weight}
         </p>
-        <p>{LEVEL_GUIDANCE[spec.level].competency.note}</p>
+        <EditableText
+          contentKey={`did.level.${spec.level}.competencyNote`}
+          defaultValue={LEVEL_GUIDANCE[spec.level].competency.note}
+          as="p"
+        />
         <div className="did-guidance-grid did-guidance-grid-2">
           <div>
             <p className="did-guidance-label did-pro">Pros</p>
             <ul>
               {LEVEL_GUIDANCE[spec.level].pros.map((p, i) => (
-                <li key={i}>{p}</li>
+                <EditableText key={i} contentKey={`did.level.${spec.level}.pros.${i}`} defaultValue={p} as="li" />
               ))}
             </ul>
           </div>
@@ -127,14 +132,23 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
             <p className="did-guidance-label did-con">Cons</p>
             <ul>
               {LEVEL_GUIDANCE[spec.level].cons.map((c, i) => (
-                <li key={i}>{c}</li>
+                <EditableText key={i} contentKey={`did.level.${spec.level}.cons.${i}`} defaultValue={c} as="li" />
               ))}
             </ul>
           </div>
         </div>
         <p className="hint">
-          <strong>{spec.specType} spec:</strong> {SPEC_TYPE_GUIDANCE[spec.specType].summary}{" "}
-          {SPEC_TYPE_GUIDANCE[spec.specType].whenUsed}
+          <strong>{spec.specType} spec:</strong>{" "}
+          <EditableText
+            contentKey={`did.specType.${spec.specType}.summary`}
+            defaultValue={SPEC_TYPE_GUIDANCE[spec.specType].summary}
+            as="span"
+          />{" "}
+          <EditableText
+            contentKey={`did.specType.${spec.specType}.whenUsed`}
+            defaultValue={SPEC_TYPE_GUIDANCE[spec.specType].whenUsed}
+            as="span"
+          />
         </p>
       </section>
 
@@ -146,7 +160,7 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
               {SECTION_META[key].label}{" "}
               <span className={`badge ${RELEVANCE_CLASS[relevance[key]]}`}>{relevance[key]}</span>
             </span>
-            <span className="hint">{SECTION_META[key].description}</span>
+            <EditableText contentKey={`did.section.${key}.description`} defaultValue={SECTION_META[key].description} as="span" className="hint" />
             <textarea
               value={draft[key]}
               onChange={(e) => setDraft((prev) => ({ ...prev, [key]: e.target.value }))}

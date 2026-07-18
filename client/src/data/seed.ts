@@ -357,4 +357,5 @@ export const SEED_DATA: Database = {
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
   ],
+  content: [],
 };
