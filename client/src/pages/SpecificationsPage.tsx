@@ -11,6 +11,7 @@ import {
   emptySections,
   levelLabel,
 } from "../data/didGuidance";
+import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL, SAFETY_FRAMEWORK_INTRO } from "../data/safetyGuidance";
 import {
   SPEC_BASELINES,
   SPEC_DOMAINS,
@@ -142,6 +143,34 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
             as="p"
             className="hint"
           />
+
+          <h3>System Safety Decomposition (MIL-STD-882E / JSSSEH)</h3>
+          <EditableText contentKey="safety.frameworkIntro" defaultValue={SAFETY_FRAMEWORK_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            {SPEC_LEVELS.map((level) => (
+              <div className="detail-card" key={level}>
+                <h4>{levelLabel(level)}</h4>
+                <div className="safety-badge-row">
+                  {SAFETY_BY_LEVEL[level].analyses.map((type) => (
+                    <span key={type} className="safety-badge" title={HAZARD_ANALYSIS_META[type].name}>
+                      {type}
+                    </span>
+                  ))}
+                </div>
+                <EditableText
+                  contentKey={`safety.level.${level}.safetyContent`}
+                  defaultValue={SAFETY_BY_LEVEL[level].safetyContent}
+                  as="p"
+                />
+                <EditableText
+                  contentKey={`safety.level.${level}.decompositionDependency`}
+                  defaultValue={SAFETY_BY_LEVEL[level].decompositionDependency}
+                  as="p"
+                  className="hint"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

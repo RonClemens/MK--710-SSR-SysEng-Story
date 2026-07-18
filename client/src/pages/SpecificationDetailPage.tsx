@@ -11,6 +11,7 @@ import {
   COMPETENCY_CLASS,
   levelLabel,
 } from "../data/didGuidance";
+import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL } from "../data/safetyGuidance";
 import type { ConfigurationItem, LogicalSubsystem, SpecSections, Specification } from "../types";
 
 interface Props {
@@ -150,6 +151,26 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
             as="span"
           />
         </p>
+
+        <p className="did-guidance-label">System safety at this level (MIL-STD-882E / JSSSEH)</p>
+        <div className="safety-badge-row">
+          {SAFETY_BY_LEVEL[spec.level].analyses.map((type) => (
+            <span key={type} className="safety-badge" title={HAZARD_ANALYSIS_META[type].name}>
+              {type}
+            </span>
+          ))}
+        </div>
+        <EditableText
+          contentKey={`safety.level.${spec.level}.safetyContent`}
+          defaultValue={SAFETY_BY_LEVEL[spec.level].safetyContent}
+          as="p"
+        />
+        <EditableText
+          contentKey={`safety.level.${spec.level}.decompositionDependency`}
+          defaultValue={SAFETY_BY_LEVEL[spec.level].decompositionDependency}
+          as="p"
+          className="hint"
+        />
       </section>
 
       <section>
@@ -159,6 +180,12 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
             <span className="spec-section-heading">
               {SECTION_META[key].label}{" "}
               <span className={`badge ${RELEVANCE_CLASS[relevance[key]]}`}>{relevance[key]}</span>
+              {key === "safety" &&
+                SAFETY_BY_LEVEL[spec.level].analyses.map((type) => (
+                  <span key={type} className="safety-badge" title={HAZARD_ANALYSIS_META[type].name} style={{ marginLeft: "0.4rem" }}>
+                    {type}
+                  </span>
+                ))}
             </span>
             <EditableText contentKey={`did.section.${key}.description`} defaultValue={SECTION_META[key].description} as="span" className="hint" />
             <textarea

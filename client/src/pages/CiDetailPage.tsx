@@ -1,4 +1,5 @@
 import { EditableText } from "../components/EditableText";
+import { OVER_DECOMPOSITION_SAFETY_NOTE } from "../data/safetyGuidance";
 import type {
   AbCompatibilityRow,
   ConfigurationItem,
@@ -62,6 +63,16 @@ export function CiDetailPage({
           </>
         )}
       </dl>
+
+      {ci.overDecompositionFlag && (
+        <div className="safety-callout">
+          <EditableText
+            contentKey="safety.ciDetail.overDecompositionNote"
+            defaultValue={OVER_DECOMPOSITION_SAFETY_NOTE}
+            as="span"
+          />
+        </div>
+      )}
 
       <section>
         <h3>Logical Subsystems Served{linkedSubsystems.length >= 2 ? ` (${linkedSubsystems.length})` : ""}</h3>

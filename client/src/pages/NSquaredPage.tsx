@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { EditableText } from "../components/EditableText";
 import { N2Grid } from "../components/N2Grid";
+import { INTERFACE_HAZARD_NOTE } from "../data/safetyGuidance";
 import type { ConfigurationItem, InterfaceRecord, LogicalSubsystem } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
@@ -68,6 +69,9 @@ export function NSquaredPage({ subsystems, cis, interfacesEntity, onSelectSubsys
           as="span"
           className="hint"
         />
+      </div>
+      <div className="safety-callout">
+        <EditableText contentKey="safety.n2.interfaceHazardNote" defaultValue={INTERFACE_HAZARD_NOTE} as="span" />
       </div>
       {error && <p className="form-error">{error}</p>}
 

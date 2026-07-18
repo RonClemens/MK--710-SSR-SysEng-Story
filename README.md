@@ -133,6 +133,43 @@ plus a ninth, `ContentEntry`, for editable site prose (see
   discipline. This program's SSDD-inherited, unverified subsystems are what
   happens when that process step gets skipped.
 
+### System safety and the decomposition hierarchy
+
+MIL-STD-882E and the JSSSEH (Joint Software Systems Safety Engineering
+Handbook) require hazard analysis and safety-requirements flow-down to ride on
+the same System → Subsystem → HWCI/CSCI hierarchy IEEE 12207 formalizes,
+rather than run as a parallel activity — see `client/src/data/safetyGuidance.ts`.
+A hazard analysis performed against an unvalidated or over-decomposed
+structure inherits that structure's weaknesses, so this app surfaces the
+connection at the points where it actually bites:
+
+- **Specifications tab** — a "System Safety Decomposition" guidance block maps
+  the hazard analysis types most commonly cited under 882E/JSSSEH (FHA,
+  PHA/SRHA, SSHA, SHA, O&SHA) to each level, and each specification's "Why
+  {level}-level?" section and Safety Requirements row carry the same mapping
+  in context.
+- **Subsystem Detail** — a subsystem sourced `Inherited from SSDD structure —
+  unverified` gets a callout: any Functional Hazard Analysis scoped to it
+  inherits that same unverified functional boundary.
+- **CI Detail** — a CI with the over-decomposition flag set gets a callout
+  that a Subsystem/System Hazard Analysis scoped to it risks re-analyzing the
+  same causal factor redundantly across CIs that should have been
+  consolidated.
+- **N² Diagrams** — a note that documented interfaces are also where
+  interface hazard causal factors live (the System Hazard Analysis's core
+  concern), so a derived-only cell is also an unassessed interface hazard
+  boundary.
+- **Delta / Traceability Matrix** — a note that this matrix is also where
+  PHA/SRHA-derived safety requirements get verified as correctly allocated
+  from system level down to the responsible CI.
+
+All of this is prose, not a new tracked entity — it's editable in place the
+same way as the DID guidance above (see
+[Editable site content](#editable-site-content)). If you need to actually
+*track* SRHA/FHA hazard records (hazard ID, severity/likelihood, causal
+factor, mitigation, verification), that would be a new entity and tab, not
+covered here.
+
 All entities are fully CRUD-editable in the UI (add/edit/delete, no page
 reloads). The CI Detail view rolls up every related row for a given CI,
 including its linked subsystems (and which other CIs also serve them) and

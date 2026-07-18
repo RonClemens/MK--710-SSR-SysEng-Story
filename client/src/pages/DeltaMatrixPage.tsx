@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
+import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
+import { TRACEABILITY_HAZARD_NOTE } from "../data/safetyGuidance";
 import { DELTA_SOURCES, DISPOSITIONS, type ConfigurationItem, type DeltaMatrixRow } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
@@ -64,6 +66,9 @@ export function DeltaMatrixPage({ entity, cis }: Props) {
         </button>
       </div>
       {cis.length === 0 && <p className="hint">Add a CI first before creating delta matrix rows.</p>}
+      <div className="safety-callout">
+        <EditableText contentKey="safety.deltaMatrix.traceabilityNote" defaultValue={TRACEABILITY_HAZARD_NOTE} as="span" />
+      </div>
       {error && <p className="form-error">{error}</p>}
       {loading ? (
         <p>Loading…</p>

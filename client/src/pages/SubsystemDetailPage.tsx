@@ -1,4 +1,5 @@
 import { EditableText } from "../components/EditableText";
+import { UNVERIFIED_SUBSYSTEM_SAFETY_NOTE } from "../data/safetyGuidance";
 import type { ConfigurationItem, LogicalSubsystem, Specification } from "../types";
 
 interface Props {
@@ -31,6 +32,16 @@ export function SubsystemDetailPage({
         <dt>Description</dt>
         <dd>{subsystem.description || "—"}</dd>
       </dl>
+
+      {subsystem.source === "Inherited from SSDD structure — unverified" && (
+        <div className="safety-callout">
+          <EditableText
+            contentKey="safety.subsystemDetail.unverifiedNote"
+            defaultValue={UNVERIFIED_SUBSYSTEM_SAFETY_NOTE}
+            as="span"
+          />
+        </div>
+      )}
 
       <section>
         <h3>CIs serving this subsystem</h3>

@@ -634,6 +634,34 @@ button {
   color: var(--amber);
 }
 
+.safety-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.5rem 0;
+}
+
+.safety-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #fbe2e0;
+  color: var(--danger);
+}
+
+.safety-callout {
+  background: #fdf3f2;
+  border: 1px solid #f3c9c6;
+  border-left: 4px solid var(--danger);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
 .spec-section {
   border-top: 1px solid var(--border);
   padding-top: 0.9rem;
