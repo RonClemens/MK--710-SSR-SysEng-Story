@@ -5,6 +5,7 @@ import { Modal } from "../components/Modal";
 import { PlanningDeliverableForm, type PlanningDeliverableValues } from "../components/PlanningDeliverableForm";
 import { levelLabel } from "../data/didGuidance";
 import { PLANNING_CDRL_CATALOG, PLANNING_DELIVERABLES_INTRO } from "../data/planningGuidance";
+import { SETR_EVENTS, SETR_GUIDANCE } from "../data/setrGuidance";
 import {
   SAFETY_APPLICABILITIES,
   SPEC_BASELINES,
@@ -122,6 +123,23 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
               </div>
             ))}
           </div>
+
+          <h3>Software/Program Planning Through SRR → PRR</h3>
+          <div className="did-guidance-grid">
+            {SETR_EVENTS.map((event) => (
+              <div className="detail-card" key={event}>
+                <h4>
+                  {event} <span className="badge">{SETR_GUIDANCE[event].name}</span>
+                </h4>
+                <EditableText
+                  contentKey={`planning.setr.${event}.softwarePlanning`}
+                  defaultValue={SETR_GUIDANCE[event].softwarePlanning}
+                  as="p"
+                />
+              </div>
+            ))}
+          </div>
+          <p className="hint">See the Specifications tab's "SETR Milestones" section for the full System Decomposition / System Safety Planning / System Software Planning / Spec Generation breakdown at each event.</p>
         </div>
       )}
 

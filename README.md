@@ -218,40 +218,58 @@ shouldn't be finalized before the corresponding Production spec exists,
 since it depends on the same as-built design maturity. `Both`-applicability
 CDRLs (SSPP, SAR, Hazard Log) are program-wide and aren't gated by either.
 
-### SRR → SFR → SSR: Baseline B's own decomposition
+### SRR → PRR: the full SETR arc, on both baselines
 
-Baseline A's story in this app starts mid-stream, already reconciling
-CI-level over-decomposition against a design that exists. Baseline B's story
-starts earlier, at its own SETR (Systems Engineering Technical Review)
-events, and this app now models that history rather than treating Baseline B
-as a placeholder — see `client/src/data/setrGuidance.ts` for the guidance
-content and the Specifications tab's "SETR Milestones: SRR → SFR → SSR"
-section for where it's shown.
+This app now models the whole SETR (Systems Engineering Technical Review)
+sequence from System Requirements Review through Production Readiness
+Review — see `client/src/data/setrGuidance.ts` for the guidance content,
+shown on the Specifications tab's "SETR Milestones: SRR → PRR" section (all
+eight events, four dimensions each: System Decomposition, System Safety
+Planning, System Software Planning, Spec Generation) and, more narrowly, on
+the Program Planning tab's own SETR section (the System Software Planning
+dimension only, since that's this tab's focus).
 
-- **SRR (System Requirements Review)** confirms the requirements baseline
-  before functional decomposition starts. Baseline B's SRR is closed (System
-  Requirements Specification `spec-003` is `In Review`; SSPP-equivalent
-  planning — SEMP, CMP, SDP — established, `plan-001`/`plan-002`/`plan-003`).
-- **SFR (System Functional Review)** baselines the functional architecture.
-  Baseline B has its **own** Logical Subsystems (`sub-b-001`..`sub-b-003`),
-  independently validated from Baseline A's — two cleared SFR (`Validated`),
-  one (`Power Conditioning & Distribution`) is still `Proposed`, the one
-  subsystem that didn't clear alongside the other two. Subsystem-level
-  Development specs (`spec-004`, `spec-005`) and Functional Hazard Analyses
-  (`safety-008`, `safety-009`) exist for the two validated subsystems, not
-  for the one still pending.
-- **SSR (System Specification Review)** — this app's working name for the
-  review that closes out System/Subsystem-level Development specs before
-  CI-level decomposition starts at PDR; confirm this against your program's
-  actual SETR nomenclature if it differs. Baseline B hasn't reached it yet:
-  `spec-005` (the Ethernet-based Diagnostic Messaging redesign) is flagged in
-  its own notes as the most likely to slip SSR if its FHA (`safety-009`,
-  still `Draft`) doesn't close first. Consistent with that, Baseline B has
-  **no CI-level specs, Safety Deliverables, or CIs at all** — physical
-  decomposition is a PDR-era activity, and their absence is the correct
-  state, not a gap to fill in.
+**Baseline B tells the early half of the story** — it starts at its own SRR,
+not as a placeholder:
 
-The point of modeling it this way: SRR, SFR, and SSR aren't independent
+- **SRR** is closed (System Requirements Specification `spec-003` is
+  `In Review`; SEMP/CMP/SDP established, `plan-001`/`plan-002`/`plan-003`).
+- **SFR** is mostly closed. Baseline B has its **own** Logical Subsystems
+  (`sub-b-001`..`sub-b-003`), independently validated from Baseline A's — two
+  cleared SFR (`Validated`), one (`Power Conditioning & Distribution`) is
+  still `Proposed`. Subsystem-level Development specs (`spec-004`,
+  `spec-005`) and Functional Hazard Analyses (`safety-008`, `safety-009`)
+  exist for the two validated subsystems only.
+- **SSR** — this app's working name for the review that closes out
+  System/Subsystem-level Development specs before CI-level decomposition
+  starts at PDR; confirm this against your program's actual SETR
+  nomenclature if it differs — hasn't been reached. `spec-005` (the
+  Ethernet-based Diagnostic Messaging redesign) is flagged in its own notes
+  as the most likely to slip SSR if its FHA (`safety-009`, still `Draft`)
+  doesn't close first.
+- **PDR through PRR**: not reached. Consistent with that, Baseline B has
+  **no CI-level specs, Safety Deliverables, Program Planning Deliverables, or
+  CIs at all** — physical decomposition is a PDR-era activity, and their
+  absence is the correct state, not a gap to fill in.
+
+**Baseline A tells the later half** — it's the "approaching System TRR"
+baseline this app's PDR-reconciliation effort exists to reconcile:
+
+- **PDR/CDR**: CI-level decomposition happened (`ci-001`..`ci-005`), but
+  imperfectly — MCC and IPS are the over-decomposition finding a proper PDR
+  disposition should have caught (see CI Inventory, `rec-001`). A Software
+  Design Description for the Test Set CI (`plan-005`) is `In Review`, in
+  step with that same CI's still-unresolved Development spec (`spec-002`).
+- **TRR**: approaching, not yet reached. CI-level System/Operating & Support
+  Hazard Analyses (`safety-005`, `safety-006`) and the Test Set CI's Version
+  Description Document (`plan-006`) are all still `Draft` — exactly what
+  TRR-era artifacts should look like before the gate, not after it.
+- **SVR/PRR**: not yet reached — no Baseline A spec has transitioned to
+  Production type yet, which is the whole point: this program's
+  reconciliation problem is what happens when that transition gets attempted
+  before the underlying CI structure and traceability are actually sound.
+
+The point of modeling it this way: SRR through PRR aren't independent
 checklists. Each gates what the next is allowed to assume, and System
 Decomposition, System Safety Planning, and System Software Planning are
 expected to mature together at each event — not for one to run ahead of or

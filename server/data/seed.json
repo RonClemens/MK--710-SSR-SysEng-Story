@@ -630,6 +630,36 @@
       "deliveryMilestone": "SFR",
       "createdAt": "2026-06-15T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
+    },
+    {
+      "id": "plan-005",
+      "title": "Software Design Description — Test Set CI (Baseline A)",
+      "level": "CI",
+      "cdrlType": "Software Design Description (SDD)",
+      "applicability": "Development",
+      "baseline": "Baseline A",
+      "status": "In Review",
+      "linkedSubsystemId": null,
+      "linkedCiId": "ci-001",
+      "cdrlDescription": "Documents the Test Set CI's internal software design, drafted at CDR — still In Review in step with the CI's own Development spec (spec-002), which is itself held up pending the over-decomposition consolidation recommendation (rec-001).",
+      "deliveryMilestone": "CDR",
+      "createdAt": "2026-05-01T00:00:00.000Z",
+      "updatedAt": "2026-06-10T00:00:00.000Z"
+    },
+    {
+      "id": "plan-006",
+      "title": "Version Description Document — Test Set CI (Baseline A)",
+      "level": "CI",
+      "cdrlType": "Version Description Document (VDD)",
+      "applicability": "Production",
+      "baseline": "Baseline A",
+      "status": "Draft",
+      "linkedSubsystemId": null,
+      "linkedCiId": "ci-001",
+      "cdrlDescription": "Will record the as-built/as-qualified software baseline once TRR-era testing closes — still Draft, consistent with Baseline A approaching but not yet at System TRR.",
+      "deliveryMilestone": "TRR",
+      "createdAt": "2026-06-15T00:00:00.000Z",
+      "updatedAt": "2026-06-15T00:00:00.000Z"
     }
   ],
   "content": []
