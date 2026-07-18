@@ -12,6 +12,7 @@ import {
   levelLabel,
 } from "../data/didGuidance";
 import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL, SAFETY_FRAMEWORK_INTRO } from "../data/safetyGuidance";
+import { SETR_EVENTS, SETR_FRAMEWORK_INTRO, SETR_GUIDANCE } from "../data/setrGuidance";
 import {
   SPEC_BASELINES,
   SPEC_DOMAINS,
@@ -168,6 +169,27 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                   as="p"
                   className="hint"
                 />
+              </div>
+            ))}
+          </div>
+
+          <h3>SETR Milestones: SRR → SFR → SSR</h3>
+          <EditableText contentKey="setr.frameworkIntro" defaultValue={SETR_FRAMEWORK_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            {SETR_EVENTS.map((event) => (
+              <div className="detail-card" key={event}>
+                <h4>
+                  {event} <span className="badge">{SETR_GUIDANCE[event].name}</span>
+                </h4>
+                <EditableText contentKey={`setr.${event}.summary`} defaultValue={SETR_GUIDANCE[event].summary} as="p" />
+                <p className="did-guidance-label">System Decomposition</p>
+                <EditableText contentKey={`setr.${event}.decomposition`} defaultValue={SETR_GUIDANCE[event].decomposition} as="p" />
+                <p className="did-guidance-label">System Safety Planning</p>
+                <EditableText contentKey={`setr.${event}.safetyPlanning`} defaultValue={SETR_GUIDANCE[event].safetyPlanning} as="p" />
+                <p className="did-guidance-label">System Software Planning</p>
+                <EditableText contentKey={`setr.${event}.softwarePlanning`} defaultValue={SETR_GUIDANCE[event].softwarePlanning} as="p" />
+                <p className="did-guidance-label">Spec Generation</p>
+                <EditableText contentKey={`setr.${event}.specGeneration`} defaultValue={SETR_GUIDANCE[event].specGeneration} as="p" />
               </div>
             ))}
           </div>

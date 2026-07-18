@@ -2,7 +2,7 @@ import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
-import { CI_TIERS, CI_TYPES, type ConfigurationItem, type LogicalSubsystem } from "../types";
+import { CI_TIERS, CI_TYPES, SPEC_BASELINES, type ConfigurationItem, type LogicalSubsystem } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
 const emptyRow: Partial<ConfigurationItem> = {
@@ -10,6 +10,7 @@ const emptyRow: Partial<ConfigurationItem> = {
   type: "developmental",
   tier: "Tier 2",
   subsystemIds: [],
+  baseline: "Baseline A",
   overDecompositionFlag: false,
   consolidationNotes: "",
   status: "",
@@ -28,17 +29,23 @@ export function CisPage({ entity, subsystems, onSelectCi }: Props) {
 
   const subsystemLabels = Object.fromEntries(subsystems.map((s) => [s.id, s.name]));
   const subsystemNames = (ids: string[]) => ids.map((id) => subsystemLabels[id] ?? "(unknown)").join(", ");
+  // Include the baseline in each option's label since the multiselect isn't
+  // filtered to the CI's own baseline — subsystems are baseline-scoped, so
+  // this is the cheapest way to keep a cross-baseline pick from looking like
+  // a plain oversight.
+  const subsystemOptionLabels = Object.fromEntries(subsystems.map((s) => [s.id, `${s.name} (${s.baseline})`]));
 
   const fields: FieldDef<ConfigurationItem>[] = [
     { key: "name", label: "Name", type: "text" },
     { key: "type", label: "Type", type: "select", options: CI_TYPES },
     { key: "tier", label: "Tier", type: "select", options: CI_TIERS },
+    { key: "baseline", label: "Baseline", type: "select", options: SPEC_BASELINES },
     {
       key: "subsystemIds",
       label: "Logical subsystem(s) served",
       type: "multiselect",
       options: subsystems.map((s) => s.id),
-      optionLabels: subsystemLabels,
+      optionLabels: subsystemOptionLabels,
     },
     { key: "overDecompositionFlag", label: "Over-decomposition flag", type: "boolean" },
     { key: "consolidationNotes", label: "Consolidation notes", type: "textarea" },
@@ -59,6 +66,7 @@ export function CisPage({ entity, subsystems, onSelectCi }: Props) {
     },
     { key: "type", label: "Type", sortValue: (r) => r.type, filterOptions: CI_TYPES, filterValue: (r) => r.type },
     { key: "tier", label: "Tier", sortValue: (r) => r.tier, filterOptions: CI_TIERS, filterValue: (r) => r.tier },
+    { key: "baseline", label: "Baseline", filterOptions: SPEC_BASELINES, filterValue: (r) => r.baseline },
     {
       key: "subsystemIds",
       label: "Subsystems served",

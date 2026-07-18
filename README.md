@@ -63,8 +63,8 @@ even if it's misconfigured.
 
 ## Data model
 
-Nine structured entities (see `server/src/types.ts` / `client/src/types/index.ts`),
-plus a tenth, `ContentEntry`, for editable site prose (see
+Ten structured entities (see `server/src/types.ts` / `client/src/types/index.ts`),
+plus an eleventh, `ContentEntry`, for editable site prose (see
 [Editable site content](#editable-site-content) below):
 
 - **Logical Subsystems** — the functional/behavioral decomposition layer this
@@ -72,12 +72,17 @@ plus a tenth, `ContentEntry`, for editable site prose (see
   requirements to physical CI allocation, organized around rack enclosures —
   see the existing SSDD). Each subsystem carries a `source`: `Validated`,
   `Proposed`, or `Inherited from SSDD structure — unverified` (i.e. lifted
-  from the physical/rack grouping without independent functional validation).
+  from the physical/rack grouping without independent functional validation),
+  and a `baseline` (`Baseline A` / `Baseline B`) — Baseline A and Baseline B
+  are **independently decomposed architectures**, not one shared structure
+  with two states, so a Baseline B subsystem is its own record even when its
+  name mirrors a Baseline A subsystem.
 - **Configuration Items (CIs)** — inventory with Tier 1/2/3 classification,
-  over-decomposition flagging, and a **many-to-many** link to the subsystem(s)
-  a CI serves (`subsystemIds: string[]` on the CI — not a single foreign key,
-  since one CI legitimately can serve more than one subsystem). The UI
-  visually flags CIs serving 2+ subsystems rather than hiding the overlap —
+  over-decomposition flagging, a `baseline`, and a **many-to-many** link to
+  the subsystem(s) a CI serves (`subsystemIds: string[]` on the CI — not a
+  single foreign key, since one CI legitimately can serve more than one
+  subsystem, and should only reference subsystems of its own baseline). The
+  UI visually flags CIs serving 2+ subsystems rather than hiding the overlap —
   that overlap is signal, not noise.
 - **Delta / Traceability Matrix** — SFR-agreed allocation vs. as-built vs.
   disposition, scoped to Baseline A's internal reconciliation.
@@ -88,7 +93,12 @@ plus a tenth, `ContentEntry`, for editable site prose (see
 - **Recommendations / Action Items** — optionally linked back to a CI.
 - **Interfaces** — a documented edge between two elements of the same type
   (`scope: "subsystem" | "ci"`, `aId`, `bId`, `description`), for the N²
-  Diagram tab. Two N² grids are generated: Subsystem×Subsystem and CI×CI.
+  Diagram tab. The tab has its own **Baseline** selector (defaulting to
+  Baseline A) that filters which subsystems/CIs feed both grids —
+  `InterfaceRecord` itself carries no baseline field, since an interface
+  between two Baseline-B-scoped elements is already implicitly Baseline B by
+  virtue of the ids it references. Two N² grids are generated per baseline:
+  Subsystem×Subsystem and CI×CI.
   Off-diagonal cells that share a linking CI (subsystem grid) or a linking
   subsystem (CI grid) are shown as a "derived" hint (○) — this is computed
   live from existing data, not stored. Clicking any cell opens an editor
@@ -148,6 +158,15 @@ plus a tenth, `ContentEntry`, for editable site prose (see
   [System safety and the decomposition hierarchy](#system-safety-and-the-decomposition-hierarchy)
   below for how deliverable maturity should track Development vs. Production
   specs.
+- **Program Planning Deliverables** — the same CDRL-per-instance shape as
+  Safety Deliverables (`level`, `cdrlType`, `applicability`, `baseline`,
+  `status`, optional Subsystem/CI link, `cdrlDescription`,
+  `deliveryMilestone`), but for **non-safety** program and software planning
+  artifacts (SEMP, CMP, SDP, STP, SDD, VDD — see
+  `client/src/data/planningGuidance.ts`). Kept as a separate entity/tab
+  rather than folded into Safety Deliverables' CDRL catalog, since a Software
+  Development Plan is about how software gets built and verified, not what
+  hazards it introduces.
 
 ### System safety and the decomposition hierarchy
 
@@ -199,11 +218,50 @@ shouldn't be finalized before the corresponding Production spec exists,
 since it depends on the same as-built design maturity. `Both`-applicability
 CDRLs (SSPP, SAR, Hazard Log) are program-wide and aren't gated by either.
 
+### SRR → SFR → SSR: Baseline B's own decomposition
+
+Baseline A's story in this app starts mid-stream, already reconciling
+CI-level over-decomposition against a design that exists. Baseline B's story
+starts earlier, at its own SETR (Systems Engineering Technical Review)
+events, and this app now models that history rather than treating Baseline B
+as a placeholder — see `client/src/data/setrGuidance.ts` for the guidance
+content and the Specifications tab's "SETR Milestones: SRR → SFR → SSR"
+section for where it's shown.
+
+- **SRR (System Requirements Review)** confirms the requirements baseline
+  before functional decomposition starts. Baseline B's SRR is closed (System
+  Requirements Specification `spec-003` is `In Review`; SSPP-equivalent
+  planning — SEMP, CMP, SDP — established, `plan-001`/`plan-002`/`plan-003`).
+- **SFR (System Functional Review)** baselines the functional architecture.
+  Baseline B has its **own** Logical Subsystems (`sub-b-001`..`sub-b-003`),
+  independently validated from Baseline A's — two cleared SFR (`Validated`),
+  one (`Power Conditioning & Distribution`) is still `Proposed`, the one
+  subsystem that didn't clear alongside the other two. Subsystem-level
+  Development specs (`spec-004`, `spec-005`) and Functional Hazard Analyses
+  (`safety-008`, `safety-009`) exist for the two validated subsystems, not
+  for the one still pending.
+- **SSR (System Specification Review)** — this app's working name for the
+  review that closes out System/Subsystem-level Development specs before
+  CI-level decomposition starts at PDR; confirm this against your program's
+  actual SETR nomenclature if it differs. Baseline B hasn't reached it yet:
+  `spec-005` (the Ethernet-based Diagnostic Messaging redesign) is flagged in
+  its own notes as the most likely to slip SSR if its FHA (`safety-009`,
+  still `Draft`) doesn't close first. Consistent with that, Baseline B has
+  **no CI-level specs, Safety Deliverables, or CIs at all** — physical
+  decomposition is a PDR-era activity, and their absence is the correct
+  state, not a gap to fill in.
+
+The point of modeling it this way: SRR, SFR, and SSR aren't independent
+checklists. Each gates what the next is allowed to assume, and System
+Decomposition, System Safety Planning, and System Software Planning are
+expected to mature together at each event — not for one to run ahead of or
+behind the others.
+
 All entities are fully CRUD-editable in the UI (add/edit/delete, no page
 reloads). The CI Detail view rolls up every related row for a given CI,
-including its linked subsystems (and which other CIs also serve them) and
-any linked specifications; the Subsystem Detail view is the mirror image
-(which CIs and specifications are linked to this subsystem).
+including its linked subsystems (and which other CIs also serve them), any
+linked specifications, safety deliverables, and planning deliverables; the
+Subsystem Detail view is the mirror image.
 
 ## Editable site content
 

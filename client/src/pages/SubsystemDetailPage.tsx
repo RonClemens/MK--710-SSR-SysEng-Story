@@ -1,12 +1,13 @@
 import { EditableText } from "../components/EditableText";
 import { UNVERIFIED_SUBSYSTEM_SAFETY_NOTE } from "../data/safetyGuidance";
-import type { ConfigurationItem, LogicalSubsystem, SafetyDeliverable, Specification } from "../types";
+import type { ConfigurationItem, LogicalSubsystem, ProgramPlanningDeliverable, SafetyDeliverable, Specification } from "../types";
 
 interface Props {
   subsystem: LogicalSubsystem;
   servingCis: ConfigurationItem[];
   specifications: Specification[];
   safetyDeliverables: SafetyDeliverable[];
+  planningDeliverables: ProgramPlanningDeliverable[];
   onBack: () => void;
   onSelectCi: (id: string) => void;
   onSelectSpecification: (id: string) => void;
@@ -17,6 +18,7 @@ export function SubsystemDetailPage({
   servingCis,
   specifications,
   safetyDeliverables,
+  planningDeliverables,
   onBack,
   onSelectCi,
   onSelectSpecification,
@@ -28,6 +30,7 @@ export function SubsystemDetailPage({
       </button>
       <div className="page-header">
         <h2>{subsystem.name}</h2>
+        <span className="badge">{subsystem.baseline}</span>
         <span className="badge">{subsystem.source}</span>
       </div>
       <dl className="detail-grid">
@@ -111,6 +114,24 @@ export function SubsystemDetailPage({
                 <span className="badge badge-info">{sd.status}</span>
               </p>
               <p className="hint">{sd.cdrlDescription}</p>
+            </div>
+          ))
+        )}
+      </section>
+
+      <section>
+        <h3>Program Planning Deliverables</h3>
+        {planningDeliverables.length === 0 ? (
+          <p className="hint">No planning deliverables linked to this subsystem yet.</p>
+        ) : (
+          planningDeliverables.map((pd) => (
+            <div className="detail-card" key={pd.id}>
+              <p>
+                <strong>{pd.title}</strong> <span className="badge">{pd.cdrlType}</span>{" "}
+                <span className="badge">{pd.applicability}</span> <span className="badge">{pd.baseline}</span>{" "}
+                <span className="badge badge-info">{pd.status}</span>
+              </p>
+              <p className="hint">{pd.cdrlDescription}</p>
             </div>
           ))
         )}

@@ -3,19 +3,26 @@ import { DataTable, type ColumnDef } from "../components/DataTable";
 import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
-import { LOGICAL_SUBSYSTEM_SOURCES, type ConfigurationItem, type LogicalSubsystem } from "../types";
+import {
+  LOGICAL_SUBSYSTEM_SOURCES,
+  SPEC_BASELINES,
+  type ConfigurationItem,
+  type LogicalSubsystem,
+} from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
 const fields: FieldDef<LogicalSubsystem>[] = [
   { key: "name", label: "Name", type: "text" },
   { key: "description", label: "Description (functional/behavioral — not the enclosure it sits in)", type: "textarea" },
   { key: "source", label: "Source", type: "select", options: LOGICAL_SUBSYSTEM_SOURCES },
+  { key: "baseline", label: "Baseline", type: "select", options: SPEC_BASELINES },
 ];
 
 const emptyRow: Partial<LogicalSubsystem> = {
   name: "",
   description: "",
   source: "Proposed",
+  baseline: "Baseline A",
 };
 
 interface Props {
@@ -42,6 +49,12 @@ export function SubsystemsPage({ entity, cis, onSelectSubsystem }: Props) {
       ),
     },
     { key: "description", label: "Description", render: (r) => <span className="truncate">{r.description}</span> },
+    {
+      key: "baseline",
+      label: "Baseline",
+      filterOptions: SPEC_BASELINES,
+      filterValue: (r) => r.baseline,
+    },
     {
       key: "source",
       label: "Source",

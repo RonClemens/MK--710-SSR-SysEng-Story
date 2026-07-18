@@ -8,6 +8,11 @@ export interface LogicalSubsystem {
   name: string;
   description: string;
   source: LogicalSubsystemSource;
+  // Which baseline's decomposition this subsystem belongs to. Baseline A and
+  // Baseline B are independently-decomposed architectures, not one shared
+  // structure with two states — a Baseline B subsystem is its own record,
+  // even if its name/function mirrors a Baseline A subsystem.
+  baseline: SpecBaseline;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,8 +26,10 @@ export interface ConfigurationItem {
   type: CiType;
   tier: CiTier;
   // Many-to-many: a CI can legitimately serve more than one logical subsystem
-  // (see LogicalSubsystem) — not modeled as a single foreign key.
+  // (see LogicalSubsystem) — not modeled as a single foreign key. Should only
+  // reference subsystems of this same CI's baseline.
   subsystemIds: string[];
+  baseline: SpecBaseline;
   overDecompositionFlag: boolean;
   consolidationNotes: string;
   status: string;
@@ -190,6 +197,29 @@ export interface SafetyDeliverable {
   updatedAt: string;
 }
 
+// General (non-safety) program/software planning CDRLs — SEMP, SDP, STP, etc.
+// Deliberately a separate entity from SafetyDeliverable rather than folded
+// into its CDRL catalog: SafetyDeliverable is scoped to safety-specific
+// artifacts (hazard analyses, safety plans), and this covers the broader
+// program/software planning documents SETR events also gate on.
+export interface ProgramPlanningDeliverable {
+  id: string;
+  title: string;
+  level: SpecLevel;
+  cdrlType: string;
+  applicability: SafetyApplicability;
+  baseline: SpecBaseline;
+  status: SpecStatus;
+  // Set when level === "Subsystem"; null otherwise.
+  linkedSubsystemId: string | null;
+  // Set when level === "CI"; null otherwise.
+  linkedCiId: string | null;
+  cdrlDescription: string;
+  deliveryMilestone: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // A site-wide editable-prose entry. Keyed by a stable string `key` chosen at
 // each call site (not a random id), so a save is always an upsert: "does an
 // override for this key exist yet, or does the UI still fall back to the
@@ -218,6 +248,7 @@ export interface Database {
   interfaces: InterfaceRecord[];
   specifications: Specification[];
   safetyDeliverables: SafetyDeliverable[];
+  programPlanningDeliverables: ProgramPlanningDeliverable[];
   content: ContentEntry[];
 }
 

@@ -12,6 +12,7 @@ const REQUIRED_KEYS: (keyof Database)[] = [
   "interfaces",
   "specifications",
   "safetyDeliverables",
+  "programPlanningDeliverables",
   "content",
 ];
 

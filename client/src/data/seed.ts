@@ -11,6 +11,7 @@ export const SEED_DATA: Database = {
       description:
         "Generates and captures electrical stimulus/response signals exchanged with the Unit Under Test during automated test sequences.",
       source: "Validated",
+      baseline: "Baseline A",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -20,6 +21,7 @@ export const SEED_DATA: Database = {
       description:
         "Formats and transports diagnostic status/health messages between the Test Set and UUT test scripts.",
       source: "Validated",
+      baseline: "Baseline A",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -29,6 +31,7 @@ export const SEED_DATA: Database = {
       description:
         "Regulates and distributes DC power to Test Set sub-assemblies. Hypothesis based on IPS's apparent role; not yet confirmed against design-engineer knowledge.",
       source: "Proposed",
+      baseline: "Baseline A",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -38,8 +41,39 @@ export const SEED_DATA: Database = {
       description:
         "Pulled directly from the existing physical/rack-organized SSDD as a placeholder grouping. Captures which enclosure a CI physically sits in, not a functional boundary — not yet independently validated as a true logical subsystem.",
       source: "Inherited from SSDD structure — unverified",
+      baseline: "Baseline A",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "sub-b-001",
+      name: "UUT Stimulus/Response",
+      description:
+        "Baseline B's own functional decomposition for stimulus/response generation and capture — independently validated at SFR, not inherited from Baseline A's subsystem of the same name.",
+      source: "Validated",
+      baseline: "Baseline B",
+      createdAt: "2026-06-01T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
+    },
+    {
+      id: "sub-b-002",
+      name: "Diagnostic Messaging (Ethernet-based)",
+      description:
+        "Baseline B's redesigned diagnostic messaging function, standardizing on Ethernet-based transport (see ab-001) in place of Baseline A's proprietary serial protocol. Validated at SFR.",
+      source: "Validated",
+      baseline: "Baseline B",
+      createdAt: "2026-06-01T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
+    },
+    {
+      id: "sub-b-003",
+      name: "Power Conditioning & Distribution",
+      description:
+        "Candidate Baseline B power conditioning function, largely mirroring Baseline A's IPS-derived allocation. Still Proposed pending SFR closure — the one subsystem that didn't clear SFR alongside the other two.",
+      source: "Proposed",
+      baseline: "Baseline B",
+      createdAt: "2026-06-01T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
     },
   ],
   cis: [
@@ -49,6 +83,7 @@ export const SEED_DATA: Database = {
       type: "developmental",
       tier: "Tier 1",
       subsystemIds: ["sub-001", "sub-002", "sub-003"],
+      baseline: "Baseline A",
       overDecompositionFlag: false,
       consolidationNotes: "",
       status: "In reconciliation",
@@ -63,6 +98,7 @@ export const SEED_DATA: Database = {
       type: "developmental",
       tier: "Tier 1",
       subsystemIds: ["sub-001", "sub-002"],
+      baseline: "Baseline A",
       overDecompositionFlag: false,
       consolidationNotes: "",
       status: "In reconciliation",
@@ -76,6 +112,7 @@ export const SEED_DATA: Database = {
       type: "COTS",
       tier: "Tier 1",
       subsystemIds: ["sub-001"],
+      baseline: "Baseline A",
       overDecompositionFlag: true,
       consolidationNotes:
         "Should be absorbed into Test Set CI; currently tracked as a standalone CI despite being a COTS sub-assembly with no independent verification path.",
@@ -90,6 +127,7 @@ export const SEED_DATA: Database = {
       type: "COTS",
       tier: "Tier 1",
       subsystemIds: ["sub-003"],
+      baseline: "Baseline A",
       overDecompositionFlag: true,
       consolidationNotes:
         "Candidate for reclassification as a COTS item record under the Test Set CI rather than a standalone CI.",
@@ -104,6 +142,7 @@ export const SEED_DATA: Database = {
       type: "developmental",
       tier: "Tier 3",
       subsystemIds: ["sub-004"],
+      baseline: "Baseline A",
       overDecompositionFlag: false,
       consolidationNotes: "",
       status: "Slated for replacement",
@@ -327,18 +366,18 @@ export const SEED_DATA: Database = {
     },
     {
       id: "spec-003",
-      title: "System Requirements Specification — Baseline B (early draft)",
+      title: "System Requirements Specification — Baseline B",
       level: "System",
       domain: "Hardware",
       specType: "Development",
       baseline: "Baseline B",
-      status: "Draft",
+      status: "In Review",
       linkedSubsystemId: null,
       linkedCiId: null,
       sections: {
         scope:
-          "Early-draft top-level requirements for Baseline B. Content is intentionally sparse — Baseline B is still in concept/early design and should not be treated as stable.",
-        applicableDocuments: "TBD pending Baseline B CDD update.",
+          "Top-level requirements for Baseline B, confirmed complete and bounded at SRR. Functional decomposition (SFR) has since validated two of three candidate subsystems — see sub-b-001/sub-b-002/sub-b-003.",
+        applicableDocuments: "Baseline B CDD; SEMP (plan-001); Software Development Plan (plan-003).",
         functionalPerformance:
           "TBD — see A/B Compatibility Matrix for the specific UUT-relevant interfaces already being tracked ahead of full requirements definition.",
         interfaces:
@@ -351,10 +390,77 @@ export const SEED_DATA: Database = {
         logistics: "TBD.",
         verificationProvisions: "TBD.",
         notes:
-          "Illustrative/demo content only. This spec should mature roughly in step with Baseline A's transition from Development to Production specs — track that relationship via the A/B Compatibility Matrix, not by duplicating content here.",
+          "Illustrative/demo content only. SRR closed this spec's requirements baseline; it should mature roughly in step with Baseline A's transition from Development to Production specs — track that relationship via the A/B Compatibility Matrix, not by duplicating content here.",
       },
       createdAt: "2026-01-06T00:00:00.000Z",
-      updatedAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
+    },
+    {
+      id: "spec-004",
+      title: "UUT Stimulus/Response — Subsystem Development Specification (Baseline B)",
+      level: "Subsystem",
+      domain: "Hardware",
+      specType: "Development",
+      baseline: "Baseline B",
+      status: "Draft",
+      linkedSubsystemId: "sub-b-001",
+      linkedCiId: null,
+      sections: {
+        scope:
+          "Development specification for Baseline B's UUT Stimulus/Response subsystem, allocating system-level stimulus/response requirements to this now-validated functional boundary (see Subsystems tab, sub-b-001).",
+        applicableDocuments: "System Requirements Specification — Baseline B (spec-003); SEMP (plan-001).",
+        functionalPerformance:
+          "Shall generate and capture UUT stimulus/response signals per the Baseline B requirements baseline; specific signal timing/tolerance TBD pending detailed design.",
+        interfaces:
+          "External interface to the UUT carries over from Baseline A's ICD-TS-014 pending confirmation this remains unchanged for Baseline B; internal CI-level interfaces not yet defined — physical decomposition hasn't started.",
+        environmental: "TBD pending Baseline B environmental design reference mission profile confirmation.",
+        designConstraints:
+          "None prescribed at this level by design, consistent with keeping subsystem specs free of design-solution language.",
+        safety:
+          "Functional Hazard Analysis in progress (see Safety Deliverables) — no safety requirements finalized here until that closes.",
+        security: "N/A for this illustrative dataset.",
+        humanFactors: "Deferred to system-level allocation.",
+        logistics: "N/A at this level — deferred to CI-level specs once physical decomposition begins post-SSR.",
+        verificationProvisions: "TBD — verification approach depends on CI-level decomposition, not yet started.",
+        notes:
+          "Illustrative/demo content only. This subsystem cleared SFR; this spec reflects the resulting allocation, still Draft pending SSR review.",
+      },
+      createdAt: "2026-06-20T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
+    },
+    {
+      id: "spec-005",
+      title: "Diagnostic Messaging (Ethernet-based) — Subsystem Development Specification (Baseline B)",
+      level: "Subsystem",
+      domain: "Software",
+      specType: "Development",
+      baseline: "Baseline B",
+      status: "Draft",
+      linkedSubsystemId: "sub-b-002",
+      linkedCiId: null,
+      sections: {
+        scope:
+          "Development specification for Baseline B's redesigned Ethernet-based Diagnostic Messaging subsystem (see Subsystems tab, sub-b-002), replacing Baseline A's proprietary serial protocol (see ab-001).",
+        applicableDocuments:
+          "System Requirements Specification — Baseline B (spec-003); Software Development Plan (plan-003); Software Test Plan (plan-004).",
+        functionalPerformance:
+          "Shall transport diagnostic status/health messages over Ethernet per the Baseline B requirements baseline; message schema and latency bounds TBD pending detailed design.",
+        interfaces: "Ethernet-based transport per the Baseline B interface intent noted in ab-001; specific protocol/port allocation TBD.",
+        environmental: "Inherits system-level environmental allocation; no tailored exception identified yet.",
+        designConstraints:
+          "Must interoperate with legacy serial-protocol UUT scripts during the Baseline A→B transition (see rec-003) until an adapter layer or script rewrite is in place.",
+        safety:
+          "Functional Hazard Analysis in progress (see Safety Deliverables) — flags network congestion delaying a safety-relevant fault report as a candidate hazard; not yet a finalized safety requirement.",
+        security:
+          "Ethernet transport introduces a network attack surface Baseline A's point-to-point serial link didn't have — security requirements TBD, flagged for follow-up rather than deferred silently.",
+        humanFactors: "N/A beyond system-level allocation.",
+        logistics: "N/A at this level.",
+        verificationProvisions: "TBD — depends on CI-level decomposition, not yet started.",
+        notes:
+          "Illustrative/demo content only. This is the subsystem most likely to slip SSR if its FHA doesn't close — track via the Safety Deliverables tab, not just this spec's status.",
+      },
+      createdAt: "2026-06-20T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
     },
   ],
   safetyDeliverables: [
@@ -461,6 +567,126 @@ export const SEED_DATA: Database = {
       deliveryMilestone: "Post-TRR, prior to fielding",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "safety-007",
+      title: "Preliminary Hazard Analysis Report — Baseline B",
+      level: "System",
+      cdrlType: "Preliminary Hazard Analysis / System Requirements Hazard Analysis Report",
+      applicability: "Development",
+      baseline: "Baseline B",
+      status: "Approved",
+      linkedSubsystemId: null,
+      linkedCiId: null,
+      hazardExample:
+        "Loss of test-set control over the UUT during an automated Baseline B test sequence, before the redesigned Ethernet messaging path is fully validated.",
+      cdrlDescription:
+        "Identified candidate system-level hazards and allocated resulting safety requirements at SRR, against the Baseline B requirements baseline (spec-003).",
+      deliveryMilestone: "SRR",
+      createdAt: "2026-06-01T00:00:00.000Z",
+      updatedAt: "2026-06-01T00:00:00.000Z",
+    },
+    {
+      id: "safety-008",
+      title: "Functional Hazard Analysis Report — UUT Stimulus/Response (Baseline B)",
+      level: "Subsystem",
+      cdrlType: "Functional Hazard Analysis Report",
+      applicability: "Development",
+      baseline: "Baseline B",
+      status: "In Review",
+      linkedSubsystemId: "sub-b-001",
+      linkedCiId: null,
+      hazardExample:
+        "Stimulus generation function applies an out-of-tolerance signal to the UUT interface during a Baseline B automated test sequence.",
+      cdrlDescription:
+        "Performed against the now-validated UUT Stimulus/Response functional boundary (see Subsystems tab, sub-b-001) — one of the two subsystems that cleared SFR.",
+      deliveryMilestone: "SFR",
+      createdAt: "2026-06-20T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
+    },
+    {
+      id: "safety-009",
+      title: "Functional Hazard Analysis Report — Diagnostic Messaging (Baseline B)",
+      level: "Subsystem",
+      cdrlType: "Functional Hazard Analysis Report",
+      applicability: "Development",
+      baseline: "Baseline B",
+      status: "Draft",
+      linkedSubsystemId: "sub-b-002",
+      linkedCiId: null,
+      hazardExample:
+        "Ethernet-based diagnostic messaging introduces a new potential hazard: network congestion delaying a safety-relevant fault report beyond the required latency bound — a failure mode Baseline A's point-to-point serial protocol didn't have.",
+      cdrlDescription:
+        "Performed against the redesigned Ethernet-based Diagnostic Messaging subsystem (sub-b-002) — still Draft since this is the subsystem most likely to slip SSR.",
+      deliveryMilestone: "SFR",
+      createdAt: "2026-06-20T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
+    },
+  ],
+  programPlanningDeliverables: [
+    {
+      id: "plan-001",
+      title: "Systems Engineering Management Plan",
+      level: "System",
+      cdrlType: "Systems Engineering Management Plan (SEMP)",
+      applicability: "Both",
+      baseline: "Baseline A",
+      status: "Approved",
+      linkedSubsystemId: null,
+      linkedCiId: null,
+      cdrlDescription:
+        "Governs the overall SE process (reviews, baselines, decomposition approach) across both baselines — established at/before SRR, updated rather than re-issued per baseline.",
+      deliveryMilestone: "SRR",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "plan-002",
+      title: "Configuration Management Plan",
+      level: "System",
+      cdrlType: "Configuration Management Plan (CMP)",
+      applicability: "Both",
+      baseline: "Baseline A",
+      status: "Approved",
+      linkedSubsystemId: null,
+      linkedCiId: null,
+      cdrlDescription:
+        "Governs CM process for both baselines — the same discipline the Delta/Traceability Matrix and CI over-decomposition tracking ultimately feed into.",
+      deliveryMilestone: "SRR",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "plan-003",
+      title: "Software Development Plan — Baseline B",
+      level: "System",
+      cdrlType: "Software Development Plan (SDP)",
+      applicability: "Development",
+      baseline: "Baseline B",
+      status: "In Review",
+      linkedSubsystemId: null,
+      linkedCiId: null,
+      cdrlDescription:
+        "Drafted at SRR establishing candidate CSCI boundaries; updated at SFR to allocate software functions against the now-validated Diagnostic Messaging and UUT Stimulus/Response subsystems.",
+      deliveryMilestone: "SFR",
+      createdAt: "2026-06-01T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
+    },
+    {
+      id: "plan-004",
+      title: "Software Test Plan — Diagnostic Messaging (Baseline B)",
+      level: "Subsystem",
+      cdrlType: "Software Test Plan (STP)",
+      applicability: "Development",
+      baseline: "Baseline B",
+      status: "Draft",
+      linkedSubsystemId: "sub-b-002",
+      linkedCiId: null,
+      cdrlDescription:
+        "Establishes the test approach for the Ethernet-based diagnostic messaging redesign now that this subsystem's functional boundary cleared SFR — still Draft since the subsystem's own FHA hasn't closed yet.",
+      deliveryMilestone: "SFR",
+      createdAt: "2026-06-15T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
     },
   ],
   content: [],

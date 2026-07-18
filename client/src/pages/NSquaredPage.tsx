@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { EditableText } from "../components/EditableText";
 import { N2Grid } from "../components/N2Grid";
 import { INTERFACE_HAZARD_NOTE } from "../data/safetyGuidance";
-import type { ConfigurationItem, InterfaceRecord, LogicalSubsystem } from "../types";
+import { SPEC_BASELINES, type ConfigurationItem, type InterfaceRecord, type LogicalSubsystem, type SpecBaseline } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
 interface Props {
@@ -18,10 +18,14 @@ interface CiFocus {
   label: string;
 }
 
-export function NSquaredPage({ subsystems, cis, interfacesEntity, onSelectSubsystem, onSelectCi }: Props) {
+export function NSquaredPage({ subsystems: allSubsystems, cis: allCis, interfacesEntity, onSelectSubsystem, onSelectCi }: Props) {
   const { rows: interfaces, error, create, update, remove } = interfacesEntity;
   const [ciFocus, setCiFocus] = useState<CiFocus | null>(null);
+  const [baseline, setBaseline] = useState<SpecBaseline>("Baseline A");
   const ciSectionRef = useRef<HTMLElement>(null);
+
+  const subsystems = allSubsystems.filter((s) => s.baseline === baseline);
+  const cis = allCis.filter((c) => c.baseline === baseline);
 
   function makeSaveHandler(scope: "subsystem" | "ci") {
     return async ({ id, aId, bId, description }: { id?: string; aId: string; bId: string; description: string }) => {
@@ -69,6 +73,22 @@ export function NSquaredPage({ subsystems, cis, interfacesEntity, onSelectSubsys
           as="span"
           className="hint"
         />
+        <label className="form-field" style={{ flexDirection: "row", alignItems: "center", gap: "0.5rem", width: "auto" }}>
+          <span>Baseline</span>
+          <select
+            value={baseline}
+            onChange={(e) => {
+              setBaseline(e.target.value as SpecBaseline);
+              setCiFocus(null);
+            }}
+          >
+            {SPEC_BASELINES.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
       <div className="safety-callout">
         <EditableText contentKey="safety.n2.interfaceHazardNote" defaultValue={INTERFACE_HAZARD_NOTE} as="span" />

@@ -8,6 +8,7 @@ import type {
   DeltaMatrixRow,
   InterfaceRecord,
   LogicalSubsystem,
+  ProgramPlanningDeliverable,
   Recommendation,
   SafetyDeliverable,
   Specification,
@@ -21,6 +22,10 @@ export const logicalSubsystemsApi = entity<LogicalSubsystem>("/subsystems", "log
 export const interfacesApi = entity<InterfaceRecord>("/interfaces", "interfaces");
 export const specificationsApi = entity<Specification>("/specifications", "specifications");
 export const safetyDeliverablesApi = entity<SafetyDeliverable>("/safety-deliverables", "safetyDeliverables");
+export const programPlanningDeliverablesApi = entity<ProgramPlanningDeliverable>(
+  "/program-planning-deliverables",
+  "programPlanningDeliverables"
+);
 export const cisApi = entity<ConfigurationItem>("/cis", "cis");
 export const deltaMatrixApi = entity<DeltaMatrixRow>("/delta-matrix", "deltaMatrix");
 export const abCompatibilityApi = entity<AbCompatibilityRow>("/ab-compatibility", "abCompatibility");

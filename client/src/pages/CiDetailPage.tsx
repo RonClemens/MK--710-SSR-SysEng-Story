@@ -6,6 +6,7 @@ import type {
   CotsRecord,
   DeltaMatrixRow,
   LogicalSubsystem,
+  ProgramPlanningDeliverable,
   Recommendation,
   SafetyDeliverable,
   Specification,
@@ -21,6 +22,7 @@ interface Props {
   recommendations: Recommendation[];
   specifications: Specification[];
   safetyDeliverables: SafetyDeliverable[];
+  planningDeliverables: ProgramPlanningDeliverable[];
   onBack: () => void;
   onSelectSubsystem: (id: string) => void;
   onSelectSpecification: (id: string) => void;
@@ -36,6 +38,7 @@ export function CiDetailPage({
   recommendations,
   specifications,
   safetyDeliverables,
+  planningDeliverables,
   onBack,
   onSelectSubsystem,
   onSelectSpecification,
@@ -49,6 +52,7 @@ export function CiDetailPage({
       </button>
       <div className="page-header">
         <h2>{ci.name}</h2>
+        <span className="badge">{ci.baseline}</span>
         <span className={`badge tier-${ci.tier.replace(/\s/g, "")}`}>{ci.tier}</span>
         {ci.overDecompositionFlag && <span className="badge badge-warning">Over-decomposition flagged</span>}
       </div>
@@ -198,6 +202,24 @@ export function CiDetailPage({
                 <span className="badge badge-info">{sd.status}</span>
               </p>
               <p className="hint">{sd.cdrlDescription}</p>
+            </div>
+          ))
+        )}
+      </section>
+
+      <section>
+        <h3>Program Planning Deliverables</h3>
+        {planningDeliverables.length === 0 ? (
+          <p className="hint">No planning deliverables linked to this CI yet.</p>
+        ) : (
+          planningDeliverables.map((pd) => (
+            <div className="detail-card" key={pd.id}>
+              <p>
+                <strong>{pd.title}</strong> <span className="badge">{pd.cdrlType}</span>{" "}
+                <span className="badge">{pd.applicability}</span> <span className="badge">{pd.baseline}</span>{" "}
+                <span className="badge badge-info">{pd.status}</span>
+              </p>
+              <p className="hint">{pd.cdrlDescription}</p>
             </div>
           ))
         )}

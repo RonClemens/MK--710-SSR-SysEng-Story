@@ -7,6 +7,7 @@ import {
   deltaMatrixApi,
   interfacesApi,
   logicalSubsystemsApi,
+  programPlanningDeliverablesApi,
   recommendationsApi,
   safetyDeliverablesApi,
   specificationsApi,
@@ -23,6 +24,7 @@ import { RecommendationsPage } from "./pages/RecommendationsPage";
 import { SpecificationsPage } from "./pages/SpecificationsPage";
 import { SpecificationDetailPage } from "./pages/SpecificationDetailPage";
 import { SafetyDeliverablesPage } from "./pages/SafetyDeliverablesPage";
+import { PlanningDeliverablesPage } from "./pages/PlanningDeliverablesPage";
 import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { EditableText } from "./components/EditableText";
@@ -38,6 +40,7 @@ type Tab =
   | "cots"
   | "specifications"
   | "safetyDeliverables"
+  | "planningDeliverables"
   | "recommendations";
 
 const TABS: { key: Tab; label: string }[] = [
@@ -49,6 +52,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "cots", label: "COTS Records" },
   { key: "specifications", label: "Specifications" },
   { key: "safetyDeliverables", label: "Safety Deliverables" },
+  { key: "planningDeliverables", label: "Program Planning" },
   { key: "recommendations", label: "Recommendations" },
 ];
 
@@ -62,6 +66,7 @@ export default function App() {
   const interfaces = useEntity(interfacesApi);
   const specifications = useEntity(specificationsApi);
   const safetyDeliverables = useEntity(safetyDeliverablesApi);
+  const planningDeliverables = useEntity(programPlanningDeliverablesApi);
 
   const [tab, setTab] = useState<Tab>("subsystems");
   const [selectedCiId, setSelectedCiId] = useState<string | null>(null);
@@ -84,6 +89,7 @@ export default function App() {
     interfaces.refresh();
     specifications.refresh();
     safetyDeliverables.refresh();
+    planningDeliverables.refresh();
   }
 
   function selectCi(id: string) {
@@ -150,6 +156,7 @@ export default function App() {
               recommendations={recommendations.rows.filter((r) => r.relatedCiId === selectedCi.id)}
               specifications={specifications.rows.filter((s) => s.linkedCiId === selectedCi.id)}
               safetyDeliverables={safetyDeliverables.rows.filter((sd) => sd.linkedCiId === selectedCi.id)}
+              planningDeliverables={planningDeliverables.rows.filter((pd) => pd.linkedCiId === selectedCi.id)}
               onBack={clearSelection}
               onSelectSubsystem={selectSubsystem}
               onSelectSpecification={selectSpecification}
@@ -160,6 +167,7 @@ export default function App() {
               servingCis={cis.rows.filter((c) => c.subsystemIds.includes(selectedSubsystem.id))}
               specifications={specifications.rows.filter((s) => s.linkedSubsystemId === selectedSubsystem.id)}
               safetyDeliverables={safetyDeliverables.rows.filter((sd) => sd.linkedSubsystemId === selectedSubsystem.id)}
+              planningDeliverables={planningDeliverables.rows.filter((pd) => pd.linkedSubsystemId === selectedSubsystem.id)}
               onBack={clearSelection}
               onSelectCi={selectCi}
               onSelectSpecification={selectSpecification}
@@ -218,6 +226,13 @@ export default function App() {
               {tab === "safetyDeliverables" && (
                 <SafetyDeliverablesPage
                   entity={safetyDeliverables}
+                  subsystems={logicalSubsystems.rows}
+                  cis={cis.rows}
+                />
+              )}
+              {tab === "planningDeliverables" && (
+                <PlanningDeliverablesPage
+                  entity={planningDeliverables}
                   subsystems={logicalSubsystems.rows}
                   cis={cis.rows}
                 />

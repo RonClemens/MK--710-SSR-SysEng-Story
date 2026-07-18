@@ -12,9 +12,14 @@ function normalize(db: Partial<Database>): Database {
   const cis = (db.cis ?? []).map((ci) => ({
     ...ci,
     subsystemIds: ci.subsystemIds ?? [],
+    baseline: ci.baseline ?? "Baseline A",
+  }));
+  const logicalSubsystems = (db.logicalSubsystems ?? []).map((s) => ({
+    ...s,
+    baseline: s.baseline ?? "Baseline A",
   }));
   return {
-    logicalSubsystems: db.logicalSubsystems ?? [],
+    logicalSubsystems,
     cis,
     deltaMatrix: db.deltaMatrix ?? [],
     abCompatibility: db.abCompatibility ?? [],
@@ -23,6 +28,7 @@ function normalize(db: Partial<Database>): Database {
     interfaces: db.interfaces ?? [],
     specifications: db.specifications ?? [],
     safetyDeliverables: db.safetyDeliverables ?? [],
+    programPlanningDeliverables: db.programPlanningDeliverables ?? [],
     content: db.content ?? [],
   };
 }
@@ -38,7 +44,8 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.logicalSubsystems === undefined ||
     db.interfaces === undefined ||
     db.specifications === undefined ||
-    db.safetyDeliverables === undefined;
+    db.safetyDeliverables === undefined ||
+    db.programPlanningDeliverables === undefined;
   return {
     db: {
       ...db,
@@ -46,6 +53,7 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       interfaces: db.interfaces ?? SEED_DATA.interfaces,
       specifications: db.specifications ?? SEED_DATA.specifications,
       safetyDeliverables: db.safetyDeliverables ?? SEED_DATA.safetyDeliverables,
+      programPlanningDeliverables: db.programPlanningDeliverables ?? SEED_DATA.programPlanningDeliverables,
     },
     changed,
   };
