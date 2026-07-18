@@ -8,6 +8,7 @@ import {
   interfacesApi,
   logicalSubsystemsApi,
   recommendationsApi,
+  safetyDeliverablesApi,
   specificationsApi,
 } from "./api/entities";
 import { api } from "./api/client";
@@ -21,13 +22,23 @@ import { CotsRecordsPage } from "./pages/CotsRecordsPage";
 import { RecommendationsPage } from "./pages/RecommendationsPage";
 import { SpecificationsPage } from "./pages/SpecificationsPage";
 import { SpecificationDetailPage } from "./pages/SpecificationDetailPage";
+import { SafetyDeliverablesPage } from "./pages/SafetyDeliverablesPage";
 import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { EditableText } from "./components/EditableText";
 import { ExportImport } from "./components/ExportImport";
 import { useSiteContent } from "./contexts/SiteContentContext";
 
-type Tab = "subsystems" | "n2" | "cis" | "delta" | "ab" | "cots" | "specifications" | "recommendations";
+type Tab =
+  | "subsystems"
+  | "n2"
+  | "cis"
+  | "delta"
+  | "ab"
+  | "cots"
+  | "specifications"
+  | "safetyDeliverables"
+  | "recommendations";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "subsystems", label: "Subsystems" },
@@ -37,6 +48,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "ab", label: "A/B Compatibility" },
   { key: "cots", label: "COTS Records" },
   { key: "specifications", label: "Specifications" },
+  { key: "safetyDeliverables", label: "Safety Deliverables" },
   { key: "recommendations", label: "Recommendations" },
 ];
 
@@ -49,6 +61,7 @@ export default function App() {
   const recommendations = useEntity(recommendationsApi);
   const interfaces = useEntity(interfacesApi);
   const specifications = useEntity(specificationsApi);
+  const safetyDeliverables = useEntity(safetyDeliverablesApi);
 
   const [tab, setTab] = useState<Tab>("subsystems");
   const [selectedCiId, setSelectedCiId] = useState<string | null>(null);
@@ -70,6 +83,7 @@ export default function App() {
     recommendations.refresh();
     interfaces.refresh();
     specifications.refresh();
+    safetyDeliverables.refresh();
   }
 
   function selectCi(id: string) {
@@ -135,6 +149,7 @@ export default function App() {
               cotsRecords={cotsRecords.rows.filter((r) => r.ciId === selectedCi.id)}
               recommendations={recommendations.rows.filter((r) => r.relatedCiId === selectedCi.id)}
               specifications={specifications.rows.filter((s) => s.linkedCiId === selectedCi.id)}
+              safetyDeliverables={safetyDeliverables.rows.filter((sd) => sd.linkedCiId === selectedCi.id)}
               onBack={clearSelection}
               onSelectSubsystem={selectSubsystem}
               onSelectSpecification={selectSpecification}
@@ -144,6 +159,7 @@ export default function App() {
               subsystem={selectedSubsystem}
               servingCis={cis.rows.filter((c) => c.subsystemIds.includes(selectedSubsystem.id))}
               specifications={specifications.rows.filter((s) => s.linkedSubsystemId === selectedSubsystem.id)}
+              safetyDeliverables={safetyDeliverables.rows.filter((sd) => sd.linkedSubsystemId === selectedSubsystem.id)}
               onBack={clearSelection}
               onSelectCi={selectCi}
               onSelectSpecification={selectSpecification}
@@ -197,6 +213,13 @@ export default function App() {
                   subsystems={logicalSubsystems.rows}
                   cis={cis.rows}
                   onSelectSpecification={selectSpecification}
+                />
+              )}
+              {tab === "safetyDeliverables" && (
+                <SafetyDeliverablesPage
+                  entity={safetyDeliverables}
+                  subsystems={logicalSubsystems.rows}
+                  cis={cis.rows}
                 />
               )}
               {tab === "recommendations" && (

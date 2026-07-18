@@ -22,6 +22,7 @@ function normalize(db: Partial<Database>): Database {
     recommendations: db.recommendations ?? [],
     interfaces: db.interfaces ?? [],
     specifications: db.specifications ?? [],
+    safetyDeliverables: db.safetyDeliverables ?? [],
     content: db.content ?? [],
   };
 }
@@ -34,13 +35,17 @@ function normalize(db: Partial<Database>): Database {
 // alternative is this demo silently losing features on a stale cache.
 function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Database>; changed: boolean } {
   const changed =
-    db.logicalSubsystems === undefined || db.interfaces === undefined || db.specifications === undefined;
+    db.logicalSubsystems === undefined ||
+    db.interfaces === undefined ||
+    db.specifications === undefined ||
+    db.safetyDeliverables === undefined;
   return {
     db: {
       ...db,
       logicalSubsystems: db.logicalSubsystems ?? SEED_DATA.logicalSubsystems,
       interfaces: db.interfaces ?? SEED_DATA.interfaces,
       specifications: db.specifications ?? SEED_DATA.specifications,
+      safetyDeliverables: db.safetyDeliverables ?? SEED_DATA.safetyDeliverables,
     },
     changed,
   };

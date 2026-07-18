@@ -166,6 +166,32 @@ export interface Specification {
   updatedAt: string;
 }
 
+// System safety CDRLs (MIL-STD-882E / JSSSEH), one record per deliverable
+// instance. hazardCategory is not stored — it's 1:1 with level (System
+// Hazard/Functional Hazard/Physical Hazard ↔ System/Subsystem/CI), so it's
+// derived via hazardCategoryForLevel() in the client's safetyGuidance module
+// rather than duplicated here as a field that could drift out of sync.
+export type SafetyApplicability = "Development" | "Production" | "Both";
+
+export interface SafetyDeliverable {
+  id: string;
+  title: string;
+  level: SpecLevel;
+  cdrlType: string;
+  applicability: SafetyApplicability;
+  baseline: SpecBaseline;
+  status: SpecStatus;
+  // Set when level === "Subsystem"; null otherwise.
+  linkedSubsystemId: string | null;
+  // Set when level === "CI"; null otherwise.
+  linkedCiId: string | null;
+  hazardExample: string;
+  cdrlDescription: string;
+  deliveryMilestone: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // A site-wide editable-prose entry. Keyed by a stable string `key` chosen at
 // each call site (not a random id), so a save is always an upsert: "does an
 // override for this key exist yet, or does the UI still fall back to the
@@ -193,6 +219,7 @@ export interface Database {
   recommendations: Recommendation[];
   interfaces: InterfaceRecord[];
   specifications: Specification[];
+  safetyDeliverables: SafetyDeliverable[];
   content: ContentEntry[];
 }
 

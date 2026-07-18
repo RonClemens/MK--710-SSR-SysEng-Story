@@ -42,6 +42,7 @@ async function start() {
   app.use("/api/recommendations", crudRouter("recommendations"));
   app.use("/api/interfaces", crudRouter("interfaces"));
   app.use("/api/specifications", crudRouter("specifications"));
+  app.use("/api/safety-deliverables", crudRouter("safetyDeliverables"));
   app.use("/api/content", contentRouter);
   app.use("/api/data", dataRouter);
 

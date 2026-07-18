@@ -63,8 +63,8 @@ even if it's misconfigured.
 
 ## Data model
 
-Eight structured entities (see `server/src/types.ts` / `client/src/types/index.ts`),
-plus a ninth, `ContentEntry`, for editable site prose (see
+Nine structured entities (see `server/src/types.ts` / `client/src/types/index.ts`),
+plus a tenth, `ContentEntry`, for editable site prose (see
 [Editable site content](#editable-site-content) below):
 
 - **Logical Subsystems** — the functional/behavioral decomposition layer this
@@ -132,6 +132,22 @@ plus a ninth, `ContentEntry`, for editable site prose (see
   technique supplies, while documenting and maintaining it is process
   discipline. This program's SSDD-inherited, unverified subsystems are what
   happens when that process step gets skipped.
+- **Safety Deliverables** — MIL-STD-882E/JSSSEH CDRL-style safety artifacts
+  (see `client/src/data/safetyGuidance.ts`), one record per deliverable
+  instance. Each has a `level` (System / Subsystem / CI — the same three
+  levels as Specifications, just relabeled in safety vocabulary as System
+  Hazard / Functional Hazard / Physical Hazard, derived rather than stored so
+  the two can't drift out of sync), a `cdrlType` (e.g. Preliminary Hazard
+  Analysis Report, Functional Hazard Analysis Report, System Hazard Analysis
+  Report — filtered to what's relevant at the chosen level), an
+  `applicability` (Development / Production / Both), a `baseline`, a
+  `status`, an optional link to a Subsystem or CI, an illustrative
+  `hazardExample`, a `cdrlDescription` of what the artifact documents, and a
+  `deliveryMilestone`. The tab's guidance panel shows example hazards per
+  category and the expected CDRL catalog per level before the CRUD list. See
+  [System safety and the decomposition hierarchy](#system-safety-and-the-decomposition-hierarchy)
+  below for how deliverable maturity should track Development vs. Production
+  specs.
 
 ### System safety and the decomposition hierarchy
 
@@ -162,13 +178,26 @@ connection at the points where it actually bites:
 - **Delta / Traceability Matrix** — a note that this matrix is also where
   PHA/SRHA-derived safety requirements get verified as correctly allocated
   from system level down to the responsible CI.
+- **Safety Deliverables tab** — actually tracks the CDRL instances the four
+  bullets above only reference in passing: real records with a level, hazard
+  category, CDRL type, applicability, baseline, status, and links to a
+  Subsystem or CI, rolled up on both detail views the same way Specifications
+  are.
 
-All of this is prose, not a new tracked entity — it's editable in place the
-same way as the DID guidance above (see
-[Editable site content](#editable-site-content)). If you need to actually
-*track* SRHA/FHA hazard records (hazard ID, severity/likelihood, causal
-factor, mitigation, verification), that would be a new entity and tab, not
-covered here.
+The guidance prose above (framework intro, hazard category descriptions and
+examples, CDRL descriptions, callout text) is editable in place the same way
+as the DID guidance (see [Editable site content](#editable-site-content));
+the Safety Deliverable *records* themselves are a normal CRUD entity like
+everything else in the data model.
+
+Each Safety Deliverable's `applicability` should track its corresponding
+specification's maturity, not run ahead of or behind it: a CDRL marked
+`Development` is expected to close out around the same milestone as the
+matching Development spec (e.g. a Subsystem's FHA Report alongside its
+Subsystem Development spec), while a `Production` CDRL — SHA, O&SHA, HHA —
+shouldn't be finalized before the corresponding Production spec exists,
+since it depends on the same as-built design maturity. `Both`-applicability
+CDRLs (SSPP, SAR, Hazard Log) are program-wide and aren't gated by either.
 
 All entities are fully CRUD-editable in the UI (add/edit/delete, no page
 reloads). The CI Detail view rolls up every related row for a given CI,

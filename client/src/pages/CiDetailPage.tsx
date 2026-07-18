@@ -7,6 +7,7 @@ import type {
   DeltaMatrixRow,
   LogicalSubsystem,
   Recommendation,
+  SafetyDeliverable,
   Specification,
 } from "../types";
 
@@ -19,6 +20,7 @@ interface Props {
   cotsRecords: CotsRecord[];
   recommendations: Recommendation[];
   specifications: Specification[];
+  safetyDeliverables: SafetyDeliverable[];
   onBack: () => void;
   onSelectSubsystem: (id: string) => void;
   onSelectSpecification: (id: string) => void;
@@ -33,6 +35,7 @@ export function CiDetailPage({
   cotsRecords,
   recommendations,
   specifications,
+  safetyDeliverables,
   onBack,
   onSelectSubsystem,
   onSelectSpecification,
@@ -177,6 +180,24 @@ export function CiDetailPage({
                 <span className="badge">{spec.domain}</span> <span className="badge">{spec.specType}</span>{" "}
                 <span className="badge">{spec.baseline}</span> <span className="badge badge-info">{spec.status}</span>
               </p>
+            </div>
+          ))
+        )}
+      </section>
+
+      <section>
+        <h3>Safety Deliverables</h3>
+        {safetyDeliverables.length === 0 ? (
+          <p className="hint">No safety deliverables linked to this CI yet.</p>
+        ) : (
+          safetyDeliverables.map((sd) => (
+            <div className="detail-card" key={sd.id}>
+              <p>
+                <strong>{sd.title}</strong> <span className="badge">{sd.cdrlType}</span>{" "}
+                <span className="badge">{sd.applicability}</span> <span className="badge">{sd.baseline}</span>{" "}
+                <span className="badge badge-info">{sd.status}</span>
+              </p>
+              <p className="hint">{sd.cdrlDescription}</p>
             </div>
           ))
         )}

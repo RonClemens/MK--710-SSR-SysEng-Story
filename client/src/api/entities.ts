@@ -9,6 +9,7 @@ import type {
   InterfaceRecord,
   LogicalSubsystem,
   Recommendation,
+  SafetyDeliverable,
   Specification,
 } from "../types";
 
@@ -19,6 +20,7 @@ function entity<T extends { id: string }>(path: string, collection: Parameters<t
 export const logicalSubsystemsApi = entity<LogicalSubsystem>("/subsystems", "logicalSubsystems");
 export const interfacesApi = entity<InterfaceRecord>("/interfaces", "interfaces");
 export const specificationsApi = entity<Specification>("/specifications", "specifications");
+export const safetyDeliverablesApi = entity<SafetyDeliverable>("/safety-deliverables", "safetyDeliverables");
 export const cisApi = entity<ConfigurationItem>("/cis", "cis");
 export const deltaMatrixApi = entity<DeltaMatrixRow>("/delta-matrix", "deltaMatrix");
 export const abCompatibilityApi = entity<AbCompatibilityRow>("/ab-compatibility", "abCompatibility");
