@@ -299,6 +299,44 @@ kind of CUI exposure the [security banner](#read-this-before-entering-real-data)
 above exists to prevent. If you need actual file storage, that belongs in
 your program's real CM system; this app just needs to point at it.
 
+## SEMP Migration
+
+The **SEMP Migration** tab produces a single downloadable Markdown file that
+maps this app's current content — including any Edit Mode changes — onto a
+Systems Engineering Management Plan (SEMP) section outline styled after
+DI-SESS-81785B (`client/src/data/sempGuidance.ts`,
+`client/src/utils/sempExport.ts`).
+
+**This is a manual, one-way export, not an integration.** This app has no
+network path to any other tool or machine, and is not meant to have one — the
+whole point of the CUI-avoidance decisions elsewhere in this README (link-only
+attachments, no CUI in the AI Assistant) is that this app stays outside the
+CUI boundary. If you're authoring a real SEMP on a separate (e.g. CUI) system:
+
+1. Open the **SEMP Migration** tab and click **Download SEMP Migration
+   Package (.md)**. The file contains only what's already visible in this
+   app's illustrative workbench data — it is not CUI by construction, but
+   review its contents yourself before moving it anywhere, since it will
+   reflect whatever real data you've entered.
+2. Move the downloaded file to your CUI-side environment using your
+   organization's own authorized transfer process (approved removable media,
+   an approved file-transfer gateway, etc.). This app cannot do that step for
+   you and does not try to.
+3. On the CUI side, manually incorporate each section into the SEMP you're
+   authoring there, using the file's section-by-section structure as a
+   drafting aid and cross-check — not as a finished, ready-to-sign document.
+
+**The DI-SESS-81785B section numbering/titles are a working assumption, not a
+verified citation** — this app has not been checked against a real copy of
+that DID. Every section number, title, and "source in this app" description
+on the SEMP Migration tab is editable via Edit Mode (see below) so you can
+correct the mapping to match your program's actual DID/SEMP table of contents
+before exporting; corrections are picked up by the next export automatically.
+
+Explicit non-goal: no direct integration with any other tool (no API push, no
+file write to a shared/mounted location) — see
+[Non-goals](#non-goals-v1).
+
 ## Editable site content
 
 Beyond the structured entity data above, most of the app's guidance prose
@@ -381,4 +419,6 @@ automatically.
 No multi-user auth, no real-time collaboration, no integration with
 Cameo/SysML/DOORS/Jama, and no attempt to be a formal CM system of record —
 this is a staging tool that feeds into (not replaces) official program
-documentation and CM processes.
+documentation and CM processes. The SEMP Migration tab follows the same
+principle: a downloadable Markdown drafting aid, not a live integration with
+any CUI-side SEMP-authoring tool.

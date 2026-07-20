@@ -25,6 +25,7 @@ import { SpecificationsPage } from "./pages/SpecificationsPage";
 import { SpecificationDetailPage } from "./pages/SpecificationDetailPage";
 import { SafetyDeliverablesPage } from "./pages/SafetyDeliverablesPage";
 import { PlanningDeliverablesPage } from "./pages/PlanningDeliverablesPage";
+import { SempMigrationPage } from "./pages/SempMigrationPage";
 import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { EditableText } from "./components/EditableText";
@@ -41,7 +42,8 @@ type Tab =
   | "specifications"
   | "safetyDeliverables"
   | "planningDeliverables"
-  | "recommendations";
+  | "recommendations"
+  | "sempMigration";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "subsystems", label: "Subsystems" },
@@ -54,6 +56,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "safetyDeliverables", label: "Safety Deliverables" },
   { key: "planningDeliverables", label: "Program Planning" },
   { key: "recommendations", label: "Recommendations" },
+  { key: "sempMigration", label: "SEMP Migration" },
 ];
 
 export default function App() {
@@ -239,6 +242,20 @@ export default function App() {
               )}
               {tab === "recommendations" && (
                 <RecommendationsPage entity={recommendations} cis={cis.rows} />
+              )}
+              {tab === "sempMigration" && (
+                <SempMigrationPage
+                  logicalSubsystems={logicalSubsystems.rows}
+                  cis={cis.rows}
+                  deltaMatrix={deltaMatrix.rows}
+                  abCompatibility={abCompatibility.rows}
+                  cotsRecords={cotsRecords.rows}
+                  recommendations={recommendations.rows}
+                  interfaces={interfaces.rows}
+                  specifications={specifications.rows}
+                  safetyDeliverables={safetyDeliverables.rows}
+                  planningDeliverables={planningDeliverables.rows}
+                />
               )}
             </>
           )}
