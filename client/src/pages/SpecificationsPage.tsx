@@ -71,6 +71,18 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
     { key: "baseline", label: "Baseline", filterOptions: SPEC_BASELINES, filterValue: (r) => r.baseline },
     { key: "status", label: "Status", filterOptions: SPEC_STATUSES, filterValue: (r) => r.status },
     { key: "linkedTo", label: "Linked to", render: linkedTo },
+    {
+      key: "attachments",
+      label: "Links",
+      render: (r) =>
+        r.attachments.length === 0 ? (
+          "—"
+        ) : (
+          <span className="badge" title={r.attachments.map((a) => a.label).join(", ")}>
+            {r.attachments.length} 📎
+          </span>
+        ),
+    },
   ];
 
   return (
@@ -228,7 +240,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
             cis={cis}
             onCancel={() => setCreating(false)}
             onSubmit={async (values: SpecMetadataValues) => {
-              const created = await create({ ...values, sections: emptySections() });
+              const created = await create({ ...values, sections: emptySections(), attachments: [] });
               setCreating(false);
               onSelectSpecification(created.id);
             }}

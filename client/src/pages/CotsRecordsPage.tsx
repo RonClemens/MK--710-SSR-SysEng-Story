@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
+import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import type { ConfigurationItem, CotsRecord, QualifiedAlternate } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
@@ -25,7 +26,10 @@ function textToAlternates(text: string): QualifiedAlternate[] {
     });
 }
 
-type CotsFormValues = Omit<CotsRecord, "qualifiedAlternates"> & { qualifiedAlternates: string };
+type CotsFormValues = Omit<CotsRecord, "qualifiedAlternates" | "attachments"> & {
+  qualifiedAlternates: string;
+  attachments: string;
+};
 
 export function CotsRecordsPage({ entity, cis }: Props) {
   const { rows, loading, error, create, update, remove } = entity;
@@ -50,6 +54,12 @@ export function CotsRecordsPage({ entity, cis }: Props) {
       type: "textarea",
     },
     { key: "obsolescenceMonitoringNotes", label: "Obsolescence monitoring notes", type: "textarea" },
+    {
+      key: "attachments",
+      label: "Linked files/documents (one per line: label | url)",
+      type: "textarea",
+      placeholder: "Vendor Datasheet | https://...",
+    },
   ];
 
   const emptyRow: CotsFormValues = {
@@ -63,6 +73,7 @@ export function CotsRecordsPage({ entity, cis }: Props) {
     partsListEntry: "",
     qualifiedAlternates: "",
     obsolescenceMonitoringNotes: "",
+    attachments: "",
     createdAt: "",
     updatedAt: "",
   };
@@ -75,6 +86,18 @@ export function CotsRecordsPage({ entity, cis }: Props) {
       key: "qualifiedAlternates",
       label: "Qualified alternates",
       render: (r) => r.qualifiedAlternates.length,
+    },
+    {
+      key: "attachments",
+      label: "Links",
+      render: (r) =>
+        r.attachments.length === 0 ? (
+          "—"
+        ) : (
+          <span className="badge" title={r.attachments.map((a) => a.label).join(", ")}>
+            {r.attachments.length} 📎
+          </span>
+        ),
     },
   ];
 
@@ -105,13 +128,20 @@ export function CotsRecordsPage({ entity, cis }: Props) {
           <EntityForm<CotsFormValues>
             fields={fields}
             initialValues={
-              editing === "new" ? emptyRow : { ...editing, qualifiedAlternates: alternatesToText(editing.qualifiedAlternates) }
+              editing === "new"
+                ? emptyRow
+                : {
+                    ...editing,
+                    qualifiedAlternates: alternatesToText(editing.qualifiedAlternates),
+                    attachments: attachmentsToText(editing.attachments),
+                  }
             }
             onCancel={() => setEditing(null)}
             onSubmit={async (values) => {
               const payload = {
                 ...values,
                 qualifiedAlternates: textToAlternates(values.qualifiedAlternates ?? ""),
+                attachments: textToAttachments(values.attachments ?? ""),
               };
               if (editing === "new") await create(payload);
               else await update(editing.id, payload);

@@ -2,10 +2,13 @@ import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
+import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import { CI_TIERS, CI_TYPES, SPEC_BASELINES, type ConfigurationItem, type LogicalSubsystem } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
-const emptyRow: Partial<ConfigurationItem> = {
+type CiFormValues = Omit<ConfigurationItem, "attachments"> & { attachments: string };
+
+const emptyRow: Partial<CiFormValues> = {
   name: "",
   type: "developmental",
   tier: "Tier 2",
@@ -15,6 +18,7 @@ const emptyRow: Partial<ConfigurationItem> = {
   consolidationNotes: "",
   status: "",
   notes: "",
+  attachments: "",
 };
 
 interface Props {
@@ -35,7 +39,7 @@ export function CisPage({ entity, subsystems, onSelectCi }: Props) {
   // a plain oversight.
   const subsystemOptionLabels = Object.fromEntries(subsystems.map((s) => [s.id, `${s.name} (${s.baseline})`]));
 
-  const fields: FieldDef<ConfigurationItem>[] = [
+  const fields: FieldDef<CiFormValues>[] = [
     { key: "name", label: "Name", type: "text" },
     { key: "type", label: "Type", type: "select", options: CI_TYPES },
     { key: "tier", label: "Tier", type: "select", options: CI_TIERS },
@@ -51,6 +55,12 @@ export function CisPage({ entity, subsystems, onSelectCi }: Props) {
     { key: "consolidationNotes", label: "Consolidation notes", type: "textarea" },
     { key: "status", label: "Status", type: "text" },
     { key: "notes", label: "Notes", type: "textarea" },
+    {
+      key: "attachments",
+      label: "Linked files/documents (one per line: label | url)",
+      type: "textarea",
+      placeholder: "ICD-TS-014 | https://...",
+    },
   ];
 
   const columns: ColumnDef<ConfigurationItem>[] = [
@@ -89,6 +99,18 @@ export function CisPage({ entity, subsystems, onSelectCi }: Props) {
       filterValue: (r) => (r.overDecompositionFlag ? "Yes" : "No"),
     },
     { key: "status", label: "Status", sortValue: (r) => r.status },
+    {
+      key: "attachments",
+      label: "Links",
+      render: (r) =>
+        r.attachments.length === 0 ? (
+          "—"
+        ) : (
+          <span className="badge" title={r.attachments.map((a) => a.label).join(", ")}>
+            {r.attachments.length} 📎
+          </span>
+        ),
+    },
   ];
 
   return (
@@ -114,13 +136,16 @@ export function CisPage({ entity, subsystems, onSelectCi }: Props) {
       )}
       {editing && (
         <Modal title={editing === "new" ? "Add CI" : `Edit ${editing.name}`} onClose={() => setEditing(null)}>
-          <EntityForm<ConfigurationItem>
+          <EntityForm<CiFormValues>
             fields={fields}
-            initialValues={editing === "new" ? emptyRow : editing}
+            initialValues={
+              editing === "new" ? emptyRow : { ...editing, attachments: attachmentsToText(editing.attachments) }
+            }
             onCancel={() => setEditing(null)}
             onSubmit={async (values) => {
-              if (editing === "new") await create(values);
-              else await update(editing.id, values);
+              const payload = { ...values, attachments: textToAttachments(values.attachments ?? "") };
+              if (editing === "new") await create(payload);
+              else await update(editing.id, payload);
               setEditing(null);
             }}
           />

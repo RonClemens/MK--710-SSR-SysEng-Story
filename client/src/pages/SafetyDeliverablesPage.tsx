@@ -63,6 +63,18 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
     { key: "status", label: "Status", filterOptions: SPEC_STATUSES, filterValue: (r) => r.status },
     { key: "linkedTo", label: "Linked to", render: linkedTo },
     { key: "deliveryMilestone", label: "Delivery milestone" },
+    {
+      key: "attachments",
+      label: "Links",
+      render: (r) =>
+        r.attachments.length === 0 ? (
+          "—"
+        ) : (
+          <span className="badge" title={r.attachments.map((a) => a.label).join(", ")}>
+            {r.attachments.length} 📎
+          </span>
+        ),
+    },
   ];
 
   const emptyValues: SafetyDeliverableValues = {
@@ -77,6 +89,7 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
     hazardExample: "",
     cdrlDescription: "",
     deliveryMilestone: "",
+    attachments: [],
   };
 
   return (
@@ -181,6 +194,7 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
                     hazardExample: editing.hazardExample,
                     cdrlDescription: editing.cdrlDescription,
                     deliveryMilestone: editing.deliveryMilestone,
+                    attachments: editing.attachments,
                   }
             }
             subsystems={subsystems}

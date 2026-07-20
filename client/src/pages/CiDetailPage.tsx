@@ -1,3 +1,4 @@
+import { AttachmentLinks } from "../components/AttachmentLinks";
 import { EditableText } from "../components/EditableText";
 import { OVER_DECOMPOSITION_SAFETY_NOTE } from "../data/safetyGuidance";
 import type {
@@ -70,6 +71,8 @@ export function CiDetailPage({
           </>
         )}
       </dl>
+
+      <AttachmentLinks attachments={ci.attachments} />
 
       {ci.overDecompositionFlag && (
         <div className="safety-callout">
@@ -165,6 +168,7 @@ export function CiDetailPage({
               <p><strong>Rationale:</strong> {row.rationale}</p>
               <p><strong>Parts list entry:</strong> {row.partsListEntry}</p>
               <p><strong>Obsolescence notes:</strong> {row.obsolescenceMonitoringNotes}</p>
+              <AttachmentLinks attachments={row.attachments} />
             </div>
           ))
         )}
@@ -184,6 +188,7 @@ export function CiDetailPage({
                 <span className="badge">{spec.domain}</span> <span className="badge">{spec.specType}</span>{" "}
                 <span className="badge">{spec.baseline}</span> <span className="badge badge-info">{spec.status}</span>
               </p>
+              <AttachmentLinks attachments={spec.attachments} />
             </div>
           ))
         )}
@@ -202,6 +207,7 @@ export function CiDetailPage({
                 <span className="badge badge-info">{sd.status}</span>
               </p>
               <p className="hint">{sd.cdrlDescription}</p>
+              <AttachmentLinks attachments={sd.attachments} />
             </div>
           ))
         )}
@@ -220,6 +226,7 @@ export function CiDetailPage({
                 <span className="badge badge-info">{pd.status}</span>
               </p>
               <p className="hint">{pd.cdrlDescription}</p>
+              <AttachmentLinks attachments={pd.attachments} />
             </div>
           ))
         )}

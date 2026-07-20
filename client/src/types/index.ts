@@ -1,3 +1,14 @@
+// A link-only reference to a file/document the record relates to — no file
+// content is stored or uploaded, just a label and a URL (SharePoint, DOORS,
+// a network share, wherever the real CM system already hosts it). This app
+// is a staging tool, not a CM system of record, and storing real program
+// files here — especially in the public static/Pages build — would be a CUI
+// exposure this app is explicitly built to avoid.
+export interface Attachment {
+  label: string;
+  url: string;
+}
+
 export type LogicalSubsystemSource =
   | "Validated"
   | "Proposed"
@@ -34,6 +45,7 @@ export interface ConfigurationItem {
   consolidationNotes: string;
   status: string;
   notes: string;
+  attachments: Attachment[];
   createdAt: string;
   updatedAt: string;
 }
@@ -84,6 +96,7 @@ export interface CotsRecord {
   partsListEntry: string;
   qualifiedAlternates: QualifiedAlternate[];
   obsolescenceMonitoringNotes: string;
+  attachments: Attachment[];
   createdAt: string;
   updatedAt: string;
 }
@@ -167,6 +180,7 @@ export interface Specification {
   linkedSubsystemId: string | null;
   linkedCiId: string | null;
   sections: SpecSections;
+  attachments: Attachment[];
   createdAt: string;
   updatedAt: string;
 }
@@ -193,6 +207,7 @@ export interface SafetyDeliverable {
   hazardExample: string;
   cdrlDescription: string;
   deliveryMilestone: string;
+  attachments: Attachment[];
   createdAt: string;
   updatedAt: string;
 }
@@ -216,6 +231,7 @@ export interface ProgramPlanningDeliverable {
   linkedCiId: string | null;
   cdrlDescription: string;
   deliveryMilestone: string;
+  attachments: Attachment[];
   createdAt: string;
   updatedAt: string;
 }

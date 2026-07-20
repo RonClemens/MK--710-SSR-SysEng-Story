@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { levelLabel } from "../data/didGuidance";
 import { CDRL_CATALOG, hazardCategoryForLevel } from "../data/safetyGuidance";
+import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import {
   SAFETY_APPLICABILITIES,
   SPEC_BASELINES,
   SPEC_LEVELS,
   SPEC_STATUSES,
+  type Attachment,
   type ConfigurationItem,
   type LogicalSubsystem,
   type SafetyApplicability,
@@ -26,6 +28,7 @@ export interface SafetyDeliverableValues {
   hazardExample: string;
   cdrlDescription: string;
   deliveryMilestone: string;
+  attachments: Attachment[];
 }
 
 interface Props {
@@ -49,6 +52,7 @@ export function SafetyDeliverableForm({ initial, subsystems, cis, onSubmit, onCa
   const [hazardExample, setHazardExample] = useState(initial.hazardExample);
   const [cdrlDescription, setCdrlDescription] = useState(initial.cdrlDescription);
   const [deliveryMilestone, setDeliveryMilestone] = useState(initial.deliveryMilestone);
+  const [attachmentsText, setAttachmentsText] = useState(attachmentsToText(initial.attachments));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -87,6 +91,7 @@ export function SafetyDeliverableForm({ initial, subsystems, cis, onSubmit, onCa
         hazardExample,
         cdrlDescription,
         deliveryMilestone,
+        attachments: textToAttachments(attachmentsText),
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
@@ -192,6 +197,15 @@ export function SafetyDeliverableForm({ initial, subsystems, cis, onSubmit, onCa
           value={deliveryMilestone}
           placeholder="e.g. PDR, CDR, TRR"
           onChange={(e) => setDeliveryMilestone(e.target.value)}
+        />
+      </label>
+      <label className="form-field">
+        <span>Linked files/documents (one per line: label | url)</span>
+        <textarea
+          value={attachmentsText}
+          onChange={(e) => setAttachmentsText(e.target.value)}
+          placeholder="Hazard Log entry | https://..."
+          rows={2}
         />
       </label>
       {error && <p className="form-error">{error}</p>}

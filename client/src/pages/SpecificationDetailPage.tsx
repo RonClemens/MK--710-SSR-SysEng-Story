@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AttachmentLinks } from "../components/AttachmentLinks";
 import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { SpecMetadataForm, type SpecMetadataValues } from "../components/SpecMetadataForm";
@@ -12,6 +13,7 @@ import {
   levelLabel,
 } from "../data/didGuidance";
 import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL } from "../data/safetyGuidance";
+import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import type { ConfigurationItem, LogicalSubsystem, SpecSections, Specification } from "../types";
 
 interface Props {
@@ -36,8 +38,12 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingMetadata, setEditingMetadata] = useState(false);
+  const [attachmentsDraft, setAttachmentsDraft] = useState(attachmentsToText(spec.attachments));
+  const [attachmentsSaving, setAttachmentsSaving] = useState(false);
+  const [attachmentsError, setAttachmentsError] = useState<string | null>(null);
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(spec.sections);
+  const attachmentsDirty = attachmentsDraft !== attachmentsToText(spec.attachments);
   const relevance = SECTION_RELEVANCE[spec.level];
 
   async function handleSave() {
@@ -49,6 +55,18 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
       setError(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleSaveAttachments() {
+    setAttachmentsSaving(true);
+    setAttachmentsError(null);
+    try {
+      await onUpdate(spec.id, { attachments: textToAttachments(attachmentsDraft) });
+    } catch (err) {
+      setAttachmentsError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setAttachmentsSaving(false);
     }
   }
 
@@ -199,6 +217,31 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
         <div className="form-actions">
           <button className="button-primary" onClick={handleSave} disabled={saving || !dirty}>
             {saving ? "Saving…" : dirty ? "Save Changes" : "Saved"}
+          </button>
+        </div>
+      </section>
+
+      <section>
+        <h3>Attachments</h3>
+        <p className="hint">
+          Linked files/documents (one per line: label | url) — no file content is stored in this app, just
+          references to wherever the real document lives.
+        </p>
+        <AttachmentLinks attachments={spec.attachments} />
+        <textarea
+          value={attachmentsDraft}
+          onChange={(e) => setAttachmentsDraft(e.target.value)}
+          placeholder="ICD-TS-014 | https://..."
+          rows={3}
+        />
+        {attachmentsError && <p className="form-error">{attachmentsError}</p>}
+        <div className="form-actions">
+          <button
+            className="button-primary"
+            onClick={handleSaveAttachments}
+            disabled={attachmentsSaving || !attachmentsDirty}
+          >
+            {attachmentsSaving ? "Saving…" : attachmentsDirty ? "Save Changes" : "Saved"}
           </button>
         </div>
       </section>

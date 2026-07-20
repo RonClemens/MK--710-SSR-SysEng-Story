@@ -1,3 +1,4 @@
+import { AttachmentLinks } from "../components/AttachmentLinks";
 import { EditableText } from "../components/EditableText";
 import { UNVERIFIED_SUBSYSTEM_SAFETY_NOTE } from "../data/safetyGuidance";
 import type { ConfigurationItem, LogicalSubsystem, ProgramPlanningDeliverable, SafetyDeliverable, Specification } from "../types";
@@ -96,6 +97,7 @@ export function SubsystemDetailPage({
                 <span className="badge">{spec.domain}</span> <span className="badge">{spec.specType}</span>{" "}
                 <span className="badge">{spec.baseline}</span> <span className="badge badge-info">{spec.status}</span>
               </p>
+              <AttachmentLinks attachments={spec.attachments} />
             </div>
           ))
         )}
@@ -114,6 +116,7 @@ export function SubsystemDetailPage({
                 <span className="badge badge-info">{sd.status}</span>
               </p>
               <p className="hint">{sd.cdrlDescription}</p>
+              <AttachmentLinks attachments={sd.attachments} />
             </div>
           ))
         )}
@@ -132,6 +135,7 @@ export function SubsystemDetailPage({
                 <span className="badge badge-info">{pd.status}</span>
               </p>
               <p className="hint">{pd.cdrlDescription}</p>
+              <AttachmentLinks attachments={pd.attachments} />
             </div>
           ))
         )}

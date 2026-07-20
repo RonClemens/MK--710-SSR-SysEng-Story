@@ -13,22 +13,30 @@ function normalize(db: Partial<Database>): Database {
     ...ci,
     subsystemIds: ci.subsystemIds ?? [],
     baseline: ci.baseline ?? "Baseline A",
+    attachments: ci.attachments ?? [],
   }));
   const logicalSubsystems = (db.logicalSubsystems ?? []).map((s) => ({
     ...s,
     baseline: s.baseline ?? "Baseline A",
+  }));
+  const cotsRecords = (db.cotsRecords ?? []).map((r) => ({ ...r, attachments: r.attachments ?? [] }));
+  const specifications = (db.specifications ?? []).map((s) => ({ ...s, attachments: s.attachments ?? [] }));
+  const safetyDeliverables = (db.safetyDeliverables ?? []).map((s) => ({ ...s, attachments: s.attachments ?? [] }));
+  const programPlanningDeliverables = (db.programPlanningDeliverables ?? []).map((p) => ({
+    ...p,
+    attachments: p.attachments ?? [],
   }));
   return {
     logicalSubsystems,
     cis,
     deltaMatrix: db.deltaMatrix ?? [],
     abCompatibility: db.abCompatibility ?? [],
-    cotsRecords: db.cotsRecords ?? [],
+    cotsRecords,
     recommendations: db.recommendations ?? [],
     interfaces: db.interfaces ?? [],
-    specifications: db.specifications ?? [],
-    safetyDeliverables: db.safetyDeliverables ?? [],
-    programPlanningDeliverables: db.programPlanningDeliverables ?? [],
+    specifications,
+    safetyDeliverables,
+    programPlanningDeliverables,
     content: db.content ?? [],
   };
 }

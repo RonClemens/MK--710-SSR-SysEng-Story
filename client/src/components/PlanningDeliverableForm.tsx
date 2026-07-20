@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { levelLabel } from "../data/didGuidance";
 import { PLANNING_CDRL_CATALOG } from "../data/planningGuidance";
+import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import {
   SAFETY_APPLICABILITIES,
   SPEC_BASELINES,
   SPEC_LEVELS,
   SPEC_STATUSES,
+  type Attachment,
   type ConfigurationItem,
   type LogicalSubsystem,
   type SafetyApplicability,
@@ -25,6 +27,7 @@ export interface PlanningDeliverableValues {
   linkedCiId: string | null;
   cdrlDescription: string;
   deliveryMilestone: string;
+  attachments: Attachment[];
 }
 
 interface Props {
@@ -47,6 +50,7 @@ export function PlanningDeliverableForm({ initial, subsystems, cis, onSubmit, on
   const [linkedCiId, setLinkedCiId] = useState(initial.linkedCiId ?? "");
   const [cdrlDescription, setCdrlDescription] = useState(initial.cdrlDescription);
   const [deliveryMilestone, setDeliveryMilestone] = useState(initial.deliveryMilestone);
+  const [attachmentsText, setAttachmentsText] = useState(attachmentsToText(initial.attachments));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -84,6 +88,7 @@ export function PlanningDeliverableForm({ initial, subsystems, cis, onSubmit, on
         linkedCiId: level === "CI" ? linkedCiId || null : null,
         cdrlDescription,
         deliveryMilestone,
+        attachments: textToAttachments(attachmentsText),
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
@@ -185,6 +190,15 @@ export function PlanningDeliverableForm({ initial, subsystems, cis, onSubmit, on
           value={deliveryMilestone}
           placeholder="e.g. SRR, SFR, SSR"
           onChange={(e) => setDeliveryMilestone(e.target.value)}
+        />
+      </label>
+      <label className="form-field">
+        <span>Linked files/documents (one per line: label | url)</span>
+        <textarea
+          value={attachmentsText}
+          onChange={(e) => setAttachmentsText(e.target.value)}
+          placeholder="SEMP document | https://..."
+          rows={2}
         />
       </label>
       {error && <p className="form-error">{error}</p>}

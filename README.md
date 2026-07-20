@@ -281,6 +281,24 @@ including its linked subsystems (and which other CIs also serve them), any
 linked specifications, safety deliverables, and planning deliverables; the
 Subsystem Detail view is the mirror image.
 
+## Linked files/documents
+
+CIs, COTS Item Records, Specifications, Safety Deliverables, and Program
+Planning Deliverables can each carry an `attachments: Attachment[]` field
+(`{ label, url }`). This is **link-only** — the app never stores or uploads
+file content, only a label and a URL pointing at wherever the real document
+already lives (SharePoint, DOORS, a network share). Edited as free text, one
+`label | url` per line, the same convention as `qualifiedAlternates` on COTS
+records, and rendered as clickable 📎-prefixed pills wherever the record
+appears (list tables, CI/Subsystem detail rollups).
+
+This was a deliberate scope decision, not a v1-of-something-bigger: this app
+is a staging tool, not a CM system of record, and storing real program files
+here — especially in the public static/Pages build — would be exactly the
+kind of CUI exposure the [security banner](#read-this-before-entering-real-data)
+above exists to prevent. If you need actual file storage, that belongs in
+your program's real CM system; this app just needs to point at it.
+
 ## Editable site content
 
 Beyond the structured entity data above, most of the app's guidance prose

@@ -89,6 +89,7 @@ export const SEED_DATA: Database = {
       status: "In reconciliation",
       notes:
         "Primary UUT test interface assembly; consolidation target for over-decomposed COTS sub-items below.",
+      attachments: [{ label: "ICD-TS-014 (Interface Control Document)", url: "https://example.com/docs/ICD-TS-014" }],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -103,6 +104,7 @@ export const SEED_DATA: Database = {
       consolidationNotes: "",
       status: "In reconciliation",
       notes: "UUT-facing controller module within the Test Set.",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -118,6 +120,7 @@ export const SEED_DATA: Database = {
         "Should be absorbed into Test Set CI; currently tracked as a standalone CI despite being a COTS sub-assembly with no independent verification path.",
       status: "Flagged for consolidation",
       notes: "Vendor COTS card, no unique program requirements beyond the Test Set's allocation.",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -133,6 +136,7 @@ export const SEED_DATA: Database = {
         "Candidate for reclassification as a COTS item record under the Test Set CI rather than a standalone CI.",
       status: "Flagged for consolidation",
       notes: "Commercial power supply module.",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -147,6 +151,7 @@ export const SEED_DATA: Database = {
       consolidationNotes: "",
       status: "Slated for replacement",
       notes: "Not UUT-facing; scheduled to be retired in a future increment.",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -224,6 +229,7 @@ export const SEED_DATA: Database = {
       ],
       obsolescenceMonitoringNotes:
         "Vendor has not announced end-of-life; monitor annually via vendor product change notice (PCN) subscription.",
+      attachments: [{ label: "Acme Corp MCC-200 Datasheet", url: "https://example.com/vendor/mcc-200-datasheet.pdf" }],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -240,6 +246,7 @@ export const SEED_DATA: Database = {
       partsListEntry: "Volt Dynamics IPS-28-15, Rev A",
       qualifiedAlternates: [],
       obsolescenceMonitoringNotes: "Vendor lifecycle status last checked 2026-05-01; no obsolescence notice on file.",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -328,6 +335,7 @@ export const SEED_DATA: Database = {
           "System-level requirements verified via integrated DT&E; subsystem/CI-level verification methods are specified in those respective specs.",
         notes: "Illustrative/demo content only — not real program data.",
       },
+      attachments: [{ label: "Capability Development Document (CDD)", url: "https://example.com/docs/cdd-baseline-a" }],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-06-01T00:00:00.000Z",
     },
@@ -361,6 +369,7 @@ export const SEED_DATA: Database = {
         notes:
           "This CI is flagged for over-decomposition consolidation — see CI Inventory and rec-001. Keep this spec's scope tight to avoid re-litigating requirements already captured in COTS item records once consolidation happens.",
       },
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-06-10T00:00:00.000Z",
     },
@@ -392,6 +401,7 @@ export const SEED_DATA: Database = {
         notes:
           "Illustrative/demo content only. SRR closed this spec's requirements baseline; it should mature roughly in step with Baseline A's transition from Development to Production specs — track that relationship via the A/B Compatibility Matrix, not by duplicating content here.",
       },
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-06-20T00:00:00.000Z",
     },
@@ -425,6 +435,7 @@ export const SEED_DATA: Database = {
         notes:
           "Illustrative/demo content only. This subsystem cleared SFR; this spec reflects the resulting allocation, still Draft pending SSR review.",
       },
+      attachments: [],
       createdAt: "2026-06-20T00:00:00.000Z",
       updatedAt: "2026-06-20T00:00:00.000Z",
     },
@@ -459,6 +470,7 @@ export const SEED_DATA: Database = {
         notes:
           "Illustrative/demo content only. This is the subsystem most likely to slip SSR if its FHA doesn't close — track via the Safety Deliverables tab, not just this spec's status.",
       },
+      attachments: [],
       createdAt: "2026-06-20T00:00:00.000Z",
       updatedAt: "2026-06-20T00:00:00.000Z",
     },
@@ -478,6 +490,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Governs the safety program's process, organization, and hazard-tracking approach across both baselines — established early and updated, not re-issued per baseline.",
       deliveryMilestone: "SRR",
+      attachments: [{ label: "System Safety Program Plan (full document)", url: "https://example.com/docs/sspp" }],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -495,6 +508,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Identifies candidate system-level hazards and allocates the resulting safety requirements before detailed design is fixed — feeds the System-level Development spec's Safety Requirements section (see spec-001).",
       deliveryMilestone: "PDR",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -512,6 +526,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Performed against the validated Diagnostic Messaging functional decomposition before subsystem design is fixed.",
       deliveryMilestone: "CDR",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -530,6 +545,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Provisional: any FHA findings scoped to this subsystem inherit its unverified functional boundary (see Subsystem Detail) — do not treat as closed until the subsystem itself is validated.",
       deliveryMilestone: "TBD pending subsystem validation",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -547,6 +563,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Verifies the MCC's integrated design doesn't introduce new hazards at its interfaces with MHC and IPS — this CI is flagged for over-decomposition, so check for causal-factor overlap with related CI-level hazard findings before closing (see CI Detail).",
       deliveryMilestone: "TRR",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -565,6 +582,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Identifies hazards from operational and maintenance procedures around the MHC — depends on stable maintenance procedures, which aren't finalized until Production.",
       deliveryMilestone: "Post-TRR, prior to fielding",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -583,6 +601,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Identified candidate system-level hazards and allocated resulting safety requirements at SRR, against the Baseline B requirements baseline (spec-003).",
       deliveryMilestone: "SRR",
+      attachments: [],
       createdAt: "2026-06-01T00:00:00.000Z",
       updatedAt: "2026-06-01T00:00:00.000Z",
     },
@@ -601,6 +620,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Performed against the now-validated UUT Stimulus/Response functional boundary (see Subsystems tab, sub-b-001) — one of the two subsystems that cleared SFR.",
       deliveryMilestone: "SFR",
+      attachments: [],
       createdAt: "2026-06-20T00:00:00.000Z",
       updatedAt: "2026-06-20T00:00:00.000Z",
     },
@@ -619,6 +639,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Performed against the redesigned Ethernet-based Diagnostic Messaging subsystem (sub-b-002) — still Draft since this is the subsystem most likely to slip SSR.",
       deliveryMilestone: "SFR",
+      attachments: [],
       createdAt: "2026-06-20T00:00:00.000Z",
       updatedAt: "2026-06-20T00:00:00.000Z",
     },
@@ -637,6 +658,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Governs the overall SE process (reviews, baselines, decomposition approach) across both baselines — established at/before SRR, updated rather than re-issued per baseline.",
       deliveryMilestone: "SRR",
+      attachments: [{ label: "Systems Engineering Management Plan (full document)", url: "https://example.com/docs/semp" }],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -653,6 +675,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Governs CM process for both baselines — the same discipline the Delta/Traceability Matrix and CI over-decomposition tracking ultimately feed into.",
       deliveryMilestone: "SRR",
+      attachments: [],
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -669,6 +692,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Drafted at SRR establishing candidate CSCI boundaries; updated at SFR to allocate software functions against the now-validated Diagnostic Messaging and UUT Stimulus/Response subsystems.",
       deliveryMilestone: "SFR",
+      attachments: [],
       createdAt: "2026-06-01T00:00:00.000Z",
       updatedAt: "2026-06-20T00:00:00.000Z",
     },
@@ -685,6 +709,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Establishes the test approach for the Ethernet-based diagnostic messaging redesign now that this subsystem's functional boundary cleared SFR — still Draft since the subsystem's own FHA hasn't closed yet.",
       deliveryMilestone: "SFR",
+      attachments: [],
       createdAt: "2026-06-15T00:00:00.000Z",
       updatedAt: "2026-06-20T00:00:00.000Z",
     },
@@ -701,6 +726,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Documents the Test Set CI's internal software design, drafted at CDR — still In Review in step with the CI's own Development spec (spec-002), which is itself held up pending the over-decomposition consolidation recommendation (rec-001).",
       deliveryMilestone: "CDR",
+      attachments: [],
       createdAt: "2026-05-01T00:00:00.000Z",
       updatedAt: "2026-06-10T00:00:00.000Z",
     },
@@ -717,6 +743,7 @@ export const SEED_DATA: Database = {
       cdrlDescription:
         "Will record the as-built/as-qualified software baseline once TRR-era testing closes — still Draft, consistent with Baseline A approaching but not yet at System TRR.",
       deliveryMilestone: "TRR",
+      attachments: [],
       createdAt: "2026-06-15T00:00:00.000Z",
       updatedAt: "2026-06-15T00:00:00.000Z",
     },
