@@ -13,6 +13,7 @@ import {
 } from "../data/didGuidance";
 import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL, SAFETY_FRAMEWORK_INTRO } from "../data/safetyGuidance";
 import { SETR_EVENTS, SETR_FRAMEWORK_INTRO, SETR_GUIDANCE } from "../data/setrGuidance";
+import { POINTER_SPEC_CATALOG, POINTER_SPEC_INTRO, POINTER_SPEC_PRINCIPLES } from "../data/pointerSpecGuidance";
 import {
   SPEC_BASELINES,
   SPEC_DOMAINS,
@@ -202,6 +203,46 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                 <EditableText contentKey={`setr.${event}.softwarePlanning`} defaultValue={SETR_GUIDANCE[event].softwarePlanning} as="p" />
                 <p className="did-guidance-label">Spec Generation</p>
                 <EditableText contentKey={`setr.${event}.specGeneration`} defaultValue={SETR_GUIDANCE[event].specGeneration} as="p" />
+              </div>
+            ))}
+          </div>
+
+          <h3>Pointer Specifications: Citing Higher-Level Standards</h3>
+          <EditableText contentKey="pointerSpec.frameworkIntro" defaultValue={POINTER_SPEC_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            {POINTER_SPEC_PRINCIPLES.map((principle, i) => (
+              <div className="detail-card" key={principle.title}>
+                <h4>{principle.title}</h4>
+                <EditableText contentKey={`pointerSpec.principles.${i}`} defaultValue={principle.text} as="p" />
+              </div>
+            ))}
+          </div>
+          <div className="did-guidance-grid">
+            {POINTER_SPEC_CATALOG.map((entry) => (
+              <div className="detail-card" key={entry.id}>
+                <h4>
+                  {entry.designator} <span className="badge">{entry.domain}</span>
+                </h4>
+                <p className="hint">{entry.title}</p>
+                <div className="safety-badge-row">
+                  {entry.levels.map((level) => (
+                    <span key={level} className="safety-badge">
+                      {levelLabel(level)}
+                    </span>
+                  ))}
+                </div>
+                <p className="did-guidance-label">Why it matters</p>
+                <EditableText
+                  contentKey={`pointerSpec.catalog.${entry.id}.whyItMatters`}
+                  defaultValue={entry.whyItMatters}
+                  as="p"
+                />
+                <p className="did-guidance-label">Recommended approach</p>
+                <EditableText
+                  contentKey={`pointerSpec.catalog.${entry.id}.recommendedApproach`}
+                  defaultValue={entry.recommendedApproach}
+                  as="p"
+                />
               </div>
             ))}
           </div>

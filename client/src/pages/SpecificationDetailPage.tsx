@@ -206,6 +206,19 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
                 ))}
             </span>
             <EditableText contentKey={`did.section.${key}.description`} defaultValue={SECTION_META[key].description} as="span" className="hint" />
+            {key === "applicableDocuments" && (
+              <p className="hint">
+                <EditableText
+                  contentKey="pointerSpec.detailHint"
+                  defaultValue={
+                    "Citing a MIL-STD, ASME standard, or handbook here (a \"pointer specification\")? See the " +
+                    "Pointer Specifications guidance on the Specifications tab list view for the recommended " +
+                    "cite-tailor-flow down approach before restating standard text here."
+                  }
+                  as="span"
+                />
+              </p>
+            )}
             <textarea
               value={draft[key]}
               onChange={(e) => setDraft((prev) => ({ ...prev, [key]: e.target.value }))}

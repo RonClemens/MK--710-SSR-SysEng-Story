@@ -142,6 +142,27 @@ plus an eleventh, `ContentEntry`, for editable site prose (see
   technique supplies, while documenting and maintaining it is process
   discipline. This program's SSDD-inherited, unverified subsystems are what
   happens when that process step gets skipped.
+
+  The Specifications tab's guidance panel also covers **pointer
+  specifications** — the higher-level industry/military standards a spec's
+  Section 2 (Applicable Documents) cites and requires compliance with (MIL-
+  STDs, ASME/ANSI standards, handbooks like the JSSSEH), as distinct from
+  requirements this program authors itself (see
+  `client/src/data/pointerSpecGuidance.ts`). The recommended approach: cite
+  by reference rather than restating standard text, tailor each standard
+  once (at the highest level it applies) rather than re-deriving the
+  tailoring at every level, flow every applicable paragraph down into an
+  actual verifiable "shall" with an assigned verification method, track
+  revision level under configuration management, and don't cite a standard
+  at a level it doesn't actually drive. An illustrative, non-exhaustive
+  catalog covers MIL-STD-882E (System Safety) and the JSSSEH (its
+  software-safety supplement), MIL-STD-1472 (Human Engineering, at System
+  level and wherever a CI presents an operator interface), MIL-STD-28800
+  (equipment ruggedization class, CI/Hardware-domain), and ASME Y14.100
+  (engineering drawing practices, CI-level and Production-spec-era) — each
+  with why it matters and the recommended cite/tailor/flow-down approach for
+  this program's decomposition. The Specification Detail page also surfaces
+  a pointer back to this guidance directly on the Applicable Documents field.
 - **Safety Deliverables** — MIL-STD-882E/JSSSEH CDRL-style safety artifacts
   (see `client/src/data/safetyGuidance.ts`), one record per deliverable
   instance. Each has a `level` (System / Subsystem / CI — the same three
