@@ -6,6 +6,7 @@ import { PlanningDeliverableForm, type PlanningDeliverableValues } from "../comp
 import { levelLabel } from "../data/didGuidance";
 import { PLANNING_CDRL_CATALOG, PLANNING_DELIVERABLES_INTRO } from "../data/planningGuidance";
 import { SETR_EVENTS, SETR_GUIDANCE } from "../data/setrGuidance";
+import { SOFTWARE_LIFECYCLE_GROUPS, SOFTWARE_LIFECYCLE_INTRO } from "../data/tdpGuidance";
 import {
   SAFETY_APPLICABILITIES,
   SPEC_BASELINES,
@@ -149,10 +150,31 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
                   defaultValue={SETR_GUIDANCE[event].softwarePlanning}
                   as="p"
                 />
+                <p className="did-guidance-label">TDP Maturity (MIL-STD-31000)</p>
+                <EditableText
+                  contentKey={`setr.${event}.tdpMaturity`}
+                  defaultValue={SETR_GUIDANCE[event].tdpMaturity}
+                  as="p"
+                  className="hint"
+                />
               </div>
             ))}
           </div>
-          <p className="hint">See the Specifications tab's "SETR Milestones" section for the full System Decomposition / System Safety Planning / System Software Planning / Spec Generation breakdown at each event.</p>
+          <p className="hint">See the Specifications tab's "SETR Milestones" section for the full System Decomposition / System Safety Planning / System Software Planning / Spec Generation breakdown at each event, and its "Technical Data Package (TDP) Alignment" section for the full MIL-STD-31000/EIA-649 picture.</p>
+
+          <h3>IEEE 12207 Software Life Cycle Alignment</h3>
+          <EditableText contentKey="softwareLifecycle.intro" defaultValue={SOFTWARE_LIFECYCLE_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            {SOFTWARE_LIFECYCLE_GROUPS.map((g) => (
+              <div className="detail-card" key={g.id}>
+                <h4>{g.name}</h4>
+                <EditableText contentKey={`softwareLifecycle.${g.id}.description`} defaultValue={g.description} as="p" className="hint" />
+                <p className="hint">SETR range: {g.setrRange}</p>
+                <p className="did-guidance-label">Planning CDRL(s)</p>
+                <EditableText contentKey={`softwareLifecycle.${g.id}.planningCdrls`} defaultValue={g.planningCdrls} as="p" />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

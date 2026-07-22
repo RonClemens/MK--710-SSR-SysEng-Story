@@ -2,6 +2,16 @@ import { SEMP_APPENDIX_NOTE, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../d
 import { CDRL_CATALOG, HAZARD_CATEGORY_META, SAFETY_DELIVERABLES_INTRO } from "../data/safetyGuidance";
 import { PLANNING_DELIVERABLES_INTRO } from "../data/planningGuidance";
 import { SETR_EVENTS, SETR_FRAMEWORK_INTRO, SETR_GUIDANCE } from "../data/setrGuidance";
+import {
+  CM_FUNCTIONAL_AREAS,
+  FCA_PCA_NOTE,
+  SOFTWARE_LIFECYCLE_GROUPS,
+  SOFTWARE_LIFECYCLE_INTRO,
+  TDP_CONTENT_ELEMENTS,
+  TDP_FRAMEWORK_INTRO,
+  TDP_MATURITY_LEVELS,
+  TDP_MATURITY_META,
+} from "../data/tdpGuidance";
 import type {
   AbCompatibilityRow,
   Attachment,
@@ -92,17 +102,20 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   lines.push("");
   lines.push(
     mdTable(
-      ["Event", "Name", "Decomposition", "Safety Planning", "Software Planning", "Spec Generation"],
+      ["Event", "Name", "Summary", "Decomposition", "Safety Planning", "Software Planning", "Spec Generation", "TDP Maturity (MIL-STD-31000)"],
       SETR_EVENTS.map((event) => [
         event,
+        SETR_GUIDANCE[event].name,
         getValue(`setr.${event}.summary`, SETR_GUIDANCE[event].summary),
         getValue(`setr.${event}.decomposition`, SETR_GUIDANCE[event].decomposition),
         getValue(`setr.${event}.safetyPlanning`, SETR_GUIDANCE[event].safetyPlanning),
         getValue(`setr.${event}.softwarePlanning`, SETR_GUIDANCE[event].softwarePlanning),
         getValue(`setr.${event}.specGeneration`, SETR_GUIDANCE[event].specGeneration),
+        getValue(`setr.${event}.tdpMaturity`, SETR_GUIDANCE[event].tdpMaturity),
       ]),
     ),
   );
+  lines.push(getValue("tdp.fcaPcaNote", FCA_PCA_NOTE));
   lines.push("");
 
   // 4. Requirements Management
@@ -189,6 +202,19 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
       "underlying CM-relevant baseline records this plan governs._",
   );
   lines.push("");
+  lines.push("**EIA-649 Configuration Management Functional Areas**");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Functional Area", "Description", "Implemented In This App As"],
+      CM_FUNCTIONAL_AREAS.map((area) => [
+        area.name,
+        getValue(`cm.area.${area.id}.description`, area.description),
+        getValue(`cm.area.${area.id}.appMapping`, area.appMapping),
+      ]),
+    ),
+  );
+  lines.push("");
 
   // 8. Technical Risk Management
   lines.push(heading("technicalRiskManagement"));
@@ -226,7 +252,38 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   );
   lines.push("");
 
-  // 10. Verification and Validation
+  // 10. Technical Data Package (TDP) Management
+  lines.push(heading("technicalDataPackage"));
+  lines.push(getValue("tdp.frameworkIntro", TDP_FRAMEWORK_INTRO));
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["TDP Maturity Level", "Description", "Spec-Type Correlation", "SETR Range"],
+      TDP_MATURITY_LEVELS.map((level) => [
+        TDP_MATURITY_META[level].name,
+        getValue(`tdp.maturity.${level}.description`, TDP_MATURITY_META[level].description),
+        getValue(`tdp.maturity.${level}.specTypeCorrelation`, TDP_MATURITY_META[level].specTypeCorrelation),
+        TDP_MATURITY_META[level].setrRange,
+      ]),
+    ),
+  );
+  lines.push(getValue("tdp.fcaPcaNote", FCA_PCA_NOTE));
+  lines.push("");
+  lines.push("**TDP Content Elements**");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Content Element", "Description", "In This App"],
+      TDP_CONTENT_ELEMENTS.map((el) => [
+        el.name,
+        el.description,
+        getValue(`tdp.content.${el.id}.appMapping`, el.appMapping),
+      ]),
+    ),
+  );
+  lines.push("");
+
+  // 11. Verification and Validation
   lines.push(heading("verificationValidation"));
   lines.push("**Specification Verification Provisions**");
   lines.push("");
@@ -247,7 +304,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   );
   lines.push("");
 
-  // 11. System Safety Engineering
+  // 12. System Safety Engineering
   lines.push(heading("systemSafetyEngineering"));
   lines.push(getValue("safety.deliverablesIntro", SAFETY_DELIVERABLES_INTRO));
   lines.push("");
@@ -292,7 +349,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   );
   lines.push("");
 
-  // 12. Software Engineering
+  // 13. Software Engineering
   lines.push(heading("softwareEngineering"));
   lines.push(getValue("planning.deliverablesIntro", PLANNING_DELIVERABLES_INTRO));
   lines.push("");
@@ -315,8 +372,24 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     ),
   );
   lines.push("");
+  lines.push("**IEEE 12207 Software Life Cycle Process Alignment**");
+  lines.push("");
+  lines.push(getValue("softwareLifecycle.intro", SOFTWARE_LIFECYCLE_INTRO));
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Process Group", "Description", "SETR Range", "Planning CDRL(s)"],
+      SOFTWARE_LIFECYCLE_GROUPS.map((g) => [
+        g.name,
+        getValue(`softwareLifecycle.${g.id}.description`, g.description),
+        g.setrRange,
+        getValue(`softwareLifecycle.${g.id}.planningCdrls`, g.planningCdrls),
+      ]),
+    ),
+  );
+  lines.push("");
 
-  // 13. Baseline Management
+  // 14. Baseline Management
   lines.push(heading("baselineManagement"));
   for (const baseline of ["Baseline A", "Baseline B"] as const) {
     const subCount = data.logicalSubsystems.filter((s) => s.baseline === baseline).length;
@@ -340,7 +413,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   );
   lines.push("");
 
-  // 14. COTS and Parts Management
+  // 15. COTS and Parts Management
   lines.push(heading("cotsPartsManagement"));
   lines.push(
     mdTable(

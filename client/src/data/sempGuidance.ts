@@ -33,7 +33,7 @@ export const SEMP_SECTIONS: SempSection[] = [
     defaultNumber: "3",
     defaultTitle: "Systems Engineering Integration",
     defaultSourceDescription:
-      "SETR framework intro and the full SRR → PRR event guidance (Specifications tab) — what System Decomposition, System Safety Planning, System Software Planning, and Spec Generation maturity is expected at each gate.",
+      "SETR framework intro and the full SRR → PRR event guidance (Specifications tab) — what System Decomposition, System Safety Planning, System Software Planning, Spec Generation, and MIL-STD-31000 TDP Maturity is expected at each gate.",
   },
   {
     id: "requirementsManagement",
@@ -61,7 +61,7 @@ export const SEMP_SECTIONS: SempSection[] = [
     defaultNumber: "7",
     defaultTitle: "Configuration Management",
     defaultSourceDescription:
-      "Configuration Management Plan (CM) entries from Program Planning Deliverables, plus the Delta Matrix and A/B Compatibility rows this app treats as CM-relevant baseline records.",
+      "Configuration Management Plan (CM) entries from Program Planning Deliverables, the Delta Matrix and A/B Compatibility rows this app treats as CM-relevant baseline records, and the EIA-649 configuration management functional-area mapping (Specifications tab TDP Alignment guidance).",
   },
   {
     id: "technicalRiskManagement",
@@ -78,36 +78,43 @@ export const SEMP_SECTIONS: SempSection[] = [
       "Full SETR guidance (SRR through PRR) as captured on the Specifications and Program Planning tabs, including the working assumption flagged on SSR's name.",
   },
   {
-    id: "verificationValidation",
+    id: "technicalDataPackage",
     defaultNumber: "10",
+    defaultTitle: "Technical Data Package (TDP) Management",
+    defaultSourceDescription:
+      "MIL-STD-31000 TDP maturity levels (Conceptual/Developmental/Product) mapped to the SRR → PRR SETR sequence and this app's Development/Production spec types, the TDP content-element-to-entity mapping, and the FCA/PCA (EIA-649 Configuration Verification and Audit) note — all from the Specifications tab's TDP Alignment guidance.",
+  },
+  {
+    id: "verificationValidation",
+    defaultNumber: "11",
     defaultTitle: "Verification and Validation",
     defaultSourceDescription:
       "Specification verificationProvisions sections, and COTS Records verification method / rationale fields.",
   },
   {
     id: "systemSafetyEngineering",
-    defaultNumber: "11",
+    defaultNumber: "12",
     defaultTitle: "System Safety Engineering",
     defaultSourceDescription:
       "Safety Deliverables (CDRL catalog by level, hazard category mapping, applicability, status) and the hazard-analysis-to-decomposition-level guidance this app ties to MIL-STD-882E/JSSSEH.",
   },
   {
     id: "softwareEngineering",
-    defaultNumber: "12",
+    defaultNumber: "13",
     defaultTitle: "Software Engineering",
     defaultSourceDescription:
-      "Program Planning Deliverables' software-specific CDRLs (SDP, STP, SDD, STD, VDD) and each Specification's Software-domain records.",
+      "Program Planning Deliverables' software-specific CDRLs (SDP, STP, SDD, STD, VDD), each Specification's Software-domain records, and the IEEE 12207 software life-cycle process alignment (Program Planning tab).",
   },
   {
     id: "baselineManagement",
-    defaultNumber: "13",
+    defaultNumber: "14",
     defaultTitle: "Baseline Management (Baseline A / Baseline B)",
     defaultSourceDescription:
       "Cross-baseline summary: independent Baseline A and Baseline B decomposition counts, Delta Matrix, and A/B Compatibility status — this app's central reconciliation story.",
   },
   {
     id: "cotsPartsManagement",
-    defaultNumber: "14",
+    defaultNumber: "15",
     defaultTitle: "COTS and Parts Management",
     defaultSourceDescription:
       "COTS Records tab: functional/interface requirements, form-fit constraints, qualified alternates, and obsolescence monitoring notes.",

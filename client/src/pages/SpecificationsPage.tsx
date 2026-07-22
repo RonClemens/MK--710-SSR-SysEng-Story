@@ -15,6 +15,14 @@ import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL, SAFETY_FRAMEWORK_INTRO } from ".
 import { SETR_EVENTS, SETR_FRAMEWORK_INTRO, SETR_GUIDANCE } from "../data/setrGuidance";
 import { POINTER_SPEC_CATALOG, POINTER_SPEC_INTRO, POINTER_SPEC_PRINCIPLES } from "../data/pointerSpecGuidance";
 import {
+  CM_FUNCTIONAL_AREAS,
+  FCA_PCA_NOTE,
+  TDP_CONTENT_ELEMENTS,
+  TDP_FRAMEWORK_INTRO,
+  TDP_MATURITY_LEVELS,
+  TDP_MATURITY_META,
+} from "../data/tdpGuidance";
+import {
   SPEC_BASELINES,
   SPEC_DOMAINS,
   SPEC_LEVELS,
@@ -203,6 +211,8 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                 <EditableText contentKey={`setr.${event}.softwarePlanning`} defaultValue={SETR_GUIDANCE[event].softwarePlanning} as="p" />
                 <p className="did-guidance-label">Spec Generation</p>
                 <EditableText contentKey={`setr.${event}.specGeneration`} defaultValue={SETR_GUIDANCE[event].specGeneration} as="p" />
+                <p className="did-guidance-label">TDP Maturity (MIL-STD-31000)</p>
+                <EditableText contentKey={`setr.${event}.tdpMaturity`} defaultValue={SETR_GUIDANCE[event].tdpMaturity} as="p" />
               </div>
             ))}
           </div>
@@ -243,6 +253,53 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                   defaultValue={entry.recommendedApproach}
                   as="p"
                 />
+              </div>
+            ))}
+          </div>
+
+          <h3>Technical Data Package (TDP) Alignment — MIL-STD-31000 / EIA-649</h3>
+          <EditableText contentKey="tdp.frameworkIntro" defaultValue={TDP_FRAMEWORK_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            {TDP_MATURITY_LEVELS.map((level) => (
+              <div className="detail-card" key={level}>
+                <h4>{TDP_MATURITY_META[level].name}</h4>
+                <EditableText
+                  contentKey={`tdp.maturity.${level}.description`}
+                  defaultValue={TDP_MATURITY_META[level].description}
+                  as="p"
+                />
+                <p className="did-guidance-label">Spec-Type Correlation</p>
+                <EditableText
+                  contentKey={`tdp.maturity.${level}.specTypeCorrelation`}
+                  defaultValue={TDP_MATURITY_META[level].specTypeCorrelation}
+                  as="p"
+                />
+                <p className="hint">SETR range: {TDP_MATURITY_META[level].setrRange}</p>
+              </div>
+            ))}
+          </div>
+          <EditableText contentKey="tdp.fcaPcaNote" defaultValue={FCA_PCA_NOTE} as="p" className="hint" />
+
+          <h4>TDP Content Elements</h4>
+          <div className="did-guidance-grid">
+            {TDP_CONTENT_ELEMENTS.map((el) => (
+              <div className="detail-card" key={el.id}>
+                <h4>{el.name}</h4>
+                <EditableText contentKey={`tdp.content.${el.id}.description`} defaultValue={el.description} as="p" className="hint" />
+                <p className="did-guidance-label">In this app</p>
+                <EditableText contentKey={`tdp.content.${el.id}.appMapping`} defaultValue={el.appMapping} as="p" />
+              </div>
+            ))}
+          </div>
+
+          <h4>EIA-649 Configuration Management Functional Areas</h4>
+          <div className="did-guidance-grid">
+            {CM_FUNCTIONAL_AREAS.map((area) => (
+              <div className="detail-card" key={area.id}>
+                <h4>{area.name}</h4>
+                <EditableText contentKey={`cm.area.${area.id}.description`} defaultValue={area.description} as="p" className="hint" />
+                <p className="did-guidance-label">In this app</p>
+                <EditableText contentKey={`cm.area.${area.id}.appMapping`} defaultValue={area.appMapping} as="p" />
               </div>
             ))}
           </div>

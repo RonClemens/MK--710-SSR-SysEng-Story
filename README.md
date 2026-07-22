@@ -302,6 +302,60 @@ including its linked subsystems (and which other CIs also serve them), any
 linked specifications, safety deliverables, and planning deliverables; the
 Subsystem Detail view is the mirror image.
 
+### Technical Data Package (TDP) alignment — MIL-STD-31000 / EIA-649 / IEEE 12207
+
+The SETR sequence, spec maturity, and Program Planning CDRLs above aren't
+just internally consistent with each other — they're aligned to three
+external standards that define what a real program's Technical Data Package
+and configuration management program actually require (see
+`client/src/data/tdpGuidance.ts`):
+
+- **MIL-STD-31000 (Technical Data Packages)** — defines three TDP maturity
+  levels: **Conceptual** (requirements only, no design committed — SRR
+  through SFR), **Developmental** (preliminary/detailed design data, not yet
+  test-verified — SSR through TRR, correlating directly to this app's
+  Development spec type), and **Product/Production** (as-built,
+  qualification-verified design data — SVR through PRR and beyond,
+  correlating to this app's Production spec type). Each of the eight SETR
+  events on the Specifications and Program Planning tabs now carries an
+  explicit **TDP Maturity** field alongside its existing System
+  Decomposition / Safety Planning / Software Planning / Spec Generation
+  guidance, and the Specifications tab has its own "Technical Data Package
+  (TDP) Alignment" section mapping MIL-STD-31000's TDP content elements
+  (engineering drawings, specifications, standards, software documentation,
+  QA provisions, packaging) to which entity/tab in this app already captures
+  each one — and flagging the two (drawings, packaging) this app deliberately
+  doesn't model as structured data.
+- **EIA-649 (Configuration Management)** — its five CM functional areas
+  (Planning, Identification, Change Management, Status Accounting,
+  Verification and Audit) turn out to already be implemented by mechanisms
+  this app had before this update, just not named as CM: the independent
+  Baseline A/B decomposition *is* Configuration Identification; the Delta
+  Matrix's "ECP required" disposition *is* Configuration Change Management;
+  every status field *is* Configuration Status Accounting. The Specifications
+  tab's TDP Alignment section names this mapping explicitly. The Functional
+  and Physical Configuration Audits — EIA-649's Verification and Audit
+  function — map onto this app's own SETR sequence as **SVR (FCA)**, which
+  gates a spec's Development → Production transition item by item, and
+  **PCA**, performed at or shortly after **PRR**, which closes out
+  Product-level TDP maturity by confirming the as-built article and drawing
+  package match the Production spec.
+- **IEEE 12207 (Software Life Cycle Processes)** — its technical process
+  groups are condensed to the granularity this app's software-relevant
+  Program Planning CDRLs already operate at, and mapped on the Program
+  Planning tab's own "IEEE 12207 Software Life Cycle Alignment" section:
+  Requirements Definition → SDP, Architecture and Design Definition → SDD,
+  Verification and Validation → STP/STD, Transition → VDD (Implementation
+  and Integration has no dedicated CDRL in this app's catalog — tracked via
+  spec status and the Delta Matrix instead).
+
+As with the DI-SESS-81785B SEMP section mapping, this is a best-effort
+alignment, not a verified citation against your program's actual application
+of these standards — every piece of it is editable via Edit Mode, and the
+SEMP Migration export (below) pulls the live, possibly-edited version of all
+three, including a dedicated "Technical Data Package (TDP) Management"
+section in the exported SEMP outline.
+
 ## Linked files/documents
 
 CIs, COTS Item Records, Specifications, Safety Deliverables, and Program

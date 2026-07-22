@@ -18,6 +18,11 @@ export interface SetrEventGuidance {
   safetyPlanning: string;
   softwarePlanning: string;
   specGeneration: string;
+  // MIL-STD-31000 Technical Data Package maturity this event's exit
+  // criteria should produce — see ../data/tdpGuidance.ts for the full
+  // Conceptual/Developmental/Product level definitions and the FCA/PCA
+  // (EIA-649 Configuration Verification and Audit) notes this references.
+  tdpMaturity: string;
 }
 
 export const SETR_GUIDANCE: Record<SetrEvent, SetrEventGuidance> = {
@@ -33,6 +38,8 @@ export const SETR_GUIDANCE: Record<SetrEvent, SetrEventGuidance> = {
       "Software Development Plan (SDP) and Configuration Management Plan (CMP) drafted, establishing process and methodology — not yet allocated to specific subsystems or CSCIs.",
     specGeneration:
       "Only a System-level Development spec should exist, and it should still be Draft/In Review — no Subsystem or CI-level specs yet.",
+    tdpMaturity:
+      "Conceptual-level TDP only (MIL-STD-31000) — a System-level requirements baseline, not yet any design data. Nothing produced at this gate should be represented as Developmental or Product TDP content.",
   },
   SFR: {
     name: "System Functional Review",
@@ -46,6 +53,8 @@ export const SETR_GUIDANCE: Record<SetrEvent, SetrEventGuidance> = {
       "The SDP is updated to allocate software functions to candidate CSCIs within the now-validated subsystem structure; a Software Test Plan is drafted per subsystem.",
     specGeneration:
       "Subsystem-level Development specs (Hardware and Software domain) should exist in Draft/In Review for each validated subsystem — still no CI-level specs, since CIs aren't chosen until physical decomposition.",
+    tdpMaturity:
+      "Still Conceptual-level TDP — the validated functional architecture gives a Developmental TDP something to organize around later, but no subsystem-level design data exists yet to actually call Developmental.",
   },
   SSR: {
     name: "System Specification Review",
@@ -59,6 +68,8 @@ export const SETR_GUIDANCE: Record<SetrEvent, SetrEventGuidance> = {
       "The SDP and subsystem-level Software Test Plans should be baselined; CSCI-level planning (design descriptions, detailed test procedures) is explicitly out of scope until PDR/CDR.",
     specGeneration:
       "System- and Subsystem-level Development specs should be Approved or in final review. CI-level specs — and the CIs themselves — are a PDR-era artifact; their absence here isn't a gap, it's the correct state.",
+    tdpMaturity:
+      "Transitioning Conceptual → Developmental (MIL-STD-31000) — System/Subsystem Development specs nearing Approved is the TDP's first genuinely Developmental-level content, though CI-level design data (the bulk of a Developmental TDP) doesn't exist yet.",
   },
   PDR: {
     name: "Preliminary Design Review",
@@ -72,6 +83,8 @@ export const SETR_GUIDANCE: Record<SetrEvent, SetrEventGuidance> = {
       "CSCI-level planning begins: a Software Design Description drafted per CSCI, and a Software Test Description drafted from the subsystem-level Software Test Plan. This is the first point where a specific piece of software has a specific design, not just a functional allocation.",
     specGeneration:
       "CI-level Development specs (Hardware and Software domain) should now exist — this is exactly where this program's over-decomposition problem shows up as spurious or duplicate CI specs (see spec-002's own notes flagging its consolidation issue).",
+    tdpMaturity:
+      "Developmental-level TDP begins in earnest — CI-level Development specs and preliminary drawings are exactly what MIL-STD-31000 calls Developmental Design TDP content; over-decomposed CIs produce spurious Developmental TDP content that would need correcting before it's worth carrying forward.",
   },
   CDR: {
     name: "Critical Design Review",
@@ -85,6 +98,8 @@ export const SETR_GUIDANCE: Record<SetrEvent, SetrEventGuidance> = {
       "The Software Design Description is finalized per CSCI; detailed Software Test Descriptions are ready to execute; Version Description Document planning begins for what a qualified software baseline will need to record.",
     specGeneration:
       "CI-level Development specs should be Approved, not just In Review — build-to/code-to detail complete. This is roughly where a spec should start being evaluated for the eventual Development → Production transition, though it shouldn't flip yet.",
+    tdpMaturity:
+      "Developmental-level TDP should be complete and stable — build-to/code-to detail is the ceiling of what a Developmental TDP contains. Nothing here should be represented as Product-level yet; the Functional Configuration Audit that authorizes that transition hasn't happened (it's SVR, below).",
   },
   TRR: {
     name: "Test Readiness Review",
@@ -98,6 +113,8 @@ export const SETR_GUIDANCE: Record<SetrEvent, SetrEventGuidance> = {
       "Software Test Descriptions are executed, not just drafted; any CSCI defects found get dispositioned before formal test starts, not folded silently into \"known issues\" for the eventual Version Description Document.",
     specGeneration:
       "This is the transition point: Development specs that have passed their qualification testing should begin flipping to Production type — one CI/subsystem at a time as its qualification evidence closes out, not all at once on a calendar date.",
+    tdpMaturity:
+      "Still Developmental-level TDP formally, even though qualification testing is executing — the Functional Configuration Audit (SVR, below) is the EIA-649 event that actually authorizes calling a given item's TDP content Product-level, not the start of testing.",
   },
   SVR: {
     name: "System Verification Review (Functional Configuration Audit)",
@@ -110,6 +127,8 @@ export const SETR_GUIDANCE: Record<SetrEvent, SetrEventGuidance> = {
       "The Version Description Document is finalized, recording the as-built/as-qualified software baseline that was actually verified — not a snapshot carried over from CDR.",
     specGeneration:
       "Specs at every level should show Approved status with verification results traceable to their Verification Provisions section. A spec still Draft/In Review at SVR means its requirements were never actually confirmed against the as-built system.",
+    tdpMaturity:
+      "This is the Developmental → Product TDP transition (MIL-STD-31000), item by item, gated by the FCA this event represents — matching exactly the Development → Production spec-type transition guidance above. A spec/CI whose FCA hasn't closed shouldn't have its TDP content represented as Product-level yet, regardless of test progress.",
   },
   PRR: {
     name: "Production Readiness Review",
@@ -123,6 +142,8 @@ export const SETR_GUIDANCE: Record<SetrEvent, SetrEventGuidance> = {
       "Software configuration is fully baselined for production/fielding — no further Software Development Plan or Test Plan activity expected; only sustainment-phase planning follows, which is outside this app's SRR–PRR scope.",
     specGeneration:
       "All Development specs relevant to the fielded configuration should have transitioned to Production type (see the Development-vs-Production guidance above). A spec still Development at PRR means the production baseline isn't actually locked — which is exactly the reconciliation problem this whole app was built to catch, just caught one gate later than it should have been.",
+    tdpMaturity:
+      "Product-level TDP should be at or near complete for the fielded configuration. The Physical Configuration Audit — performed at or shortly after PRR, not at SVR/FCA — is the EIA-649 event that actually closes out Product-level TDP maturity by confirming the as-built article and drawing package match the Production spec; see the FCA/PCA note in the TDP Alignment guidance above.",
   },
 };
 
