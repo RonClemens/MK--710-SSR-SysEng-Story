@@ -269,3 +269,66 @@ export const DBX_MBX_TRANSITION_MITIGATIONS: DbxMbxTransitionMitigation[] = [
       "starting.",
   },
 ];
+
+// This program's own complicating factor, in its Lead Systems Engineer's
+// assessment — not a generic transition risk, a specific finding about
+// Baseline A. Recorded here because the user explicitly asked for it to
+// inform the pros/cons assessment of DBx and MBx co-existing, not as a
+// claim this app independently verified.
+export const DBX_MBX_BASELINE_MATURITY_ASYMMETRY =
+  "This program's Lead Systems Engineer's own assessment: Baseline A already has a mature Design/Product " +
+  "Baseline, but its earlier Functional and Allocated Baseline documentation — especially CI-specific " +
+  "requirements documentation — is poor or effectively nonexistent. That's exactly the specification-tree gap " +
+  "the OSD SEP Outline's own Figure 2.1-1 (Initial Capabilities Document → Capabilities Development Document → " +
+  "System Performance Specification → Functional Baseline → Allocated Baseline → ... → Product Baseline) " +
+  "expects to be filled in sequence, and exactly what this app's own Subsystems tab (\"Inherited from SSDD " +
+  "structure — unverified\") and thin CI-level Development specs already surface as a live finding, not a " +
+  "historical footnote. In this LSE's expert opinion, this asymmetry is one of the fundamental reasons Baseline " +
+  "A's prior development effort was never completed successfully on schedule: detailed design matured far ahead " +
+  "of the functional and allocated documentation it should have been traceable to, so there was never a sound " +
+  "basis to verify that design against.";
+
+export interface DbxMbxBaselineAsymmetryImplication {
+  id: string;
+  text: string;
+}
+
+export const DBX_MBX_BASELINE_ASYMMETRY_IMPLICATIONS: DbxMbxBaselineAsymmetryImplication[] = [
+  {
+    id: "dbxRisk",
+    text:
+      "A pure-DBx program can let this exact asymmetry develop silently — nothing forces someone to notice the " +
+      "Functional/Allocated Baseline layer is thin until a reconciliation effort like this one goes looking for " +
+      "it, which is precisely how Baseline A's gap went unnoticed for years.",
+  },
+  {
+    id: "mbxRisk",
+    text:
+      "MBx doesn't automatically fix this either: a model built forward from an already-mature Product Baseline " +
+      "inherits the same gap by omission unless the team deliberately reconstructs the missing Functional and " +
+      "Allocated Baseline relationships when authoring the model — a model is only as complete as what someone " +
+      "puts into it.",
+  },
+  {
+    id: "opportunity",
+    text:
+      "The transition is also the first real structural opportunity to close the gap for good: building the " +
+      "missing Functional/Allocated Baseline layer as enforced model relationships, rather than backfilled " +
+      "documents nobody will maintain either, is exactly the kind of once-and-done fix DBx never delivered for " +
+      "Baseline A the first time.",
+  },
+];
+
+// Also this program's live state, not a hypothetical: the SOW still
+// contracts document-shaped CDRLs while engineering has moved into MBx/PLM
+// tooling — a concrete, current instance of the Customer Expectations
+// friction described above, not an abstraction.
+export const DBX_MBX_SOW_TOOLING_MISMATCH =
+  "This program's Statement of Work still contracts DBx CDRL deliverables — Development and Production " +
+  "specifications, ICDs, and the other document-shaped artifacts this app itself models — while the actual " +
+  "engineering work increasingly happens natively in MBx/PLM tools: Cameo (Systems Modeler / Enterprise " +
+  "Architecture) for the SysML model, PTC Codebeamer for requirements/ALM, and Aras Innovator for PLM. That's " +
+  "not the hypothetical translation tax described under Customer Expectations, above — it's this program's live " +
+  "state: every CDRL due against the SOW has to be generated from these tools' native model, requirements, and " +
+  "PLM records into a document format the SOW and the customer's review process actually expect, for as long as " +
+  "the SOW keeps specifying DBx-shaped deliverables instead of model-based ones.";

@@ -440,6 +440,41 @@ straddling:
   treats a requirements gap — a disposition-required finding, not a
   footnote.
 
+**This program's complicating factor**, in its Lead Systems Engineer's own
+assessment: Baseline A already has a mature Design/Product Baseline, but its
+earlier Functional and Allocated Baseline documentation — especially
+CI-specific requirements documentation — is poor or effectively
+nonexistent. That's exactly the specification-tree gap the OSD SEP Outline's
+own Figure 2.1-1 (Functional Baseline → Allocated Baseline → ... → Product
+Baseline) expects to be filled in sequence, and exactly what this app's own
+Subsystems tab ("Inherited from SSDD structure — unverified") and thin
+CI-level Development specs already surface as a live finding, not a
+historical footnote. In this LSE's expert opinion, this asymmetry is one of
+the fundamental reasons Baseline A's prior development effort was never
+completed successfully on schedule. This complicates the DBx/MBx
+co-existence assessment in three concrete ways: a pure-DBx program can let
+this exact asymmetry develop silently (which is precisely how it went
+unnoticed for years); MBx doesn't automatically fix it either, since a model
+built forward from an already-mature Product Baseline inherits the same gap
+by omission unless the team deliberately reconstructs the missing
+relationships; but the transition is also the first real structural
+opportunity to close the gap for good, by building the missing layer as
+enforced model relationships instead of backfilled documents nobody will
+maintain either.
+
+Also this program's live state, not a hypothetical: the **Statement of
+Work still contracts DBx CDRL deliverables** — Development/Production
+specs, ICDs, and the other document-shaped artifacts this app itself
+models — while the actual engineering work increasingly happens natively in
+MBx/PLM tools: **Cameo** (Systems Modeler / Enterprise Architecture) for the
+SysML model, **PTC Codebeamer** for requirements/ALM, and **Aras
+Innovator** for PLM. That's the Customer Expectations friction dimension
+above, playing out concretely: every CDRL due against the SOW has to be
+generated from these tools' native model, requirements, and PLM records
+into a document format the SOW and the customer's review process actually
+expect, for as long as the SOW keeps specifying DBx-shaped deliverables
+instead of model-based ones.
+
 Five concrete mitigations are named so the straddling period stays temporary
 rather than becoming permanent by default: naming an explicit authoritative
 source per artifact type in writing, treating divergence as a tracked

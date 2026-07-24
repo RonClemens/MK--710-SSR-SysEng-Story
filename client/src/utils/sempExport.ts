@@ -13,8 +13,11 @@ import {
   TDP_MATURITY_META,
 } from "../data/tdpGuidance";
 import {
+  DBX_MBX_BASELINE_ASYMMETRY_IMPLICATIONS,
+  DBX_MBX_BASELINE_MATURITY_ASYMMETRY,
   DBX_MBX_DIMENSIONS,
   DBX_MBX_INTRO,
+  DBX_MBX_SOW_TOOLING_MISMATCH,
   DBX_MBX_TRANSITION_DIMENSIONS,
   DBX_MBX_TRANSITION_INTRO,
   DBX_MBX_TRANSITION_MITIGATIONS,
@@ -261,6 +264,16 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
       ]),
     ),
   );
+  lines.push("");
+  lines.push("**This Program's Complicating Factor**");
+  lines.push("");
+  lines.push(getValue("dbxMbx.baselineMaturityAsymmetry", DBX_MBX_BASELINE_MATURITY_ASYMMETRY));
+  lines.push("");
+  for (const [i, imp] of DBX_MBX_BASELINE_ASYMMETRY_IMPLICATIONS.entries()) {
+    lines.push("- " + getValue(`dbxMbx.baselineMaturityAsymmetry.implication.${i}`, imp.text));
+  }
+  lines.push("");
+  lines.push(getValue("dbxMbx.sowToolingMismatch", DBX_MBX_SOW_TOOLING_MISMATCH));
   lines.push("");
   lines.push("**Managing the transition without it becoming permanent**");
   lines.push("");

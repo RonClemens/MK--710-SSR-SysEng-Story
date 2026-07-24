@@ -1,5 +1,8 @@
 import { EditableText } from "./EditableText";
 import {
+  DBX_MBX_BASELINE_ASYMMETRY_IMPLICATIONS,
+  DBX_MBX_BASELINE_MATURITY_ASYMMETRY,
+  DBX_MBX_SOW_TOOLING_MISMATCH,
   DBX_MBX_TRANSITION_DIMENSIONS,
   DBX_MBX_TRANSITION_INTRO,
   DBX_MBX_TRANSITION_MITIGATIONS,
@@ -29,6 +32,25 @@ export function DbxMbxTransitionGuidance() {
           </div>
         ))}
       </div>
+
+      <h4>This program's complicating factor</h4>
+      <EditableText
+        contentKey="dbxMbx.baselineMaturityAsymmetry"
+        defaultValue={DBX_MBX_BASELINE_MATURITY_ASYMMETRY}
+        as="p"
+      />
+      <ul>
+        {DBX_MBX_BASELINE_ASYMMETRY_IMPLICATIONS.map((imp, i) => (
+          <EditableText
+            key={imp.id}
+            contentKey={`dbxMbx.baselineMaturityAsymmetry.implication.${i}`}
+            defaultValue={imp.text}
+            as="li"
+          />
+        ))}
+      </ul>
+      <EditableText contentKey="dbxMbx.sowToolingMismatch" defaultValue={DBX_MBX_SOW_TOOLING_MISMATCH} as="p" />
+
       <p className="did-guidance-label">Managing the transition without it becoming permanent</p>
       <ul>
         {DBX_MBX_TRANSITION_MITIGATIONS.map((m, i) => (
