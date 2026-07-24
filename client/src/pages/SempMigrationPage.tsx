@@ -82,22 +82,32 @@ export function SempMigrationPage(data: Props) {
               </li>
             ))}
             <li>
-              Linked document references (Appendix B): <strong>{attachmentCount}</strong>
+              Linked document references (Consolidated Attachments Index): <strong>{attachmentCount}</strong>
             </li>
           </ul>
         </div>
       </section>
 
       <section>
-        <h3>Section mapping (DI-SESS-81785B — verified paragraph structure)</h3>
+        <h3>Section mapping (OSD SEP Outline v4.1 structure)</h3>
         <EditableText contentKey="semp.appendixNote" defaultValue={SEMP_APPENDIX_NOTE} as="p" className="hint" />
+        <p className="hint">
+          <span className="badge badge-info">Verbatim-verified</span> = this app's user-supplied SEP Outline PDF
+          included the actual required-content text for that section, not just its title.{" "}
+          <span className="badge">Title-verified</span> = the section number/title is confirmed against the real
+          table of contents, but the specific required content beneath it was outside the uploaded PDF's page
+          range and hasn't been read.
+        </p>
         <div className="did-guidance-grid">
           {SEMP_SECTIONS.map((s) => (
             <div className="detail-card" key={s.id}>
               <h4>
                 <EditableText contentKey={`semp.section.${s.id}.number`} defaultValue={s.defaultNumber} as="span" />
                 {". "}
-                <EditableText contentKey={`semp.section.${s.id}.title`} defaultValue={s.defaultTitle} as="span" />
+                <EditableText contentKey={`semp.section.${s.id}.title`} defaultValue={s.defaultTitle} as="span" />{" "}
+                <span className={`badge ${s.verbatimVerified ? "badge-info" : ""}`}>
+                  {s.verbatimVerified ? "Verbatim-verified" : "Title-verified"}
+                </span>
               </h4>
               <EditableText
                 contentKey={`semp.section.${s.id}.sourceDescription`}
@@ -111,7 +121,7 @@ export function SempMigrationPage(data: Props) {
       </section>
 
       <section>
-        <h3>INCOSE / ISO 15288 process mapping (feeds DID 3.3)</h3>
+        <h3>INCOSE / ISO 15288 process mapping (feeds Section 1: Introduction)</h3>
         <EditableText contentKey="incose.frameworkIntro" defaultValue={INCOSE_FRAMEWORK_INTRO} as="p" className="hint" />
         <div className="did-guidance-grid">
           {INCOSE_PROCESS_GROUPS.map((group) => (

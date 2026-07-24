@@ -414,54 +414,87 @@ your program's real CM system; this app just needs to point at it.
 
 The **SEMP Migration** tab produces a single downloadable Markdown file that
 maps this app's current content — including any Edit Mode changes — onto a
-Systems Engineering Management Plan (SEMP) section structure built directly
-from a verified copy of the governing DID, **DI-SESS-81785B** (approved
-2025-01-08; PDF supplied by this app's user and read directly — not scraped;
-`client/src/data/sempGuidance.ts`, `client/src/utils/sempExport.ts`).
+Systems Engineering Management Plan (SEMP) section structure built from two
+verified source documents, both supplied by this app's user and read
+directly (not scraped): the governing DID, **DI-SESS-81785B** (approved
+2025-01-08), and the **Department of Defense Systems Engineering Plan (SEP)
+Outline, Version 4.1** (May 2023, OUSD(R&E), Distribution Statement A —
+publicly releasable; `client/src/data/sempGuidance.ts`,
+`client/src/utils/sempExport.ts`).
 
 **Unlike most DIDs, DI-SESS-81785B does not prescribe a fixed table of
 contents.** It says outright: *"2. Format. The SEMP format shall be selected
 by the contractor."* Content-wise, it requires the SEMP to "be consistent
 with and address all topics in the government SEP, if available. In the
 absence of a government SEP, the SEMP shall address the topics in the OSD SEP
-Outline active at the time of the RFP," and, minimally, to address eight
-numbered content requirements (paragraphs 3.1–3.8, with 3.5 split into four
-lettered sub-requirements a–d). The section list on this tab mirrors those
-**actual DID paragraph numbers** — 1 (Use/Relationship and Scope), 2
-(Reference Documents), 3.1 through 3.8 — rather than a fabricated generic
-outline. Two things remain genuinely unverified, and are flagged as such
-rather than guessed at:
+Outline active at the time of the RFP." So the section list on this tab
+mirrors the **SEP Outline's own real section numbers** — 1 (Introduction),
+2.1–2.6 (Program Technical Definition: Requirements Development,
+Architectures and Interface Control, Specialty Engineering, Modeling
+Strategy, Design Considerations, Technical Certifications), 3.1 and
+3.2.1–3.2.13 (Program Technical Management), and its Appendices B–E and
+closing References section — not a fabricated generic outline, and a richer,
+more authoritative structure than the bare DID paragraph list this tab used
+before.
+
+Two real anchors are worth calling out because they line up unusually well
+with what this app already tracks:
+
+- **2.4 Modeling Strategy** literally asks the program to *"define the
+  modeling strategy to be used (model-supported, model-integrated, or
+  model-centric)"* — this is the real-document home for the Document-Based
+  (DBx) vs Model-Based (MBx) guidance repeated across six tabs (see
+  [above](#document-based-dbx-vs-model-based-mbx-systems-engineering)); the
+  full six-dimension table is reproduced here.
+- **2.1 Requirements Development**'s own sample table is literally a
+  *"Requirements Traceability Matrix (mandatory)"* with a per-requirement
+  verification-method column — a direct match for this app's Delta Matrix
+  and each Specification's Verification Provisions section.
+
+**One honest limitation:** the uploaded SEP Outline PDF is 20 pages, but the
+document's own table of contents runs to page 58 — so this app has verbatim
+body text (the actual "Expectation:" requirement language) only through
+section 2.5. Sections 2.6 onward — all of Section 3, and the Appendices —
+have their **section numbers and titles verified against the real table of
+contents**, but not their specific required content; this app's mapping for
+those is a reasonable inference from the title and general DoD SE practice,
+not a citation. Every section on the SEMP Migration tab is tagged
+**Verbatim-verified** or **Title-verified** accordingly, and several genuine
+gaps are called out rather than papered over: Technical Performance
+Measures, Reliability and Maintainability Engineering, Manufacturing and
+Quality Engineering, Corrosion Prevention and Control, Technology Insertion
+and Refresh, System Security Engineering, Technical Certifications, and
+Technical Planning (staffing/schedule/WBS) are all real SEP Outline sections
+this app does not model. Two things also remain genuinely unverified beyond
+the section structure itself:
 
 - If your program has an actual **government-furnished SEP**, the DID
   requires this SEMP to be consistent with *that* document first — this app
-  has no visibility into it and can't substitute for it. In its absence, the
-  DID falls back to the **OSD SEP Outline** (v4.1 as of this writing,
-  publicly available at
-  `https://www.cto.mil/wp-content/uploads/2023/06/SEP-Outline-4.1.pdf`, but
-  not yet verified against this app's structure).
+  has no visibility into it and can't substitute for it.
 - **IEEE 24748-7:2019** and **IEEE 24748-8:2019** (the DID's own cited
   reference standards for SE application and technical reviews/audits) are
   typically available only via an IEEE subscription — this app's SETR event
   names and entry/exit criteria (SRR/SFR/SSR/PDR/CDR/TRR/SVR/PRR) haven't
   been checked against IEEE 24748-8's actual defined review/audit set.
 
-Paragraph 3.3 requires *"an annotated mapping between contractor and
-government SE processes"* — this app supplies the contractor-side half via a
-new **INCOSE / ISO-IEC-IEEE 15288 process-group mapping**
+Section 1 (Introduction) is where the SEP Outline asks the program to
+*"describe the program's plan to align the Prime Contractor's SEMP with the
+PMO SEP"* — this app supplies the contractor-side half of that via an
+**INCOSE / ISO-IEC-IEEE 15288 process-group mapping**
 (`client/src/data/incoseGuidance.ts`, rendered on this tab below the section
 mapping), covering all four 15288 process groups (Agreement, Organizational
 Project-Enabling, Technical Management, Technical) and naming which of this
 app's tabs implements each sub-process — including the honest gaps
 (Agreement Processes and Organizational Project-Enabling Processes sit above
 the level of individual technical artifacts this app models). The
-government-side column and any not-needed-process rationale still require
-your program's actual government SE process documentation. Paragraph 3.7
-names *"risk management plan, requirements management plan, data management
-plan, and configuration management plan"* explicitly as referenced lower-
-level plans — the Program Planning tab's System-level CDRL catalog gained
-Risk Management Plan, Requirements Management Plan, and Data Management Plan
-entries specifically because this DID paragraph names them (Configuration
-Management Plan was already modeled).
+government-side column still requires your program's actual government SE
+process documentation. Section 3.2.10 (Configuration and Change Management)
+is where DI-SESS-81785B paragraph 3.7's named *"risk management plan,
+requirements management plan, data management plan, and configuration
+management plan"* live — the Program Planning tab's System-level CDRL
+catalog gained Risk Management Plan, Requirements Management Plan, and Data
+Management Plan entries specifically because that DID paragraph names them
+(Configuration Management Plan was already modeled).
 
 **This is a manual, one-way export, not an integration.** This app has no
 network path to any other tool or machine, and is not meant to have one — the
@@ -483,9 +516,10 @@ CUI boundary. If you're authoring a real SEMP on a separate (e.g. CUI) system:
    drafting aid and cross-check — not as a finished, ready-to-sign document.
 
 Every section number, title, and "source in this app" description on the
-SEMP Migration tab is editable via Edit Mode (see below) so the two
-still-unverified items above (or anything else) can be corrected to match
-your program's actual governing documents before exporting; corrections are
+SEMP Migration tab is editable via Edit Mode (see below) so any of the
+title-verified-only sections, the flagged gaps, or the still-unverified
+government-SEP/IEEE 24748-7/8 items above can be corrected to match your
+program's actual governing documents before exporting; corrections are
 picked up by the next export automatically.
 
 Explicit non-goal: no direct integration with any other tool (no API push, no
