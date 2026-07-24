@@ -1,4 +1,4 @@
-import { SEMP_APPENDIX_NOTE, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../data/sempGuidance";
+import { SEMP_APPENDIX_NOTE, SEMP_DID_CITATION, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../data/sempGuidance";
 import { CDRL_CATALOG, HAZARD_CATEGORY_META, SAFETY_DELIVERABLES_INTRO } from "../data/safetyGuidance";
 import { PLANNING_DELIVERABLES_INTRO } from "../data/planningGuidance";
 import { SETR_EVENTS, SETR_FRAMEWORK_INTRO, SETR_GUIDANCE } from "../data/setrGuidance";
@@ -13,6 +13,8 @@ import {
   TDP_MATURITY_META,
 } from "../data/tdpGuidance";
 import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
+import { POINTER_SPEC_CATALOG, POINTER_SPEC_INTRO, POINTER_SPEC_PRINCIPLES } from "../data/pointerSpecGuidance";
+import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../data/incoseGuidance";
 import type {
   AbCompatibilityRow,
   Attachment,
@@ -66,7 +68,8 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
 
   const sectionByI = new Map(SEMP_SECTIONS.map((s) => [s.id, s]));
   const heading = (id: string) => {
-    const s = sectionByI.get(id)!;
+    const s = sectionByI.get(id);
+    if (!s) throw new Error(`Unknown SEMP section id: ${id}`);
     const number = getValue(`semp.section.${id}.number`, s.defaultNumber);
     const title = getValue(`semp.section.${id}.title`, s.defaultTitle);
     const source = getValue(`semp.section.${id}.sourceDescription`, s.defaultSourceDescription);
@@ -78,6 +81,8 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   lines.push("");
   lines.push(`_Generated ${new Date().toISOString()} from the PDR Reconciliation & Baseline Alignment Workbench._`);
   lines.push("");
+  lines.push("> " + getValue("semp.didCitation", SEMP_DID_CITATION));
+  lines.push("");
   lines.push("> " + SEMP_MAPPING_DISCLAIMER.replace(/\n/g, "\n> "));
   lines.push("");
   lines.push(
@@ -87,244 +92,46 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   );
   lines.push("");
 
-  // 1. Scope
-  lines.push(heading("scope"));
-  lines.push("_Not auto-generated — carry over program/system identification from the destination SEMP._");
+  // 1. Use/Relationship and Scope
+  lines.push(heading("useRelationshipScope"));
+  lines.push("_Not auto-generated — carry over program/system identification and scope from the destination SEMP._");
   lines.push("");
 
-  // 2. Applicable Documents
-  lines.push(heading("applicableDocuments"));
-  lines.push("_Not auto-generated — see the consolidated Attachments appendix at the end of this file._");
+  // 2. Reference Documents
+  lines.push(heading("referenceDocuments"));
+  lines.push("**DID-cited references:** OSD SEP Outline; IEEE 24748-7:2019; IEEE 24748-8:2019.");
+  lines.push("");
+  lines.push("**Pointer Specifications (industry/military standards this program's design and production comply with):**");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Designator", "Title", "Domain", "Levels"],
+      POINTER_SPEC_CATALOG.map((p) => [p.designator, p.title, p.domain, p.levels.join(", ")]),
+    ),
+  );
+  lines.push("_Full guidance for each, including recommended cite/tailor/flow-down approach, is on the Specifications tab._");
+  lines.push("");
+  lines.push("**Other referenced frameworks:** MIL-STD-31000 (Technical Data Packages), EIA-649 (Configuration Management), IEEE 12207 (Software Life Cycle Processes), INCOSE Systems Engineering Handbook / ISO-IEC-IEEE 15288 — see the relevant sections below.");
+  lines.push("");
+  lines.push("_See the consolidated Attachments appendix at the end of this file for every linked document reference captured across all tabs — a useful cross-check against this section's document list, not a substitute for it._");
   lines.push("");
 
-  // 3. SE Integration
-  lines.push(heading("seIntegration"));
+  // 3.1 Planned Engineering Approach
+  lines.push(heading("engineeringApproach"));
   lines.push(getValue("setr.frameworkIntro", SETR_FRAMEWORK_INTRO));
   lines.push("");
   lines.push(
-    mdTable(
-      ["Event", "Name", "Summary", "Decomposition", "Safety Planning", "Software Planning", "Spec Generation", "TDP Maturity (MIL-STD-31000)"],
-      SETR_EVENTS.map((event) => [
-        event,
-        SETR_GUIDANCE[event].name,
-        getValue(`setr.${event}.summary`, SETR_GUIDANCE[event].summary),
-        getValue(`setr.${event}.decomposition`, SETR_GUIDANCE[event].decomposition),
-        getValue(`setr.${event}.safetyPlanning`, SETR_GUIDANCE[event].safetyPlanning),
-        getValue(`setr.${event}.softwarePlanning`, SETR_GUIDANCE[event].softwarePlanning),
-        getValue(`setr.${event}.specGeneration`, SETR_GUIDANCE[event].specGeneration),
-        getValue(`setr.${event}.tdpMaturity`, SETR_GUIDANCE[event].tdpMaturity),
-      ]),
-    ),
-  );
-  lines.push(getValue("tdp.fcaPcaNote", FCA_PCA_NOTE));
-  lines.push("");
-
-  // 4. Requirements Management
-  lines.push(heading("requirementsManagement"));
-  lines.push(
-    mdTable(
-      ["CI", "SFR Allocation", "Actual Decomposition", "Delta", "Delta Source", "Disposition", "Rationale"],
-      data.deltaMatrix.map((r) => [
-        ciName(r.ciId),
-        r.sfrAllocation,
-        r.actualDecomposition,
-        r.delta,
-        r.deltaSource,
-        r.disposition,
-        r.rationale,
-      ]),
+    getValue(
+      "dbxMbx.programPlanningExecution.thisAppNote",
+      DBX_MBX_DIMENSIONS.find((d) => d.id === "programPlanningExecution")!.thisAppNote,
     ),
   );
   lines.push("");
 
-  // 5. Architecture and Decomposition
-  lines.push(heading("architectureDecomposition"));
-  for (const baseline of ["Baseline A", "Baseline B"] as const) {
-    lines.push(`### ${baseline}`);
-    lines.push("");
-    lines.push("**Logical Subsystems**");
-    lines.push("");
-    lines.push(
-      mdTable(
-        ["Name", "Source", "Description"],
-        data.logicalSubsystems.filter((s) => s.baseline === baseline).map((s) => [s.name, s.source, s.description]),
-      ),
-    );
-    lines.push("");
-    lines.push("**Configuration Items**");
-    lines.push("");
-    lines.push(
-      mdTable(
-        ["Name", "Type", "Tier", "Subsystems", "Over-Decomposition Flagged", "Status", "Consolidation Notes"],
-        data.cis
-          .filter((c) => c.baseline === baseline)
-          .map((c) => [
-            c.name,
-            c.type,
-            c.tier,
-            c.subsystemIds.map((id) => subsystemName(id)).join(", ") || "—",
-            c.overDecompositionFlag ? "Yes" : "No",
-            c.status,
-            c.consolidationNotes || "—",
-          ]),
-      ),
-    );
-    lines.push("");
-  }
-
-  // 6. Interface Management
-  lines.push(heading("interfaceManagement"));
-  for (const scope of ["subsystem", "ci"] as const) {
-    lines.push(`**${scope === "subsystem" ? "Subsystem-to-Subsystem" : "CI-to-CI"} Interfaces**`);
-    lines.push("");
-    lines.push(
-      mdTable(
-        ["Element A", "Element B", "Description"],
-        data.interfaces
-          .filter((i) => i.scope === scope)
-          .map((i) => [elementName(scope, i.aId), elementName(scope, i.bId), i.description]),
-      ),
-    );
-    lines.push("");
-  }
-
-  // 7. Configuration Management
-  lines.push(heading("configurationManagement"));
-  lines.push(
-    mdTable(
-      ["Title", "Level", "Applicability", "Baseline", "Status", "Description"],
-      data.planningDeliverables
-        .filter((p) => /CMP|Configuration Management/i.test(p.cdrlType) || /Configuration Management/i.test(p.title))
-        .map((p) => [p.title, p.level, p.applicability, p.baseline, p.status, p.cdrlDescription]),
-    ),
-  );
-  lines.push(
-    "_Delta Matrix (Requirements Management, above) and A/B Compatibility (Baseline Management, below) are the " +
-      "underlying CM-relevant baseline records this plan governs._",
-  );
+  // 3.2 Operational Plan / Specialty Engineering Discipline Integration
+  lines.push(heading("operationalPlanSpecialtyIntegration"));
+  lines.push("### System Safety Engineering");
   lines.push("");
-  lines.push("**EIA-649 Configuration Management Functional Areas**");
-  lines.push("");
-  lines.push(
-    mdTable(
-      ["Functional Area", "Description", "Implemented In This App As"],
-      CM_FUNCTIONAL_AREAS.map((area) => [
-        area.name,
-        getValue(`cm.area.${area.id}.description`, area.description),
-        getValue(`cm.area.${area.id}.appMapping`, area.appMapping),
-      ]),
-    ),
-  );
-  lines.push("");
-
-  // 8. Technical Risk Management
-  lines.push(heading("technicalRiskManagement"));
-  lines.push("**Recommendations**");
-  lines.push("");
-  lines.push(
-    mdTable(
-      ["Text", "Category", "Status", "Owner", "Related CI"],
-      data.recommendations.map((r) => [r.text, r.category, r.status, r.owner || "—", ciName(r.relatedCiId)]),
-    ),
-  );
-  lines.push("");
-  lines.push("**A/B Compatibility Risk Notes**");
-  lines.push("");
-  lines.push(
-    mdTable(
-      ["CI", "Compatibility Status", "Risk Note", "Last Reviewed"],
-      data.abCompatibility
-        .filter((r) => r.riskNote)
-        .map((r) => [ciName(r.ciId), r.compatibilityStatus, r.riskNote, r.lastReviewedDate]),
-    ),
-  );
-  lines.push("");
-  lines.push(
-    "_This app does not maintain a formal risk register — treat this section as a partial feed, not a complete " +
-      "one._",
-  );
-  lines.push("");
-
-  // 9. Technical Reviews (SETR)
-  lines.push(heading("technicalReviews"));
-  lines.push(
-    "_Full event-by-event guidance is reproduced under Systems Engineering Integration, above — this section is " +
-      "the canonical SEMP location for it; SE Integration keeps its own copy for narrative flow._",
-  );
-  lines.push("");
-
-  // 10. Technical Data Package (TDP) Management
-  lines.push(heading("technicalDataPackage"));
-  lines.push(getValue("tdp.frameworkIntro", TDP_FRAMEWORK_INTRO));
-  lines.push("");
-  lines.push(
-    mdTable(
-      ["TDP Maturity Level", "Description", "Spec-Type Correlation", "SETR Range"],
-      TDP_MATURITY_LEVELS.map((level) => [
-        TDP_MATURITY_META[level].name,
-        getValue(`tdp.maturity.${level}.description`, TDP_MATURITY_META[level].description),
-        getValue(`tdp.maturity.${level}.specTypeCorrelation`, TDP_MATURITY_META[level].specTypeCorrelation),
-        TDP_MATURITY_META[level].setrRange,
-      ]),
-    ),
-  );
-  lines.push(getValue("tdp.fcaPcaNote", FCA_PCA_NOTE));
-  lines.push("");
-  lines.push("**TDP Content Elements**");
-  lines.push("");
-  lines.push(
-    mdTable(
-      ["Content Element", "Description", "In This App"],
-      TDP_CONTENT_ELEMENTS.map((el) => [
-        el.name,
-        el.description,
-        getValue(`tdp.content.${el.id}.appMapping`, el.appMapping),
-      ]),
-    ),
-  );
-  lines.push("");
-
-  // 11. Digital Engineering / MBSE Strategy
-  lines.push(heading("digitalEngineeringStrategy"));
-  lines.push(getValue("dbxMbx.intro", DBX_MBX_INTRO));
-  lines.push("");
-  lines.push(
-    mdTable(
-      ["SE Dimension", "Document-Based (DBx)", "Model-Based (MBx)", "Tradeoff", "In This App"],
-      DBX_MBX_DIMENSIONS.map((d) => [
-        d.name,
-        getValue(`dbxMbx.${d.id}.dbxDescription`, d.dbxDescription),
-        getValue(`dbxMbx.${d.id}.mbxDescription`, d.mbxDescription),
-        getValue(`dbxMbx.${d.id}.tradeoff`, d.tradeoff),
-        getValue(`dbxMbx.${d.id}.thisAppNote`, d.thisAppNote),
-      ]),
-    ),
-  );
-  lines.push("");
-
-  // 12. Verification and Validation
-  lines.push(heading("verificationValidation"));
-  lines.push("**Specification Verification Provisions**");
-  lines.push("");
-  lines.push(
-    mdTable(
-      ["Specification", "Level", "Domain", "Baseline", "Verification Provisions"],
-      data.specifications.map((s) => [s.title, s.level, s.domain, s.baseline, s.sections.verificationProvisions || "—"]),
-    ),
-  );
-  lines.push("");
-  lines.push("**COTS Verification**");
-  lines.push("");
-  lines.push(
-    mdTable(
-      ["CI", "Verification Method", "Rationale"],
-      data.cotsRecords.map((c) => [ciName(c.ciId), c.verificationMethod, c.rationale]),
-    ),
-  );
-  lines.push("");
-
-  // 13. System Safety Engineering
-  lines.push(heading("systemSafetyEngineering"));
   lines.push(getValue("safety.deliverablesIntro", SAFETY_DELIVERABLES_INTRO));
   lines.push("");
   for (const level of ["System", "Subsystem", "CI"] as SpecLevel[]) {
@@ -367,9 +174,8 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     ),
   );
   lines.push("");
-
-  // 14. Software Engineering
-  lines.push(heading("softwareEngineering"));
+  lines.push("### Software Engineering");
+  lines.push("");
   lines.push(getValue("planning.deliverablesIntro", PLANNING_DELIVERABLES_INTRO));
   lines.push("");
   const softwarePlanningDeliverables = data.planningDeliverables.filter((p) =>
@@ -407,9 +213,226 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     ),
   );
   lines.push("");
+  lines.push("### Human Factors Engineering");
+  lines.push("");
+  const milStd1472 = POINTER_SPEC_CATALOG.find((p) => p.id === "milStd1472")!;
+  lines.push(getValue(`pointerSpec.catalog.${milStd1472.id}.whyItMatters`, milStd1472.whyItMatters));
+  lines.push("");
+  lines.push(getValue(`pointerSpec.catalog.${milStd1472.id}.recommendedApproach`, milStd1472.recommendedApproach));
+  lines.push("");
 
-  // 15. Baseline Management
-  lines.push(heading("baselineManagement"));
+  // 3.3 Mapping Between Contractor and Government SE Processes
+  lines.push(heading("processMapping"));
+  lines.push(getValue("incose.frameworkIntro", INCOSE_FRAMEWORK_INTRO));
+  lines.push("");
+  for (const group of INCOSE_PROCESS_GROUPS) {
+    lines.push(`**${group}**`);
+    lines.push("");
+    lines.push(getValue(`incose.group.${group}.description`, INCOSE_GROUP_META[group].description));
+    lines.push("");
+    lines.push(
+      mdTable(
+        ["Sub-Process", "Contractor Process In This App"],
+        INCOSE_GROUP_META[group].subProcesses.map((sp, i) => [
+          sp.name,
+          getValue(`incose.group.${group}.subProcess.${i}.appMapping`, sp.appMapping),
+        ]),
+      ),
+    );
+    lines.push("");
+  }
+  lines.push(
+    "_Government-side process names and any \"not mapped, not needed\" rationale (DID 3.3) still require your " +
+      "program's actual government SE process documentation — not available to this app._",
+  );
+  lines.push("");
+
+  // 3.4 Alignment of Contractor and Subcontractor SE Processes
+  lines.push(heading("subcontractorAlignment"));
+  lines.push(
+    "_This app's COTS Records tab (qualified alternates, obsolescence monitoring — see 3.8 below for the full " +
+      "table) is the nearest existing content to subcontractor/vendor process alignment, but it does not " +
+      "document actual subcontractor SE process alignment. Treat this section as a gap to fill from your " +
+      "program's real subcontractor management records._",
+  );
+  lines.push("");
+
+  // 3.5.a Architecture, Documentation, Interfaces
+  lines.push(heading("architectureInterfaces"));
+  for (const baseline of ["Baseline A", "Baseline B"] as const) {
+    lines.push(`### ${baseline}`);
+    lines.push("");
+    lines.push("**Logical Subsystems**");
+    lines.push("");
+    lines.push(
+      mdTable(
+        ["Name", "Source", "Description"],
+        data.logicalSubsystems.filter((s) => s.baseline === baseline).map((s) => [s.name, s.source, s.description]),
+      ),
+    );
+    lines.push("");
+    lines.push("**Configuration Items**");
+    lines.push("");
+    lines.push(
+      mdTable(
+        ["Name", "Type", "Tier", "Subsystems", "Over-Decomposition Flagged", "Status", "Consolidation Notes"],
+        data.cis
+          .filter((c) => c.baseline === baseline)
+          .map((c) => [
+            c.name,
+            c.type,
+            c.tier,
+            c.subsystemIds.map((id) => subsystemName(id)).join(", ") || "—",
+            c.overDecompositionFlag ? "Yes" : "No",
+            c.status,
+            c.consolidationNotes || "—",
+          ]),
+      ),
+    );
+    lines.push("");
+  }
+  for (const scope of ["subsystem", "ci"] as const) {
+    lines.push(`**${scope === "subsystem" ? "Subsystem-to-Subsystem" : "CI-to-CI"} Interfaces**`);
+    lines.push("");
+    lines.push(
+      mdTable(
+        ["Element A", "Element B", "Description"],
+        data.interfaces
+          .filter((i) => i.scope === scope)
+          .map((i) => [elementName(scope, i.aId), elementName(scope, i.bId), i.description]),
+      ),
+    );
+    lines.push("");
+  }
+
+  // 3.5.b Formal Technical Reviews and Audits
+  lines.push(heading("technicalReviewsAudits"));
+  lines.push(
+    mdTable(
+      ["Event", "Name", "Summary", "Decomposition", "Safety Planning", "Software Planning", "Spec Generation", "TDP Maturity (MIL-STD-31000)"],
+      SETR_EVENTS.map((event) => [
+        event,
+        SETR_GUIDANCE[event].name,
+        getValue(`setr.${event}.summary`, SETR_GUIDANCE[event].summary),
+        getValue(`setr.${event}.decomposition`, SETR_GUIDANCE[event].decomposition),
+        getValue(`setr.${event}.safetyPlanning`, SETR_GUIDANCE[event].safetyPlanning),
+        getValue(`setr.${event}.softwarePlanning`, SETR_GUIDANCE[event].softwarePlanning),
+        getValue(`setr.${event}.specGeneration`, SETR_GUIDANCE[event].specGeneration),
+        getValue(`setr.${event}.tdpMaturity`, SETR_GUIDANCE[event].tdpMaturity),
+      ]),
+    ),
+  );
+  lines.push(getValue("tdp.fcaPcaNote", FCA_PCA_NOTE));
+  lines.push("");
+
+  // 3.5.c Trade Studies
+  lines.push(heading("tradeStudies"));
+  lines.push("**Recommendations**");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Text", "Category", "Status", "Owner", "Related CI"],
+      data.recommendations.map((r) => [r.text, r.category, r.status, r.owner || "—", ciName(r.relatedCiId)]),
+    ),
+  );
+  lines.push("");
+  lines.push("**A/B Compatibility Risk Notes**");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["CI", "Compatibility Status", "Risk Note", "Last Reviewed"],
+      data.abCompatibility
+        .filter((r) => r.riskNote)
+        .map((r) => [ciName(r.ciId), r.compatibilityStatus, r.riskNote, r.lastReviewedDate]),
+    ),
+  );
+  lines.push("");
+  lines.push(
+    "_This app has no dedicated trade-study entity or formal risk register — treat this section as a partial " +
+      "feed, not a complete one._",
+  );
+  lines.push("");
+
+  // 3.5.d Integration, Verification, and Validation
+  lines.push(heading("integrationVerificationValidation"));
+  lines.push("**Specification Verification Provisions**");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Specification", "Level", "Domain", "Baseline", "Verification Provisions"],
+      data.specifications.map((s) => [s.title, s.level, s.domain, s.baseline, s.sections.verificationProvisions || "—"]),
+    ),
+  );
+  lines.push("");
+  lines.push("**COTS Verification**");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["CI", "Verification Method", "Rationale"],
+      data.cotsRecords.map((c) => [ciName(c.ciId), c.verificationMethod, c.rationale]),
+    ),
+  );
+  lines.push("");
+
+  // 3.6 Related Planning for Tailored SE Process Application
+  lines.push(heading("tailoredProcessPlanning"));
+  lines.push(getValue("pointerSpec.frameworkIntro", POINTER_SPEC_INTRO));
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Principle", "Description"],
+      POINTER_SPEC_PRINCIPLES.map((p, i) => [p.title, getValue(`pointerSpec.principles.${i}`, p.text)]),
+    ),
+  );
+  lines.push("");
+  lines.push("**EIA-649 Configuration Management Functional Areas**");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Functional Area", "Description", "Implemented In This App As"],
+      CM_FUNCTIONAL_AREAS.map((area) => [
+        area.name,
+        getValue(`cm.area.${area.id}.description`, area.description),
+        getValue(`cm.area.${area.id}.appMapping`, area.appMapping),
+      ]),
+    ),
+  );
+  lines.push("");
+  lines.push(
+    "_Supplier/subcontractor and COTS vendor communication details: see 3.4 (Subcontractor Alignment) and 3.8 " +
+      "(COTS and Parts Management) below._",
+  );
+  lines.push("");
+
+  // 3.7 Referenced Lower-Level and Subcontractor Technical Plans
+  lines.push(heading("referencedTechnicalPlans"));
+  lines.push(
+    mdTable(
+      ["Title", "Level", "CDRL Type", "Applicability", "Baseline", "Status", "Delivery Milestone", "Description"],
+      data.planningDeliverables.map((p) => [
+        p.title,
+        p.level,
+        p.cdrlType,
+        p.applicability,
+        p.baseline,
+        p.status,
+        p.deliveryMilestone,
+        p.cdrlDescription,
+      ]),
+    ),
+  );
+  lines.push("");
+  lines.push(
+    "_Includes the Configuration Management Plan, Risk Management Plan, Requirements Management Plan, and Data " +
+      "Management Plan named explicitly in DID paragraph 3.7, alongside the software-specific CDRLs covered in " +
+      "3.2 above._",
+  );
+  lines.push("");
+
+  // 3.8 Other Areas Necessary to Execute Systems Engineering
+  lines.push(heading("otherNecessaryAreas"));
+  lines.push("### Baseline Management (Baseline A / Baseline B)");
+  lines.push("");
   for (const baseline of ["Baseline A", "Baseline B"] as const) {
     const subCount = data.logicalSubsystems.filter((s) => s.baseline === baseline).length;
     const ciCount = data.cis.filter((c) => c.baseline === baseline).length;
@@ -431,9 +454,72 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     ),
   );
   lines.push("");
-
-  // 16. COTS and Parts Management
-  lines.push(heading("cotsPartsManagement"));
+  lines.push("**Requirements Traceability (Delta Matrix)**");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["CI", "SFR Allocation", "Actual Decomposition", "Delta", "Delta Source", "Disposition", "Rationale"],
+      data.deltaMatrix.map((r) => [
+        ciName(r.ciId),
+        r.sfrAllocation,
+        r.actualDecomposition,
+        r.delta,
+        r.deltaSource,
+        r.disposition,
+        r.rationale,
+      ]),
+    ),
+  );
+  lines.push("");
+  lines.push("### Technical Data Package (TDP) Management (MIL-STD-31000)");
+  lines.push("");
+  lines.push(getValue("tdp.frameworkIntro", TDP_FRAMEWORK_INTRO));
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["TDP Maturity Level", "Description", "Spec-Type Correlation", "SETR Range"],
+      TDP_MATURITY_LEVELS.map((level) => [
+        TDP_MATURITY_META[level].name,
+        getValue(`tdp.maturity.${level}.description`, TDP_MATURITY_META[level].description),
+        getValue(`tdp.maturity.${level}.specTypeCorrelation`, TDP_MATURITY_META[level].specTypeCorrelation),
+        TDP_MATURITY_META[level].setrRange,
+      ]),
+    ),
+  );
+  lines.push(getValue("tdp.fcaPcaNote", FCA_PCA_NOTE));
+  lines.push("");
+  lines.push("**TDP Content Elements**");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Content Element", "Description", "In This App"],
+      TDP_CONTENT_ELEMENTS.map((el) => [
+        el.name,
+        el.description,
+        getValue(`tdp.content.${el.id}.appMapping`, el.appMapping),
+      ]),
+    ),
+  );
+  lines.push("");
+  lines.push("### Digital Engineering / MBSE Strategy");
+  lines.push("");
+  lines.push(getValue("dbxMbx.intro", DBX_MBX_INTRO));
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["SE Dimension", "Document-Based (DBx)", "Model-Based (MBx)", "Tradeoff", "In This App"],
+      DBX_MBX_DIMENSIONS.map((d) => [
+        d.name,
+        getValue(`dbxMbx.${d.id}.dbxDescription`, d.dbxDescription),
+        getValue(`dbxMbx.${d.id}.mbxDescription`, d.mbxDescription),
+        getValue(`dbxMbx.${d.id}.tradeoff`, d.tradeoff),
+        getValue(`dbxMbx.${d.id}.thisAppNote`, d.thisAppNote),
+      ]),
+    ),
+  );
+  lines.push("");
+  lines.push("### COTS and Parts Management");
+  lines.push("");
   lines.push(
     mdTable(
       ["CI", "Functional Requirement", "Interface Requirement", "Form/Fit Constraints", "Qualified Alternates", "Obsolescence Monitoring"],

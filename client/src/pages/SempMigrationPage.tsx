@@ -1,5 +1,6 @@
 import { EditableText } from "../components/EditableText";
-import { SEMP_APPENDIX_NOTE, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../data/sempGuidance";
+import { SEMP_APPENDIX_NOTE, SEMP_DID_CITATION, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../data/sempGuidance";
+import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../data/incoseGuidance";
 import { buildSempMigrationMarkdown, type SempExportData } from "../utils/sempExport";
 import { useSiteContent } from "../contexts/SiteContentContext";
 
@@ -46,6 +47,7 @@ export function SempMigrationPage(data: Props) {
       </div>
 
       <div className="safety-callout">
+        <EditableText contentKey="semp.didCitation" defaultValue={SEMP_DID_CITATION} as="p" className="hint" />
         <EditableText contentKey="semp.mappingDisclaimer" defaultValue={SEMP_MAPPING_DISCLAIMER} as="p" />
       </div>
 
@@ -87,7 +89,7 @@ export function SempMigrationPage(data: Props) {
       </section>
 
       <section>
-        <h3>Section mapping (DI-SESS-81785B — best effort)</h3>
+        <h3>Section mapping (DI-SESS-81785B — verified paragraph structure)</h3>
         <EditableText contentKey="semp.appendixNote" defaultValue={SEMP_APPENDIX_NOTE} as="p" className="hint" />
         <div className="did-guidance-grid">
           {SEMP_SECTIONS.map((s) => (
@@ -103,6 +105,37 @@ export function SempMigrationPage(data: Props) {
                 as="p"
                 className="hint"
               />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h3>INCOSE / ISO 15288 process mapping (feeds DID 3.3)</h3>
+        <EditableText contentKey="incose.frameworkIntro" defaultValue={INCOSE_FRAMEWORK_INTRO} as="p" className="hint" />
+        <div className="did-guidance-grid">
+          {INCOSE_PROCESS_GROUPS.map((group) => (
+            <div className="detail-card" key={group}>
+              <h4>{group}</h4>
+              <EditableText
+                contentKey={`incose.group.${group}.description`}
+                defaultValue={INCOSE_GROUP_META[group].description}
+                as="p"
+                className="hint"
+              />
+              <ul>
+                {INCOSE_GROUP_META[group].subProcesses.map((sp, i) => (
+                  <li key={sp.name}>
+                    <strong>{sp.name}</strong>
+                    <br />
+                    <EditableText
+                      contentKey={`incose.group.${group}.subProcess.${i}.appMapping`}
+                      defaultValue={sp.appMapping}
+                      as="span"
+                    />
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

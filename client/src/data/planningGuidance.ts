@@ -30,6 +30,24 @@ export const PLANNING_CDRL_CATALOG: Record<SpecLevel, PlanningCatalogItem[]> = {
       description:
         "Governs CM process for both baselines — the same discipline the Delta/Traceability Matrix and CI over-decomposition tracking in this app ultimately feed into.",
     },
+    {
+      name: "Risk Management Plan (RMP)",
+      applicability: "Both",
+      description:
+        "Governs the risk identification/mitigation process — named explicitly in DI-SESS-81785B paragraph 3.7 as a referenced lower-level plan. This app has no formal risk register; the Recommendations tab and A/B Compatibility risk notes are the closest existing feed until this plan's own tracking is established.",
+    },
+    {
+      name: "Requirements Management Plan (RqMP)",
+      applicability: "Both",
+      description:
+        "Governs how requirements are captured, allocated, and kept traceable through change — named explicitly in DI-SESS-81785B paragraph 3.7. The Delta/Traceability Matrix is this app's concrete evidence of that process actually being followed (or not) for Baseline A.",
+    },
+    {
+      name: "Data Management Plan (DMP)",
+      applicability: "Both",
+      description:
+        "Governs how technical data (specs, drawings, analyses) is identified, controlled, and delivered — named explicitly in DI-SESS-81785B paragraph 3.7. The link-only Attachments mechanism across this app's entities is the nearest adjacent content, though it's a pointer mechanism, not a data management process in itself.",
+    },
   ],
   Subsystem: [
     {

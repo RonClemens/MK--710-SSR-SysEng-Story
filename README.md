@@ -183,8 +183,10 @@ plus an eleventh, `ContentEntry`, for editable site prose (see
   Safety Deliverables (`level`, `cdrlType`, `applicability`, `baseline`,
   `status`, optional Subsystem/CI link, `cdrlDescription`,
   `deliveryMilestone`), but for **non-safety** program and software planning
-  artifacts (SEMP, CMP, SDP, STP, SDD, VDD — see
-  `client/src/data/planningGuidance.ts`). Kept as a separate entity/tab
+  artifacts (SEMP, CMP, Risk/Requirements/Data Management Plans, SDP, STP,
+  SDD, VDD — see `client/src/data/planningGuidance.ts`; the Risk/Requirements/
+  Data Management Plans were added specifically because DI-SESS-81785B
+  paragraph 3.7 names them explicitly). Kept as a separate entity/tab
   rather than folded into Safety Deliverables' CDRL catalog, since a Software
   Development Plan is about how software gets built and verified, not what
   hazards it introduces.
@@ -412,9 +414,54 @@ your program's real CM system; this app just needs to point at it.
 
 The **SEMP Migration** tab produces a single downloadable Markdown file that
 maps this app's current content — including any Edit Mode changes — onto a
-Systems Engineering Management Plan (SEMP) section outline styled after
-DI-SESS-81785B (`client/src/data/sempGuidance.ts`,
-`client/src/utils/sempExport.ts`).
+Systems Engineering Management Plan (SEMP) section structure built directly
+from a verified copy of the governing DID, **DI-SESS-81785B** (approved
+2025-01-08; PDF supplied by this app's user and read directly — not scraped;
+`client/src/data/sempGuidance.ts`, `client/src/utils/sempExport.ts`).
+
+**Unlike most DIDs, DI-SESS-81785B does not prescribe a fixed table of
+contents.** It says outright: *"2. Format. The SEMP format shall be selected
+by the contractor."* Content-wise, it requires the SEMP to "be consistent
+with and address all topics in the government SEP, if available. In the
+absence of a government SEP, the SEMP shall address the topics in the OSD SEP
+Outline active at the time of the RFP," and, minimally, to address eight
+numbered content requirements (paragraphs 3.1–3.8, with 3.5 split into four
+lettered sub-requirements a–d). The section list on this tab mirrors those
+**actual DID paragraph numbers** — 1 (Use/Relationship and Scope), 2
+(Reference Documents), 3.1 through 3.8 — rather than a fabricated generic
+outline. Two things remain genuinely unverified, and are flagged as such
+rather than guessed at:
+
+- If your program has an actual **government-furnished SEP**, the DID
+  requires this SEMP to be consistent with *that* document first — this app
+  has no visibility into it and can't substitute for it. In its absence, the
+  DID falls back to the **OSD SEP Outline** (v4.1 as of this writing,
+  publicly available at
+  `https://www.cto.mil/wp-content/uploads/2023/06/SEP-Outline-4.1.pdf`, but
+  not yet verified against this app's structure).
+- **IEEE 24748-7:2019** and **IEEE 24748-8:2019** (the DID's own cited
+  reference standards for SE application and technical reviews/audits) are
+  typically available only via an IEEE subscription — this app's SETR event
+  names and entry/exit criteria (SRR/SFR/SSR/PDR/CDR/TRR/SVR/PRR) haven't
+  been checked against IEEE 24748-8's actual defined review/audit set.
+
+Paragraph 3.3 requires *"an annotated mapping between contractor and
+government SE processes"* — this app supplies the contractor-side half via a
+new **INCOSE / ISO-IEC-IEEE 15288 process-group mapping**
+(`client/src/data/incoseGuidance.ts`, rendered on this tab below the section
+mapping), covering all four 15288 process groups (Agreement, Organizational
+Project-Enabling, Technical Management, Technical) and naming which of this
+app's tabs implements each sub-process — including the honest gaps
+(Agreement Processes and Organizational Project-Enabling Processes sit above
+the level of individual technical artifacts this app models). The
+government-side column and any not-needed-process rationale still require
+your program's actual government SE process documentation. Paragraph 3.7
+names *"risk management plan, requirements management plan, data management
+plan, and configuration management plan"* explicitly as referenced lower-
+level plans — the Program Planning tab's System-level CDRL catalog gained
+Risk Management Plan, Requirements Management Plan, and Data Management Plan
+entries specifically because this DID paragraph names them (Configuration
+Management Plan was already modeled).
 
 **This is a manual, one-way export, not an integration.** This app has no
 network path to any other tool or machine, and is not meant to have one — the
@@ -435,12 +482,11 @@ CUI boundary. If you're authoring a real SEMP on a separate (e.g. CUI) system:
    authoring there, using the file's section-by-section structure as a
    drafting aid and cross-check — not as a finished, ready-to-sign document.
 
-**The DI-SESS-81785B section numbering/titles are a working assumption, not a
-verified citation** — this app has not been checked against a real copy of
-that DID. Every section number, title, and "source in this app" description
-on the SEMP Migration tab is editable via Edit Mode (see below) so you can
-correct the mapping to match your program's actual DID/SEMP table of contents
-before exporting; corrections are picked up by the next export automatically.
+Every section number, title, and "source in this app" description on the
+SEMP Migration tab is editable via Edit Mode (see below) so the two
+still-unverified items above (or anything else) can be corrected to match
+your program's actual governing documents before exporting; corrections are
+picked up by the next export automatically.
 
 Explicit non-goal: no direct integration with any other tool (no API push, no
 file write to a shared/mounted location) — see
