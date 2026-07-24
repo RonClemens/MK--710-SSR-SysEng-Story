@@ -1,9 +1,13 @@
 import { useRef, useState } from "react";
 import { EditableText } from "../components/EditableText";
 import { N2Grid } from "../components/N2Grid";
+import { DbxMbxCard } from "../components/DbxMbxCard";
 import { INTERFACE_HAZARD_NOTE } from "../data/safetyGuidance";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
 import { SPEC_BASELINES, type ConfigurationItem, type InterfaceRecord, type LogicalSubsystem, type SpecBaseline } from "../types";
 import type { useEntity } from "../hooks/useEntity";
+
+const interfaceManagementDimension = DBX_MBX_DIMENSIONS.find((d) => d.id === "interfaceManagement")!;
 
 interface Props {
   subsystems: LogicalSubsystem[];
@@ -22,6 +26,7 @@ export function NSquaredPage({ subsystems: allSubsystems, cis: allCis, interface
   const { rows: interfaces, error, create, update, remove } = interfacesEntity;
   const [ciFocus, setCiFocus] = useState<CiFocus | null>(null);
   const [baseline, setBaseline] = useState<SpecBaseline>("Baseline A");
+  const [showGuidance, setShowGuidance] = useState(false);
   const ciSectionRef = useRef<HTMLElement>(null);
 
   const subsystems = allSubsystems.filter((s) => s.baseline === baseline);
@@ -93,6 +98,19 @@ export function NSquaredPage({ subsystems: allSubsystems, cis: allCis, interface
       <div className="safety-callout">
         <EditableText contentKey="safety.n2.interfaceHazardNote" defaultValue={INTERFACE_HAZARD_NOTE} as="span" />
       </div>
+
+      <button className="link-button" onClick={() => setShowGuidance((v) => !v)}>
+        {showGuidance ? "Hide" : "Show"} Document-Based (DBx) vs Model-Based (MBx) guidance
+      </button>
+      {showGuidance && (
+        <div className="did-guidance">
+          <EditableText contentKey="dbxMbx.intro" defaultValue={DBX_MBX_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            <DbxMbxCard dimension={interfaceManagementDimension} />
+          </div>
+        </div>
+      )}
+
       {error && <p className="form-error">{error}</p>}
 
       <section>

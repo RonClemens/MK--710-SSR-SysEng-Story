@@ -22,6 +22,10 @@ import {
   TDP_MATURITY_LEVELS,
   TDP_MATURITY_META,
 } from "../data/tdpGuidance";
+import { DbxMbxCard } from "../components/DbxMbxCard";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
+
+const specWritingDimension = DBX_MBX_DIMENSIONS.find((d) => d.id === "specificationWriting")!;
 import {
   SPEC_BASELINES,
   SPEC_DOMAINS,
@@ -302,6 +306,12 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                 <EditableText contentKey={`cm.area.${area.id}.appMapping`} defaultValue={area.appMapping} as="p" />
               </div>
             ))}
+          </div>
+
+          <h3>Document-Based (DBx) vs Model-Based (MBx) Specification</h3>
+          <EditableText contentKey="dbxMbx.intro" defaultValue={DBX_MBX_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            <DbxMbxCard dimension={specWritingDimension} />
           </div>
         </div>
       )}

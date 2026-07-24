@@ -3,6 +3,8 @@ import { DataTable, type ColumnDef } from "../components/DataTable";
 import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
+import { DbxMbxCard } from "../components/DbxMbxCard";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
 import {
   LOGICAL_SUBSYSTEM_SOURCES,
   SPEC_BASELINES,
@@ -10,6 +12,8 @@ import {
   type LogicalSubsystem,
 } from "../types";
 import type { useEntity } from "../hooks/useEntity";
+
+const decompositionDimension = DBX_MBX_DIMENSIONS.find((d) => d.id === "decomposition")!;
 
 const fields: FieldDef<LogicalSubsystem>[] = [
   { key: "name", label: "Name", type: "text" },
@@ -34,6 +38,7 @@ interface Props {
 export function SubsystemsPage({ entity, cis, onSelectSubsystem }: Props) {
   const { rows, loading, error, create, update, remove } = entity;
   const [editing, setEditing] = useState<LogicalSubsystem | "new" | null>(null);
+  const [showGuidance, setShowGuidance] = useState(false);
 
   const ciCount = (subsystemId: string) => cis.filter((c) => c.subsystemIds.includes(subsystemId)).length;
 
@@ -86,6 +91,19 @@ export function SubsystemsPage({ entity, cis, onSelectSubsystem }: Props) {
           + Add Subsystem
         </button>
       </div>
+
+      <button className="link-button" onClick={() => setShowGuidance((v) => !v)}>
+        {showGuidance ? "Hide" : "Show"} Document-Based (DBx) vs Model-Based (MBx) guidance
+      </button>
+      {showGuidance && (
+        <div className="did-guidance">
+          <EditableText contentKey="dbxMbx.intro" defaultValue={DBX_MBX_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            <DbxMbxCard dimension={decompositionDimension} />
+          </div>
+        </div>
+      )}
+
       {error && <p className="form-error">{error}</p>}
       {loading ? (
         <p>Loading…</p>

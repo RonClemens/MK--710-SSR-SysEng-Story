@@ -7,6 +7,8 @@ import { levelLabel } from "../data/didGuidance";
 import { PLANNING_CDRL_CATALOG, PLANNING_DELIVERABLES_INTRO } from "../data/planningGuidance";
 import { SETR_EVENTS, SETR_GUIDANCE } from "../data/setrGuidance";
 import { SOFTWARE_LIFECYCLE_GROUPS, SOFTWARE_LIFECYCLE_INTRO } from "../data/tdpGuidance";
+import { DbxMbxCard } from "../components/DbxMbxCard";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
 import {
   SAFETY_APPLICABILITIES,
   SPEC_BASELINES,
@@ -29,6 +31,8 @@ const APPLICABILITY_CLASS: Record<string, string> = {
   Production: "badge-warning",
   Both: "badge",
 };
+
+const programPlanningDimension = DBX_MBX_DIMENSIONS.find((d) => d.id === "programPlanningExecution")!;
 
 export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
   const { rows, loading, error, create, update, remove } = entity;
@@ -174,6 +178,12 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
                 <EditableText contentKey={`softwareLifecycle.${g.id}.planningCdrls`} defaultValue={g.planningCdrls} as="p" />
               </div>
             ))}
+          </div>
+
+          <h3>Document-Based (DBx) vs Model-Based (MBx) Program Execution</h3>
+          <EditableText contentKey="dbxMbx.intro" defaultValue={DBX_MBX_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            <DbxMbxCard dimension={programPlanningDimension} />
           </div>
         </div>
       )}

@@ -85,36 +85,43 @@ export const SEMP_SECTIONS: SempSection[] = [
       "MIL-STD-31000 TDP maturity levels (Conceptual/Developmental/Product) mapped to the SRR → PRR SETR sequence and this app's Development/Production spec types, the TDP content-element-to-entity mapping, and the FCA/PCA (EIA-649 Configuration Verification and Audit) note — all from the Specifications tab's TDP Alignment guidance.",
   },
   {
-    id: "verificationValidation",
+    id: "digitalEngineeringStrategy",
     defaultNumber: "11",
+    defaultTitle: "Digital Engineering / MBSE Strategy",
+    defaultSourceDescription:
+      "The Document-Based (DBx) vs Model-Based (MBx) guidance repeated across the Subsystems, CI Inventory, N² Diagram, Specifications, Safety Deliverables, and Program Planning tabs — six SE dimensions, each with a DBx description, an MBx description, the tradeoff between them, and an honest note that this app itself is DBx tooling.",
+  },
+  {
+    id: "verificationValidation",
+    defaultNumber: "12",
     defaultTitle: "Verification and Validation",
     defaultSourceDescription:
       "Specification verificationProvisions sections, and COTS Records verification method / rationale fields.",
   },
   {
     id: "systemSafetyEngineering",
-    defaultNumber: "12",
+    defaultNumber: "13",
     defaultTitle: "System Safety Engineering",
     defaultSourceDescription:
       "Safety Deliverables (CDRL catalog by level, hazard category mapping, applicability, status) and the hazard-analysis-to-decomposition-level guidance this app ties to MIL-STD-882E/JSSSEH.",
   },
   {
     id: "softwareEngineering",
-    defaultNumber: "13",
+    defaultNumber: "14",
     defaultTitle: "Software Engineering",
     defaultSourceDescription:
       "Program Planning Deliverables' software-specific CDRLs (SDP, STP, SDD, STD, VDD), each Specification's Software-domain records, and the IEEE 12207 software life-cycle process alignment (Program Planning tab).",
   },
   {
     id: "baselineManagement",
-    defaultNumber: "14",
+    defaultNumber: "15",
     defaultTitle: "Baseline Management (Baseline A / Baseline B)",
     defaultSourceDescription:
       "Cross-baseline summary: independent Baseline A and Baseline B decomposition counts, Delta Matrix, and A/B Compatibility status — this app's central reconciliation story.",
   },
   {
     id: "cotsPartsManagement",
-    defaultNumber: "15",
+    defaultNumber: "16",
     defaultTitle: "COTS and Parts Management",
     defaultSourceDescription:
       "COTS Records tab: functional/interface requirements, form-fit constraints, qualified alternates, and obsolescence monitoring notes.",

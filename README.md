@@ -356,6 +356,40 @@ SEMP Migration export (below) pulls the live, possibly-edited version of all
 three, including a dedicated "Technical Data Package (TDP) Management"
 section in the exported SEMP outline.
 
+### Document-Based (DBx) vs Model-Based (MBx) Systems Engineering
+
+Every SE activity above can be executed two ways, independent of which
+review gate or CDRL governs it (see `client/src/data/dbxMbxGuidance.ts`,
+`client/src/components/DbxMbxCard.tsx`):
+
+- **Document-Based (DBx)** — text specifications, ICDs, hazard-analysis
+  reports, and plans are the authoritative artifacts, cross-referenced by
+  hand. Correct only as long as whoever updates one side of a cross-
+  reference remembers to check the other.
+- **Model-Based (MBx)** — per the DoD's 2018 Digital Engineering Strategy, a
+  single connected model (typically SysML) is the Authoritative Source of
+  Truth; documents, where they still exist, are generated views into it
+  rather than independently authored deliverables. Consistency is enforced
+  by the model itself rather than by discipline.
+
+This guidance appears — via a shared `DbxMbxCard` component and a common
+`dbxMbx.*` content-key namespace, so an edit to one instance shows up
+consistently wherever that dimension is referenced — on **six tabs**, one
+dimension each: **Subsystems** and **CI Inventory** (Systems Engineering &
+Decomposition), **N² Diagram** (Interface Management), **Specifications**
+(Specification Writing), **Safety Deliverables** (System Safety Analysis),
+and **Program Planning** (Program Planning & Execution). Each dimension
+names the DBx approach, the MBx approach, the tradeoff between them, and —
+deliberately, not glossed over — an honest note on where **this app itself**
+sits: a relational document/database staging tool, not a SysML/MBSE
+environment. The N² Diagram's "derived hint" cells are the one place this
+app borrows an MBx-*inspired* idea (a live-computed relationship, not a
+manually maintained record) without being an actual model; every other tab
+is DBx in the fullest sense, cross-references and all — including the SEMP
+Migration export itself, which is a generated Markdown document, not a
+connected model. The SEMP Migration export includes a dedicated "Digital
+Engineering / MBSE Strategy" section summarizing all six dimensions.
+
 ## Linked files/documents
 
 CIs, COTS Item Records, Specifications, Safety Deliverables, and Program

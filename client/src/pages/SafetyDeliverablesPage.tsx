@@ -5,6 +5,8 @@ import { Modal } from "../components/Modal";
 import { SafetyDeliverableForm, type SafetyDeliverableValues } from "../components/SafetyDeliverableForm";
 import { levelLabel } from "../data/didGuidance";
 import { CDRL_CATALOG, HAZARD_CATEGORY_META, SAFETY_DELIVERABLES_INTRO, hazardCategoryForLevel } from "../data/safetyGuidance";
+import { DbxMbxCard } from "../components/DbxMbxCard";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
 import {
   SAFETY_APPLICABILITIES,
   SPEC_BASELINES,
@@ -27,6 +29,8 @@ const APPLICABILITY_CLASS: Record<string, string> = {
   Production: "badge-warning",
   Both: "badge",
 };
+
+const safetyAnalysisDimension = DBX_MBX_DIMENSIONS.find((d) => d.id === "systemSafetyAnalysis")!;
 
 export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
   const { rows, loading, error, create, update, remove } = entity;
@@ -154,6 +158,12 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
                 </ul>
               </div>
             ))}
+          </div>
+
+          <h3>Document-Based (DBx) vs Model-Based (MBx) Safety Analysis</h3>
+          <EditableText contentKey="dbxMbx.intro" defaultValue={DBX_MBX_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            <DbxMbxCard dimension={safetyAnalysisDimension} />
           </div>
         </div>
       )}

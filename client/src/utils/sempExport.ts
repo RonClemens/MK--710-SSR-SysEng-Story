@@ -12,6 +12,7 @@ import {
   TDP_MATURITY_LEVELS,
   TDP_MATURITY_META,
 } from "../data/tdpGuidance";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
 import type {
   AbCompatibilityRow,
   Attachment,
@@ -283,7 +284,25 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   );
   lines.push("");
 
-  // 11. Verification and Validation
+  // 11. Digital Engineering / MBSE Strategy
+  lines.push(heading("digitalEngineeringStrategy"));
+  lines.push(getValue("dbxMbx.intro", DBX_MBX_INTRO));
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["SE Dimension", "Document-Based (DBx)", "Model-Based (MBx)", "Tradeoff", "In This App"],
+      DBX_MBX_DIMENSIONS.map((d) => [
+        d.name,
+        getValue(`dbxMbx.${d.id}.dbxDescription`, d.dbxDescription),
+        getValue(`dbxMbx.${d.id}.mbxDescription`, d.mbxDescription),
+        getValue(`dbxMbx.${d.id}.tradeoff`, d.tradeoff),
+        getValue(`dbxMbx.${d.id}.thisAppNote`, d.thisAppNote),
+      ]),
+    ),
+  );
+  lines.push("");
+
+  // 12. Verification and Validation
   lines.push(heading("verificationValidation"));
   lines.push("**Specification Verification Provisions**");
   lines.push("");
@@ -304,7 +323,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   );
   lines.push("");
 
-  // 12. System Safety Engineering
+  // 13. System Safety Engineering
   lines.push(heading("systemSafetyEngineering"));
   lines.push(getValue("safety.deliverablesIntro", SAFETY_DELIVERABLES_INTRO));
   lines.push("");
@@ -349,7 +368,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   );
   lines.push("");
 
-  // 13. Software Engineering
+  // 14. Software Engineering
   lines.push(heading("softwareEngineering"));
   lines.push(getValue("planning.deliverablesIntro", PLANNING_DELIVERABLES_INTRO));
   lines.push("");
@@ -389,7 +408,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   );
   lines.push("");
 
-  // 14. Baseline Management
+  // 15. Baseline Management
   lines.push(heading("baselineManagement"));
   for (const baseline of ["Baseline A", "Baseline B"] as const) {
     const subCount = data.logicalSubsystems.filter((s) => s.baseline === baseline).length;
@@ -413,7 +432,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   );
   lines.push("");
 
-  // 15. COTS and Parts Management
+  // 16. COTS and Parts Management
   lines.push(heading("cotsPartsManagement"));
   lines.push(
     mdTable(

@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
+import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
+import { DbxMbxCard } from "../components/DbxMbxCard";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
 import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import { CI_TIERS, CI_TYPES, SPEC_BASELINES, type ConfigurationItem, type LogicalSubsystem } from "../types";
 import type { useEntity } from "../hooks/useEntity";
+
+const decompositionDimension = DBX_MBX_DIMENSIONS.find((d) => d.id === "decomposition")!;
 
 type CiFormValues = Omit<ConfigurationItem, "attachments"> & { attachments: string };
 
@@ -30,6 +35,7 @@ interface Props {
 export function CisPage({ entity, subsystems, onSelectCi }: Props) {
   const { rows, loading, error, create, update, remove } = entity;
   const [editing, setEditing] = useState<ConfigurationItem | "new" | null>(null);
+  const [showGuidance, setShowGuidance] = useState(false);
 
   const subsystemLabels = Object.fromEntries(subsystems.map((s) => [s.id, s.name]));
   const subsystemNames = (ids: string[]) => ids.map((id) => subsystemLabels[id] ?? "(unknown)").join(", ");
@@ -121,6 +127,19 @@ export function CisPage({ entity, subsystems, onSelectCi }: Props) {
           + Add CI
         </button>
       </div>
+
+      <button className="link-button" onClick={() => setShowGuidance((v) => !v)}>
+        {showGuidance ? "Hide" : "Show"} Document-Based (DBx) vs Model-Based (MBx) guidance
+      </button>
+      {showGuidance && (
+        <div className="did-guidance">
+          <EditableText contentKey="dbxMbx.intro" defaultValue={DBX_MBX_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            <DbxMbxCard dimension={decompositionDimension} />
+          </div>
+        </div>
+      )}
+
       {error && <p className="form-error">{error}</p>}
       {loading ? (
         <p>Loading…</p>
