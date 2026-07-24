@@ -5,6 +5,12 @@ import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
 import { DbxMbxCard } from "../components/DbxMbxCard";
 import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
+import {
+  RECOVERY_DELTA_CLASSES,
+  RECOVERY_DELTA_CLASS_SCOPE_NOTE,
+  RECOVERY_DELTA_CLASS_TIER_MAPPING,
+  RECOVERY_PROGRAM_INTRO,
+} from "../data/recoveryProgramGuidance";
 import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import { CI_TIERS, CI_TYPES, SPEC_BASELINES, type ConfigurationItem, type LogicalSubsystem } from "../types";
 import type { useEntity } from "../hooks/useEntity";
@@ -137,6 +143,36 @@ export function CisPage({ entity, subsystems, onSelectCi }: Props) {
           <div className="did-guidance-grid">
             <DbxMbxCard dimension={decompositionDimension} />
           </div>
+
+          <h3>Recovery Program: CI Tier ↔ Delta Classification (Baseline B)</h3>
+          <EditableText contentKey="recovery.intro" defaultValue={RECOVERY_PROGRAM_INTRO} as="p" className="hint" />
+          <div className="did-guidance-grid">
+            {RECOVERY_DELTA_CLASSES.map((cls) => (
+              <div className="detail-card" key={cls}>
+                <h4>
+                  {cls} <span className="badge">{RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].tier}</span>
+                </h4>
+                <EditableText
+                  contentKey={`recovery.class.${cls}.description`}
+                  defaultValue={RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].description}
+                  as="p"
+                />
+                <p className="did-guidance-label">Reconciliation effort</p>
+                <EditableText
+                  contentKey={`recovery.class.${cls}.workRequired`}
+                  defaultValue={RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].workRequired}
+                  as="p"
+                  className="hint"
+                />
+              </div>
+            ))}
+          </div>
+          <EditableText
+            contentKey="recovery.scopeNote"
+            defaultValue={RECOVERY_DELTA_CLASS_SCOPE_NOTE}
+            as="p"
+            className="hint"
+          />
         </div>
       )}
 

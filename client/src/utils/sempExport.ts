@@ -1,7 +1,19 @@
 import { SEMP_APPENDIX_NOTE, SEMP_DID_CITATION, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../data/sempGuidance";
 import { CDRL_CATALOG, HAZARD_CATEGORY_META, SAFETY_DELIVERABLES_INTRO } from "../data/safetyGuidance";
 import { PLANNING_DELIVERABLES_INTRO } from "../data/planningGuidance";
-import { SETR_EVENTS, SETR_FRAMEWORK_INTRO, SETR_GUIDANCE } from "../data/setrGuidance";
+import {
+  RECURRING_TECHNICAL_ACTIVITIES,
+  RECURRING_TECHNICAL_ACTIVITIES_INTRO,
+  SETR_EVENTS,
+  SETR_FRAMEWORK_INTRO,
+  SETR_GUIDANCE,
+} from "../data/setrGuidance";
+import {
+  RECOVERY_DELTA_CLASSES,
+  RECOVERY_DELTA_CLASS_SCOPE_NOTE,
+  RECOVERY_DELTA_CLASS_TIER_MAPPING,
+  RECOVERY_PROGRAM_INTRO,
+} from "../data/recoveryProgramGuidance";
 import {
   CM_FUNCTIONAL_AREAS,
   FCA_PCA_NOTE,
@@ -216,6 +228,24 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     );
     lines.push("");
   }
+
+  lines.push("**Recovery Program: CI Tier ↔ Delta Classification (Baseline B)**");
+  lines.push("");
+  lines.push(getValue("recovery.intro", RECOVERY_PROGRAM_INTRO));
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Delta Class", "CI Tier", "Description", "Reconciliation Effort"],
+      RECOVERY_DELTA_CLASSES.map((cls) => [
+        cls,
+        RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].tier,
+        getValue(`recovery.class.${cls}.description`, RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].description),
+        getValue(`recovery.class.${cls}.workRequired`, RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].workRequired),
+      ]),
+    ),
+  );
+  lines.push(getValue("recovery.scopeNote", RECOVERY_DELTA_CLASS_SCOPE_NOTE));
+  lines.push("");
 
   // 2.3 Specialty Engineering
   lines.push(heading("specialtyEngineering"));
@@ -553,6 +583,20 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     ),
   );
   lines.push(getValue("tdp.fcaPcaNote", FCA_PCA_NOTE));
+  lines.push("");
+  lines.push(getValue("recurringTechActivities.intro", RECURRING_TECHNICAL_ACTIVITIES_INTRO));
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Activity", "Cadence", "Purpose", "Distinction from a SETR milestone gate"],
+      RECURRING_TECHNICAL_ACTIVITIES.map((activity) => [
+        activity.name,
+        getValue(`recurringTechActivities.${activity.id}.cadence`, activity.cadence),
+        getValue(`recurringTechActivities.${activity.id}.purpose`, activity.purpose),
+        getValue(`recurringTechActivities.${activity.id}.distinctionFromSetr`, activity.distinctionFromSetr),
+      ]),
+    ),
+  );
   lines.push("");
 
   // Appendix B (SEP Outline)

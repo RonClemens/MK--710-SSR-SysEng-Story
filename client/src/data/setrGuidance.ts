@@ -1,12 +1,15 @@
 // SETR (Systems Engineering Technical Review) milestone expectations, tying
 // together the three tabs this app already models (Specifications, Safety
 // Deliverables, Program Planning) into a single before/after picture of what
-// should exist by each review. Working assumption on SSR's name — not
-// confirmed against the program's own SETR nomenclature, so flagged here
-// rather than asserted as settled: this app treats it as "System
-// Specification Review," the point where System/Subsystem-level Development
-// specs are expected to close out, immediately before CI-level decomposition
-// starts at PDR.
+// should exist by each review. SSR's name is confirmed by this program's
+// Lead Systems Engineer: "Software Specification Review" — earlier revisions
+// of this app hedged this as an unverified working assumption ("System
+// Specification Review"); that hedge is resolved. The event's existing
+// guidance below (closing out System/Subsystem-level Development specs
+// before CI-level decomposition starts at PDR) is retained as-is pending a
+// deeper pass against this program's actual SSR entry/exit criteria — see
+// the RonClemens/IPPDTraining reference material for the program-specific
+// artifact-maturity detail (SCIRS draft state, etc.) not yet folded in here.
 export type SetrEvent = "SRR" | "SFR" | "SSR" | "PDR" | "CDR" | "TRR" | "SVR" | "PRR";
 
 export const SETR_EVENTS: SetrEvent[] = ["SRR", "SFR", "SSR", "PDR", "CDR", "TRR", "SVR", "PRR"];
@@ -57,7 +60,7 @@ export const SETR_GUIDANCE: Record<SetrEvent, SetrEventGuidance> = {
       "Still Conceptual-level TDP — the validated functional architecture gives a Developmental TDP something to organize around later, but no subsystem-level design data exists yet to actually call Developmental.",
   },
   SSR: {
-    name: "System Specification Review",
+    name: "Software Specification Review",
     summary:
       "Confirms the System- and Subsystem-level Development specs are complete and internally consistent before physical/CI-level design starts at PDR.",
     decomposition:
@@ -158,3 +161,80 @@ export const SETR_FRAMEWORK_INTRO =
   "team is ahead of schedule. This program's own Baseline A reconciliation effort — the reason this app exists — " +
   "is a case in point: CI-level over-decomposition that PDR should have caught wasn't caught until the program was " +
   "already approaching System TRR.";
+
+// The eight SRR-PRR events above are the formal, customer-attended
+// milestone gates — but per this program's LSE, the SEP Outline's own
+// "Technical Reviews, Audits and Activities" section title covers more than
+// just those eight named events. These four recurring activities fill the
+// space between milestone gates and are tracked here as a distinct,
+// simpler catalog rather than forced into the SetrEventGuidance shape,
+// since they don't carry the same per-event decomposition/safety/software/
+// spec-generation/TDP-maturity dimensions a milestone gate does.
+export const RECURRING_TECHNICAL_ACTIVITIES_INTRO =
+  "The eight SRR → PRR events above are the formal, customer-attended milestone gates — but they're not the " +
+  "only structured technical activity a program runs. Internal Technical Interchange Meetings, external TIMs, " +
+  "Design Reviews, and the Change (Control) Review Board fill the space between milestone gates, and \"Technical " +
+  "Reviews, Audits and Activities\" — the SEP Outline's own section title — is meant to cover all of them, not " +
+  "just the eight named events.";
+
+export interface RecurringTechnicalActivity {
+  id: string;
+  name: string;
+  cadence: string;
+  purpose: string;
+  distinctionFromSetr: string;
+}
+
+export const RECURRING_TECHNICAL_ACTIVITIES: RecurringTechnicalActivity[] = [
+  {
+    id: "internalTim",
+    name: "Internal Technical Interchange Meeting",
+    cadence: "As needed, between formal milestone gates",
+    purpose:
+      "Program-internal, cross-discipline working session (SE, safety, software, hardware) to resolve a " +
+      "specific open technical issue before it can block progress toward the next SETR gate — no customer or " +
+      "government attendance.",
+    distinctionFromSetr:
+      "Not one of the eight SRR–PRR milestone events above — those are formal, customer-attended gates with " +
+      "entry/exit criteria; this is an internal working session with no such criteria, held whenever a specific " +
+      "issue needs cross-discipline resolution.",
+  },
+  {
+    id: "externalTim",
+    name: "External Technical Interchange Meeting (TIM)",
+    cadence: "As needed, government/customer-attended",
+    purpose:
+      "Formal technical exchange with the customer on a specific topic (an interface definition, a trade study " +
+      "result, a waiver request) outside the full milestone-review process — often the venue where a risk " +
+      "surfaces to the customer before it becomes a formal finding at the next SETR gate.",
+    distinctionFromSetr:
+      "Narrower in scope than a milestone review (one topic, not a full design/requirements maturity " +
+      "assessment) but still customer-facing and often formally minuted — treat outcomes with the same rigor as " +
+      "a review action item, not an informal conversation.",
+  },
+  {
+    id: "designReview",
+    name: "Design Review",
+    cadence: "Program-defined, typically subsystem- or CI-level, between milestone gates",
+    purpose:
+      "Internal, peer-level review of a specific design (a subsystem architecture, a CI's detailed design) to " +
+      "catch issues before they reach a formal milestone gate — the informal counterpart to PDR/CDR, not a " +
+      "substitute for them.",
+    distinctionFromSetr:
+      "Scoped to one design artifact rather than the whole program baseline, and doesn't carry the formal " +
+      "entry/exit criteria or customer attendance a milestone gate does — findings here should be closed " +
+      "before, not carried into, the next formal SETR event.",
+  },
+  {
+    id: "ccb",
+    name: "Change (Control) Review Board (CCB)",
+    cadence: "Recurring, per program CM process",
+    purpose:
+      "The formal body that dispositions Engineering Change Proposals (ECPs) and change requests against the " +
+      "configuration baseline — the actual mechanism behind this app's Delta Matrix \"ECP required\" " +
+      "disposition and the EIA-649 Configuration Change Management functional area.",
+    distinctionFromSetr:
+      "Not a design-maturity gate at all — it's the configuration-management governance activity that formally " +
+      "authorizes any change to an already-baselined artifact, whether or not a SETR event is imminent.",
+  },
+];

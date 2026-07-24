@@ -263,10 +263,9 @@ not as a placeholder:
   still `Proposed`. Subsystem-level Development specs (`spec-004`,
   `spec-005`) and Functional Hazard Analyses (`safety-008`, `safety-009`)
   exist for the two validated subsystems only.
-- **SSR** — this app's working name for the review that closes out
-  System/Subsystem-level Development specs before CI-level decomposition
-  starts at PDR; confirm this against your program's actual SETR
-  nomenclature if it differs — hasn't been reached. `spec-005` (the
+- **SSR (Software Specification Review, confirmed by this program's LSE)** —
+  closes out System/Subsystem-level Development specs before CI-level
+  decomposition starts at PDR — hasn't been reached. `spec-005` (the
   Ethernet-based Diagnostic Messaging redesign) is flagged in its own notes
   as the most likely to slip SSR if its FHA (`safety-009`, still `Draft`)
   doesn't close first.
@@ -482,6 +481,45 @@ finding on a reconciliation cadence, a staged customer trust-building
 roadmap, redefined SETR entry/exit criteria for model-based artifacts before
 the first review that needs them, and an explicit sunset gate for the hybrid
 state itself.
+
+### Recovery program context, recurring technical activities, and IPPD corrections
+
+A companion repo, `RonClemens/IPPDTraining`, holds this program's own IPPD
+onboarding curriculum, and several of its program-specific facts have been
+folded into this app directly (with real names genericized to role titles —
+LSE, CE, PM, etc. — since this app is public-facing and that curriculum
+isn't). Three corrections from this program's Lead Systems Engineer,
+specifically, are now reflected:
+
+- **SSR is Software Specification Review**, not "System Specification
+  Review" — this app previously hedged the name as an unverified working
+  assumption; that hedge is now resolved (`client/src/data/setrGuidance.ts`).
+- **CI Tier doubles as Baseline B's configuration-delta classification.**
+  Per this program's LSE, this app's existing CI Tier field isn't just a
+  criticality ranking on Baseline B — assigning a CI's Tier **is** the
+  decision of how much of that CI's prior design carries forward versus
+  needs rework, mapped Class 1 (Carry Forward) → Tier 3, Class 2 (Modified)
+  → Tier 2, Class 3 (Re-Architected) → Tier 1. See
+  `client/src/data/recoveryProgramGuidance.ts`, rendered on the **CI
+  Inventory** tab (under the DBx/MBx guidance toggle) and folded into the
+  SEMP export's 2.2 Architectures and Interface Control section. The scope
+  note is explicit that this mapping is Baseline-B-specific, not a general
+  MIL-STD-961E tiering rule asserted for Baseline A or programs generally.
+- **Technical Reviews extend past the eight SRR→PRR milestone gates.** The
+  SEP Outline's own 3.2.13 section title is "Technical Reviews, Audits and
+  Activities" — broader than just the eight named events. Four recurring
+  activities that fill the space between milestone gates are now modeled
+  alongside them: **Internal Technical Interchange Meeting** (no customer
+  attendance, cross-discipline working session), **External TIM**
+  (customer-facing, narrower in scope than a milestone review but still
+  formally minuted), **Design Review** (subsystem/CI-level peer review, the
+  informal counterpart to PDR/CDR), and the **Change (Control) Review Board
+  (CCB)** — the actual governance mechanism behind this app's Delta Matrix
+  "ECP required" disposition and EIA-649 Configuration Change Management.
+  See `client/src/data/setrGuidance.ts` (`RECURRING_TECHNICAL_ACTIVITIES`),
+  rendered on the **Specifications** tab beneath the SETR Milestones grid
+  and folded into the SEMP export's 3.2.13 Technical Reviews, Audits and
+  Activities section.
 
 ## Linked files/documents
 

@@ -12,7 +12,13 @@ import {
   levelLabel,
 } from "../data/didGuidance";
 import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL, SAFETY_FRAMEWORK_INTRO } from "../data/safetyGuidance";
-import { SETR_EVENTS, SETR_FRAMEWORK_INTRO, SETR_GUIDANCE } from "../data/setrGuidance";
+import {
+  RECURRING_TECHNICAL_ACTIVITIES,
+  RECURRING_TECHNICAL_ACTIVITIES_INTRO,
+  SETR_EVENTS,
+  SETR_FRAMEWORK_INTRO,
+  SETR_GUIDANCE,
+} from "../data/setrGuidance";
 import { POINTER_SPEC_CATALOG, POINTER_SPEC_INTRO, POINTER_SPEC_PRINCIPLES } from "../data/pointerSpecGuidance";
 import {
   CM_FUNCTIONAL_AREAS,
@@ -217,6 +223,41 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                 <EditableText contentKey={`setr.${event}.specGeneration`} defaultValue={SETR_GUIDANCE[event].specGeneration} as="p" />
                 <p className="did-guidance-label">TDP Maturity (MIL-STD-31000)</p>
                 <EditableText contentKey={`setr.${event}.tdpMaturity`} defaultValue={SETR_GUIDANCE[event].tdpMaturity} as="p" />
+              </div>
+            ))}
+          </div>
+
+          <h3>Recurring Technical Activities: Beyond the Milestone Gates</h3>
+          <EditableText
+            contentKey="recurringTechActivities.intro"
+            defaultValue={RECURRING_TECHNICAL_ACTIVITIES_INTRO}
+            as="p"
+            className="hint"
+          />
+          <div className="did-guidance-grid">
+            {RECURRING_TECHNICAL_ACTIVITIES.map((activity) => (
+              <div className="detail-card" key={activity.id}>
+                <h4>{activity.name}</h4>
+                <p className="did-guidance-label">Cadence</p>
+                <EditableText
+                  contentKey={`recurringTechActivities.${activity.id}.cadence`}
+                  defaultValue={activity.cadence}
+                  as="p"
+                  className="hint"
+                />
+                <p className="did-guidance-label">Purpose</p>
+                <EditableText
+                  contentKey={`recurringTechActivities.${activity.id}.purpose`}
+                  defaultValue={activity.purpose}
+                  as="p"
+                />
+                <p className="did-guidance-label">Distinction from a SETR milestone gate</p>
+                <EditableText
+                  contentKey={`recurringTechActivities.${activity.id}.distinctionFromSetr`}
+                  defaultValue={activity.distinctionFromSetr}
+                  as="p"
+                  className="hint"
+                />
               </div>
             ))}
           </div>
