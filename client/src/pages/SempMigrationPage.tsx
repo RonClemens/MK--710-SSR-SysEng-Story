@@ -1,6 +1,7 @@
 import { EditableText } from "../components/EditableText";
 import { SEMP_APPENDIX_NOTE, SEMP_DID_CITATION, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../data/sempGuidance";
 import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../data/incoseGuidance";
+import { DbxMbxTransitionGuidance } from "../components/DbxMbxTransitionGuidance";
 import { buildSempMigrationMarkdown, type SempExportData } from "../utils/sempExport";
 import { useSiteContent } from "../contexts/SiteContentContext";
 
@@ -149,6 +150,17 @@ export function SempMigrationPage(data: Props) {
             </div>
           ))}
         </div>
+      </section>
+
+      <section>
+        <h3>2.4 Modeling Strategy: managing the DBx/MBx transition</h3>
+        <p className="hint">
+          The full Document-Based (DBx) vs Model-Based (MBx) comparison table is on the Subsystems, CI Inventory,
+          N² Diagram, Specifications, Safety Deliverables, and Program Planning tabs — not repeated here. What
+          follows is specific to Section 2.4 (Modeling Strategy): the challenges of being caught between the two
+          approaches, which this SEMP section is exactly where a program should address.
+        </p>
+        <DbxMbxTransitionGuidance />
       </section>
 
       <section>

@@ -12,7 +12,13 @@ import {
   TDP_MATURITY_LEVELS,
   TDP_MATURITY_META,
 } from "../data/tdpGuidance";
-import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
+import {
+  DBX_MBX_DIMENSIONS,
+  DBX_MBX_INTRO,
+  DBX_MBX_TRANSITION_DIMENSIONS,
+  DBX_MBX_TRANSITION_INTRO,
+  DBX_MBX_TRANSITION_MITIGATIONS,
+} from "../data/dbxMbxGuidance";
 import { POINTER_SPEC_CATALOG } from "../data/pointerSpecGuidance";
 import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../data/incoseGuidance";
 import type {
@@ -240,6 +246,27 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
       ]),
     ),
   );
+  lines.push("");
+  lines.push("### Caught Between DBx and MBx: The Transition Period");
+  lines.push("");
+  lines.push(getValue("dbxMbx.transitionIntro", DBX_MBX_TRANSITION_INTRO));
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Dimension", "Challenge", "Extra Work Required While Straddling"],
+      DBX_MBX_TRANSITION_DIMENSIONS.map((d) => [
+        d.name,
+        getValue(`dbxMbx.transition.${d.id}.challenge`, d.challenge),
+        getValue(`dbxMbx.transition.${d.id}.duplicationTax`, d.duplicationTax),
+      ]),
+    ),
+  );
+  lines.push("");
+  lines.push("**Managing the transition without it becoming permanent**");
+  lines.push("");
+  for (const [i, m] of DBX_MBX_TRANSITION_MITIGATIONS.entries()) {
+    lines.push("- " + getValue(`dbxMbx.transition.mitigation.${i}`, m.text));
+  }
   lines.push("");
 
   // 2.5 Design Considerations

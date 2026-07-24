@@ -360,6 +360,19 @@ section in the exported SEMP outline.
 
 ### Document-Based (DBx) vs Model-Based (MBx) Systems Engineering
 
+**The concrete reason a program shifts from DBx to MBx is traceability and
+change-impact analysis, not tooling fashion** — every other benefit
+(consistency, single source of truth, automated views) is downstream of that
+one, and this app's guidance leads with it rather than burying it in a
+neutral feature comparison. In DBx, a change to one requirement or
+architecture element is only as traceable as the people who remember to walk
+every dependent document and update it — the same manual-synchronization
+failure this app's own Delta Matrix exists to catch after the fact, and
+exactly what let this program's Baseline A CI over-decomposition go
+unnoticed for years. In MBx, that relationship is a first-class link inside
+the model: change-impact analysis becomes a query instead of an archaeology
+exercise across a document set.
+
 Every SE activity above can be executed two ways, independent of which
 review gate or CDRL governs it (see `client/src/data/dbxMbxGuidance.ts`,
 `client/src/components/DbxMbxCard.tsx`):
@@ -389,8 +402,51 @@ app borrows an MBx-*inspired* idea (a live-computed relationship, not a
 manually maintained record) without being an actual model; every other tab
 is DBx in the fullest sense, cross-references and all — including the SEMP
 Migration export itself, which is a generated Markdown document, not a
-connected model. The SEMP Migration export includes a dedicated "Digital
-Engineering / MBSE Strategy" section summarizing all six dimensions.
+connected model. The SEMP export's 2.4 "Modeling Strategy" section — the SEP
+Outline's own real anchor for a program's modeling-strategy discussion —
+carries the full six-dimension table.
+
+#### Caught between DBx and MBx: the transition period
+
+Most programs don't switch in one step — they spend a period straddling
+both, and a shared `DbxMbxTransitionGuidance` component (rendered on the
+**Program Planning** tab and the **SEMP Migration** tab's 2.4 Modeling
+Strategy section) makes the case that this period is not simply "doing both
+approaches at once." It's structurally worse than either pure state: two
+sources of truth exist simultaneously and can diverge, reintroducing the
+exact manual-synchronization risk MBx was adopted to eliminate — smaller and
+more insidious, since whoever's looking at either artifact has no way to
+know it's already drifted from the other. Three dimensions of friction are
+named explicitly, each with the concrete extra work required while
+straddling:
+
+- **Customer Expectations** — a customer's own review process may lack the
+  tooling or trained reviewers to accept a native model as evidence, and
+  trust in an unfamiliar model-based artifact has to be earned over a
+  visible period; every model-based artifact needs a translated document
+  view for as long as that takes.
+- **Team Organization and Expertise** — DID-structured document authorship
+  and SysML/MBSE model authorship are different skill sets requiring real
+  training investment, not a tool license; a team split between
+  document-fluent and model-fluent staff pays a coordination tax until
+  training closes the gap.
+- **Planning and Execution** — SE cost/schedule estimates built on "time to
+  write a document" don't transfer to "time to mature a model," and SETR
+  entry/exit criteria have to be explicitly redefined for model-based
+  artifacts; the concrete cost is dual configuration control (baselining
+  both the model and the documents, EIA-649 Configuration Identification and
+  Status Accounting applied twice) plus periodic reconciliation, treating
+  any model/document divergence the same way this app's own Delta Matrix
+  treats a requirements gap — a disposition-required finding, not a
+  footnote.
+
+Five concrete mitigations are named so the straddling period stays temporary
+rather than becoming permanent by default: naming an explicit authoritative
+source per artifact type in writing, treating divergence as a tracked
+finding on a reconciliation cadence, a staged customer trust-building
+roadmap, redefined SETR entry/exit criteria for model-based artifacts before
+the first review that needs them, and an explicit sunset gate for the hybrid
+state itself.
 
 ## Linked files/documents
 

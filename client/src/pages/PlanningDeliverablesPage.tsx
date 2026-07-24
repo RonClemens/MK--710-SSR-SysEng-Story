@@ -8,6 +8,7 @@ import { PLANNING_CDRL_CATALOG, PLANNING_DELIVERABLES_INTRO } from "../data/plan
 import { SETR_EVENTS, SETR_GUIDANCE } from "../data/setrGuidance";
 import { SOFTWARE_LIFECYCLE_GROUPS, SOFTWARE_LIFECYCLE_INTRO } from "../data/tdpGuidance";
 import { DbxMbxCard } from "../components/DbxMbxCard";
+import { DbxMbxTransitionGuidance } from "../components/DbxMbxTransitionGuidance";
 import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
 import {
   SAFETY_APPLICABILITIES,
@@ -185,6 +186,7 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
           <div className="did-guidance-grid">
             <DbxMbxCard dimension={programPlanningDimension} />
           </div>
+          <DbxMbxTransitionGuidance />
         </div>
       )}
 
