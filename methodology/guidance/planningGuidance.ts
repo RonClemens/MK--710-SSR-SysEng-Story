@@ -1,4 +1,4 @@
-import type { SafetyApplicability, SpecLevel } from "../types";
+import type { SafetyApplicability, SpecLevel } from "../../client/src/types";
 
 // General (non-safety) program and software planning CDRLs — SEMP, SDP, STP,
 // etc. These gate the same SETR events (SRR/SFR/SSR) as the Specifications

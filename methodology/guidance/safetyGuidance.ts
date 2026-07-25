@@ -1,4 +1,4 @@
-import type { SafetyApplicability, SpecLevel } from "../types";
+import type { SafetyApplicability, SpecLevel } from "../../client/src/types";
 
 // System safety analysis (MIL-STD-882E, extended for software by the Joint
 // Software Systems Safety Engineering Handbook / JSSSEH) is not a parallel

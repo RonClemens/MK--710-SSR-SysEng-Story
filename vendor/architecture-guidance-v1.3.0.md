@@ -1,0 +1,252 @@
+Applies to: MK 710 program / PDR Reconciliation & Baseline Alignment Workbench
+Vendored version: v1.3.0
+Imported: 2026-07-25
+Reviewer: this program's Lead Systems Engineer
+
+---
+
+# Reusable SE Webapp Architecture Guidance
+
+**Version:** 1.3.0
+**Last updated:** 2026-07-25
+**Status:** Draft
+
+**Changelog:**
+- **v1.3.0** — Added §10, forward-compatibility conventions for an eventual Unified Data Model (UDM) spanning multiple apps. Non-blocking; sets conventions only.
+- **v1.2.0** — Clarified §4: `config.json` doesn't have to own every setting (e.g., provider selection can stay on existing env vars); it exists to give settings without an existing home, like `dataSource`, a documented place to live. Prompted by SE Workbench implementation review of v1.1.0.
+- **v1.1.0** — Added public-only/static deployment exception (§3.1), clarified provider interface as a functional contract rather than a literal method signature (§3), added cross-runtime prompt-sharing guidance (§5), added "editable override ≠ real separation" anti-pattern (§1.1), added recommended migration sequencing (§7), noted §8.1 footer snippet needs adapting for multi-file/SPA frameworks. Informed by first real-world gap analysis (SE Workbench app).
+- **v1.0.0** — Initial release.
+
+**Purpose:** Mature each standalone webapp (workbench, PDR readiness, Dispatch, document translator, etc.) toward a common architecture so the *same SE methodology engine* can be reused across many programs with different technical data, and can move cleanly between the public (GitHub/Anthropic API) and CUI (GitLab/Bedrock) environments.
+
+**Core principle:** Separate the **methodology layer** ("how" — SE logic, checklists, prompts, scoring rules, document structure) from the **data layer** ("what" — program-specific technical content). The methodology layer is the reusable, versioned, public-safe product. The data layer is disposable per program and lives only in CUI space.
+
+---
+
+## 1. Three-Layer Model
+
+Every app should be decomposable into three layers, regardless of what it does on the surface:
+
+```
+┌─────────────────────────────────────────┐
+│  UI Layer            (presentation)      │  ← thin, mostly generic
+├─────────────────────────────────────────┤
+│  Methodology Layer    (the "how")        │  ← reusable across programs
+│  - SE domain logic, checklists           │
+│  - prompt templates                      │
+│  - scoring/gap-analysis rules            │
+│  - document structure schemas (DIDs)     │
+├─────────────────────────────────────────┤
+│  Provider Layer       (AI + I/O)         │  ← swappable backend
+│  - Anthropic API adapter                 │
+│  - Bedrock GovCloud adapter               │
+├─────────────────────────────────────────┤
+│  Data Layer           (the "what")       │  ← per-program, CUI, never versioned publicly
+│  - real requirements, CI names, etc.     │
+└─────────────────────────────────────────┘
+```
+
+**Test for any new feature:** "Would this line of code be the same if the program were Baseline A, Baseline B, or a completely different contract?" If yes → methodology layer. If no → data layer.
+
+### 1.1 Anti-Pattern: Editable Override ≠ Real Separation
+
+A common half-measure is building a runtime override system (e.g., a CMS-style "editable text" layer backed by a database) that lets any string be changed without a code deploy, and mistaking that for methodology/data separation. It isn't — if the *default* value baked into the methodology file is still program-specific content (real program names, actual findings, specific attributions), the file still fails the test above, even though it's technically editable. Overridability solves a different problem (letting non-developers tweak copy) than separation does (keeping the methodology repo genuinely program-agnostic and safe to vendor into any CUI environment). Apply the test to the *default value in the source file*, not to whether the field is editable at runtime.
+
+---
+
+## 2. Directory Convention (applies to every app)
+
+```
+/app
+  /methodology/          # pure SE logic — programs-agnostic
+    checklists/           # e.g. 42-item PDR checklist, domain definitions
+    prompts/               # versioned prompt templates, parameterized
+    schemas/                # document/DID structure (SSDD, RTM, etc.)
+    scoring/                 # gap-analysis / go-no-go rule logic
+  /provider/              # AI backend abstraction
+    anthropic-adapter.js
+    bedrock-adapter.js
+    provider-interface.js   # shared contract both adapters implement
+  /ui/                    # presentation components
+  /data-schema/           # SHAPE of program data (field defs), not actual data
+  /mock-data/             # synthetic mirror baseline for public-side testing
+  config.json             # points at which provider + which program data source
+```
+
+**Rule:** `/methodology`, `/provider`, `/ui`, and `/data-schema` are what get vendored into CUI repos. `/mock-data` stays public-only. Real program data never lives in this tree at all — it's injected at runtime (see §4).
+
+---
+
+## 3. Provider Abstraction Contract
+
+Every app should code against one interface, never against Anthropic's or Bedrock's SDK directly in application logic. The requirement is functional, not literal: **one shared interface, implemented identically by every backend, with application/methodology code calling only that interface.** The example below shows one reasonable shape — an existing app using different method names (e.g., `sendMessage()` instead of `complete()`) satisfies the guidance as long as the same three properties hold. Don't rename working code just to match this example verbatim; document the existing shape as an accepted equivalent instead.
+
+```js
+// provider-interface.js
+export interface AIProvider {
+  complete(prompt: string, options?: CompletionOptions): Promise<string>;
+  completeStructured(prompt: string, schema: object): Promise<object>;
+}
+```
+
+`anthropic-adapter.js` and `bedrock-adapter.js` both implement this. `config.json` (or an env var) selects which one loads. Application/methodology code never branches on environment — it just calls `provider.complete(...)`. Note `completeStructured()` implies schema-validated output; only include it if the app actually validates against a schema — otherwise a single `complete()`-style method is sufficient.
+
+This is the single highest-leverage piece of engineering across all your apps: get this right once, and every future app inherits CUI-portability for free.
+
+### 3.1 Exception: Public-Only Static Deployments
+
+Some apps ship a fully static, serverless build (e.g., GitHub Pages, client-only bundle) alongside or instead of a server-backed mode — often using a visitor-supplied API key called directly from the browser. This deployment target **cannot** implement the provider abstraction as written: there is no server to hold GovCloud credentials, and browser CORS/credential-exposure constraints make direct browser-to-Bedrock calls impractical and unsafe.
+
+This is an accepted, named exception, not a violation — **provided the static build is public-only by construction** (it structurally cannot hold or reach CUI data, e.g., GitHub Pages) and this is documented explicitly in the app's README or config, not left as a silent deviation. If an app has both a server-backed mode and a static mode, the provider-abstraction requirement applies fully to the server-backed mode; the static mode is understood to be public-demo/BYOK-only and out of scope for CUI deployment entirely.
+
+---
+
+## 4. Data Injection Pattern (the part that makes this multi-program)
+
+Instead of hardcoding a program's data into the app, define a **data schema** (shape, not content) in `/data-schema`, and load actual program data from an external, swappable source at runtime:
+
+- **Public/dev:** load `/mock-data/synthetic-program.json` — fake system, same schema.
+- **CUI/prod:** load real program data from a local file, CUI GitLab data repo, or a config-pointed path — never committed into the methodology repo.
+
+```js
+// config.json (CUI side, not committed to public repo)
+{
+  "provider": "bedrock",
+  "dataSource": "./data/baseline-b-requirements.json"
+}
+```
+
+**Scope note:** `config.json` need not be the single source of truth for every setting shown above — it exists to give the `dataSource` pointer a documented, versioned home, since that concept typically has no existing mechanism in an app. If an app already has a working, credential-appropriate way to select its provider (e.g., env vars like `AI_PROVIDER`/`AWS_REGION`, already how Bedrock credentials are meant to flow), that can coexist with `config.json` — leave provider selection where it already works, and add `config.json` for whichever settings (usually just `dataSource`) don't yet have a home. Don't migrate a working provider-selection mechanism just to consolidate it into `config.json`.
+
+This is what lets the *same codebase* run your PDR readiness checklist against Baseline A, Baseline B, or Program C next year — only the data file and config change.
+
+---
+
+## 5. Prompt Library Discipline
+
+Prompts belong in `/methodology/prompts` as parameterized templates, not embedded strings scattered through app code:
+
+```
+prompts/gap-analysis.md
+prompts/rtm-coverage-check.md
+prompts/ssdd-section-mapping.md
+```
+
+Each should be:
+- Versioned (track changes like code — prompt drift silently degrades output quality)
+- Parameterized with clear placeholders (`{{domain}}`, `{{checklist_item}}`)
+- Tested against `/mock-data` before being trusted on CUI-side real data
+
+**Cross-runtime sharing:** if an app has multiple runtimes that can't directly share a module (e.g., a Node server and a browser bundle), do not hand-duplicate prompt strings into each — that's exactly the drift risk this section exists to prevent. Instead, keep prompts as standalone `.md`/`.json` files in `/methodology/prompts` and have both runtimes load the same file at build time or via fetch at runtime, so there is exactly one source of truth even when there are two consumers.
+
+---
+
+## 6. Versioning & Vendoring (ties to the repo-sync architecture)
+
+- Public repo (`workbench-toolkit` or per-app) is the source of truth for `/methodology`, `/provider`, `/ui`, `/data-schema`.
+- Tag releases (`v1.4.0`) when methodology changes are stable.
+- CUI repos vendor a pinned snapshot under `/vendor/<app>-vX.Y.Z/`, never hand-edit it.
+- Each CUI app's `CHANGELOG.md` records: version imported, date, checksum, reviewer.
+- If a CUI-side program surfaces a methodology gap (e.g., a checklist item that doesn't fit), patch it in a local `/patches` folder, log it, and upstream to the public repo on the next sync — don't fork the methodology silently per program, or you lose the reuse benefit.
+
+---
+
+## 7. Migration Checklist for Existing Apps
+
+For each app currently in development, evaluate:
+
+- [ ] Is program-specific data (real requirement text, CI names, etc.) mixed into application code or prompts? → extract to `/data-schema` + runtime injection
+- [ ] Does the app call Anthropic's API directly in UI/logic code? → wrap behind `provider-interface.js`
+- [ ] Are prompts inline strings? → extract to `/methodology/prompts`, parameterize
+- [ ] Is there a synthetic mirror dataset for public-side testing? → build one if not
+- [ ] Could this app's methodology logic be reused for a different program today, with just a config/data swap? If not, that's the gap to close next.
+
+**Suggested order:** workbench app first (it's the platform), then retrofit PDR readiness app and Dispatch against the same pattern, since they'll benefit most from the provider abstraction and prompt library already existing.
+
+**Recommended sequencing within a single app's migration:** do mechanical, low-regression-risk moves first, and save judgment-heavy content work for last:
+
+1. Directory convention move (`/methodology`, `/provider`, `/ui`, `/data-schema`, `/mock-data`) — pure relocation.
+2. Prompt-library extraction — collapse any duplicated prompt copies into one shared, versioned source.
+3. `config.json` / data-source injection pattern — mostly additive, low regression risk.
+4. Versioning/vendoring scaffolding — `CHANGELOG.md`, version tag, in-app version footer.
+5. Methodology-vs-program-data content split (untangling program-specific narrative from genuinely reusable methodology inside existing files) — the highest-judgment, highest-regression-risk step. Do this last, file by file, so each split can be tested independently rather than attempted as one large rewrite.
+
+---
+
+## 8. Applying This Document in CUI Repos
+
+This guidance document is itself methodology-layer content — public-safe, program-agnostic — and follows the same vendoring discipline as the code it describes (§6). It is **not** to be hand-edited once vendored into a CUI GitLab workspace.
+
+**For CUI-side teams requested to comply with this guidance:**
+
+1. **Vendor it, don't fork it.** Place the imported copy at:
+   ```
+   /vendor/architecture-guidance-vX.Y.Z.md
+   ```
+   Do not edit this file directly in the CUI repo. Treat it as read-only, identical to how `/vendor/<app>-vX.Y.Z/` code is handled.
+
+2. **Attach a pointer note.** Append a short metadata block to the top of the vendored copy (or in the repo's `CHANGELOG.md`) recording program-specific context — this note is the only thing allowed to differ from the public original:
+   ```
+   Applies to: <Program / Baseline name>
+   Vendored version: v1.2.0
+   Imported: 2026-07-25
+   Reviewer: <name>
+   ```
+
+3. **Log gaps, don't silently patch.** If a CUI-side project finds the guidance doesn't fit a real situation (a checklist item, a directory convention that doesn't map cleanly), do not alter the vendored file. Record the gap in `/patches/architecture-guidance-notes.md` with enough detail to reproduce the issue, and route it back upstream through the same public-repo update process described in §6 for code. The next public version should resolve it for every program, not just this one.
+
+4. **Compliance requests reference the version, not "the doc."** When requesting a CUI team update to comply with this architecture, cite the specific vendored version (e.g., "bring `/vendor` up to architecture-guidance-v1.3.0") so compliance is checkable and auditable, consistent with the version-pinning discipline in §6.
+
+5. **Update the app's displayed version tag alongside the vendored doc.** Every app implementing this architecture should surface its current guidance version in-app (see §8.1 below). When `/vendor/architecture-guidance-vX.Y.Z.md` is bumped, update that app's `ARCHITECTURE_VERSION`/`ARCHITECTURE_DATE` config in the same commit. A compliance check is not complete until the visible tag matches the vendored file — this is the fastest way to catch drift across multiple apps without inspecting each repo.
+
+6. **This section travels with the file.** Because this section is itself part of the public-source document, it stays intact in every vendored copy — CUI teams always have the instructions for how to treat the file, without needing a second document or side-channel explanation.
+
+### 8.1 Standard In-App Version Footer
+
+Every webapp built against this architecture (public or CUI-side) should include this snippet so its current guidance version is visible at a glance. Drop into any existing or new app — it requires no dependencies and works in single-file HTML/JS tools.
+
+**Note for SPA/multi-file frameworks (React, Vue, etc.):** the snippet below is written for single-file HTML tools. In a framework-based app, adapt the *concept* rather than pasting it verbatim — e.g., a small `architectureVersion.ts` config module exporting the version/date constants, consumed by a lightweight `<ArchitectureFooter />` component. The requirement is the visible tag and the config-in-one-place discipline, not this exact markup.
+
+```html
+<!-- Add near top of <script>, alongside other config -->
+<script>
+  const ARCHITECTURE_VERSION = "1.3.0";
+  const ARCHITECTURE_DATE = "2026-07-25";
+</script>
+
+<!-- Add near end of <body> -->
+<footer style="
+  position: fixed; bottom: 0; right: 0;
+  font-size: 11px; color: #888;
+  padding: 4px 10px; opacity: 0.6;
+">
+  Architecture: v<span id="arch-version"></span> (<span id="arch-date"></span>)
+</footer>
+
+<script>
+  document.getElementById('arch-version').textContent = ARCHITECTURE_VERSION;
+  document.getElementById('arch-date').textContent = ARCHITECTURE_DATE;
+</script>
+```
+
+Update `ARCHITECTURE_VERSION` and `ARCHITECTURE_DATE` whenever the vendored guidance doc is bumped in that repo (see item 5 above). Optionally wrap the footer text in an `<a href="...">` pointing to the vendored doc's location in that repo.
+
+---
+
+## 9. Forward Compatibility with a Unified Data Model (UDM) — Exploratory, Non-Blocking
+
+A broader Unified Data Model is under design as a separate, follow-on effort: a shared **Process Knowledge Model (PKM)** — a public-safe, cross-program ontology of SE entity types and relationships (Requirement, CI, Milestone, Gap, etc.) — paired with a per-program **Product/Domain Knowledge Model (PDKM)** holding real CUI content, linked to the PKM by reference only. Eventually, individual apps are expected to become *views* over a shared UDM rather than each owning an isolated schema.
+
+This section does **not** require any app to build toward the UDM now. It exists so that current `/data-schema` and `/methodology` work (§2, §7 step 5) doesn't have to be redone when the UDM arrives. Three lightweight conventions to follow going forward:
+
+1. **Give every entity a stable, external ID**, not just an internal database auto-increment key — e.g., a CI record should carry an ID like `CI-042` that means the same thing outside the app's own database, not just `id: 17`. This is what will eventually let a PDKM record reference a PKM entity type across app boundaries.
+2. **Keep `/data-schema` definitions shape-only and minimal**, exactly as already required by §2 — these are the parts most likely to be promoted into a shared PKM type later, so the less program-specific assumption baked into a schema's structure, the easier that promotion will be.
+3. **Model relationships as explicit reference fields, not denormalized text.** E.g., "this CI satisfies Requirement REQ-118" should be a field like `satisfiesRequirementId: "REQ-118"`, not a sentence embedded in a description string. Explicit references survive a future migration into a shared/graph model; prose references don't.
+
+No app should delay its current migration work waiting on the UDM. Treat these as cheap defaults to apply while doing work you're already doing, not a new workstream.
+
+---
+
+## 10. Why This Matters Long-Term
+
+Right now each app (PDR readiness, Dispatch, translator) independently reinvents: an AI provider call, a prompt, a data shape, a UI. Once `/methodology` + `/provider` are standardized, a new tool for a new program becomes: define a data schema, write a few checklist/prompt files, reuse everything else. That's the actual scaling unlock — not just CUI-compliance, but turning one-off tools into a genuine internal SE toolkit product line.

@@ -1,6 +1,6 @@
 import { AttachmentLinks } from "../components/AttachmentLinks";
 import { EditableText } from "../components/EditableText";
-import { UNVERIFIED_SUBSYSTEM_SAFETY_NOTE } from "../data/safetyGuidance";
+import { UNVERIFIED_SUBSYSTEM_SAFETY_NOTE } from "../../../methodology/guidance/safetyGuidance";
 import type { ConfigurationItem, LogicalSubsystem, ProgramPlanningDeliverable, SafetyDeliverable, Specification } from "../types";
 
 interface Props {

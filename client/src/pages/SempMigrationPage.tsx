@@ -1,6 +1,6 @@
 import { EditableText } from "../components/EditableText";
-import { SEMP_APPENDIX_NOTE, SEMP_DID_CITATION, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../data/sempGuidance";
-import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../data/incoseGuidance";
+import { SEMP_APPENDIX_NOTE, SEMP_DID_CITATION, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../../../methodology/guidance/sempGuidance";
+import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../../../methodology/guidance/incoseGuidance";
 import { DbxMbxTransitionGuidance } from "../components/DbxMbxTransitionGuidance";
 import { buildSempMigrationMarkdown, type SempExportData } from "../utils/sempExport";
 import { useSiteContent } from "../contexts/SiteContentContext";

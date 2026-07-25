@@ -6,7 +6,7 @@ import {
   DBX_MBX_TRANSITION_DIMENSIONS,
   DBX_MBX_TRANSITION_INTRO,
   DBX_MBX_TRANSITION_MITIGATIONS,
-} from "../data/dbxMbxGuidance";
+} from "../../../methodology/guidance/dbxMbxGuidance";
 
 // Shared renderer for the "caught between DBx and MBx" transition-challenges
 // guidance — used on the Program Planning tab (team/planning-heavy content)

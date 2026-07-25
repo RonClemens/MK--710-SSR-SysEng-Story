@@ -3,13 +3,13 @@ import { DataTable, type ColumnDef } from "../components/DataTable";
 import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { PlanningDeliverableForm, type PlanningDeliverableValues } from "../components/PlanningDeliverableForm";
-import { levelLabel } from "../data/didGuidance";
-import { PLANNING_CDRL_CATALOG, PLANNING_DELIVERABLES_INTRO } from "../data/planningGuidance";
-import { SETR_EVENTS, SETR_GUIDANCE } from "../data/setrGuidance";
-import { SOFTWARE_LIFECYCLE_GROUPS, SOFTWARE_LIFECYCLE_INTRO } from "../data/tdpGuidance";
+import { levelLabel } from "../../../methodology/guidance/didGuidance";
+import { PLANNING_CDRL_CATALOG, PLANNING_DELIVERABLES_INTRO } from "../../../methodology/guidance/planningGuidance";
+import { SETR_EVENTS, SETR_GUIDANCE } from "../../../methodology/guidance/setrGuidance";
+import { SOFTWARE_LIFECYCLE_GROUPS, SOFTWARE_LIFECYCLE_INTRO } from "../../../methodology/guidance/tdpGuidance";
 import { DbxMbxCard } from "../components/DbxMbxCard";
 import { DbxMbxTransitionGuidance } from "../components/DbxMbxTransitionGuidance";
-import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../../../methodology/guidance/dbxMbxGuidance";
 import {
   SAFETY_APPLICABILITIES,
   SPEC_BASELINES,

@@ -1,19 +1,19 @@
-import { SEMP_APPENDIX_NOTE, SEMP_DID_CITATION, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../data/sempGuidance";
-import { CDRL_CATALOG, HAZARD_CATEGORY_META, SAFETY_DELIVERABLES_INTRO } from "../data/safetyGuidance";
-import { PLANNING_DELIVERABLES_INTRO } from "../data/planningGuidance";
+import { SEMP_APPENDIX_NOTE, SEMP_DID_CITATION, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../../../methodology/guidance/sempGuidance";
+import { CDRL_CATALOG, HAZARD_CATEGORY_META, SAFETY_DELIVERABLES_INTRO } from "../../../methodology/guidance/safetyGuidance";
+import { PLANNING_DELIVERABLES_INTRO } from "../../../methodology/guidance/planningGuidance";
 import {
   RECURRING_TECHNICAL_ACTIVITIES,
   RECURRING_TECHNICAL_ACTIVITIES_INTRO,
   SETR_EVENTS,
   SETR_FRAMEWORK_INTRO,
   SETR_GUIDANCE,
-} from "../data/setrGuidance";
+} from "../../../methodology/guidance/setrGuidance";
 import {
   RECOVERY_DELTA_CLASSES,
   RECOVERY_DELTA_CLASS_SCOPE_NOTE,
   RECOVERY_DELTA_CLASS_TIER_MAPPING,
   RECOVERY_PROGRAM_INTRO,
-} from "../data/recoveryProgramGuidance";
+} from "../../../methodology/guidance/recoveryProgramGuidance";
 import {
   CM_FUNCTIONAL_AREAS,
   FCA_PCA_NOTE,
@@ -23,7 +23,7 @@ import {
   TDP_FRAMEWORK_INTRO,
   TDP_MATURITY_LEVELS,
   TDP_MATURITY_META,
-} from "../data/tdpGuidance";
+} from "../../../methodology/guidance/tdpGuidance";
 import {
   DBX_MBX_BASELINE_ASYMMETRY_IMPLICATIONS,
   DBX_MBX_BASELINE_MATURITY_ASYMMETRY,
@@ -33,9 +33,9 @@ import {
   DBX_MBX_TRANSITION_DIMENSIONS,
   DBX_MBX_TRANSITION_INTRO,
   DBX_MBX_TRANSITION_MITIGATIONS,
-} from "../data/dbxMbxGuidance";
-import { POINTER_SPEC_CATALOG } from "../data/pointerSpecGuidance";
-import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../data/incoseGuidance";
+} from "../../../methodology/guidance/dbxMbxGuidance";
+import { POINTER_SPEC_CATALOG } from "../../../methodology/guidance/pointerSpecGuidance";
+import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../../../methodology/guidance/incoseGuidance";
 import type {
   AbCompatibilityRow,
   Attachment,

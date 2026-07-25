@@ -28,9 +28,10 @@ editable data tool with zero external API calls.
 - **`client/`** — React + Vite + TypeScript SPA. Editable CRUD tables for each
   entity, a CI detail rollup view, and a persistent AI Assistant drawer.
 - **`server/`** — Express + TypeScript API. Persists data as a single JSON
-  document (`server/data/db.json`, gitignored — seeded from
-  `server/data/seed.json` on first run). Hosts the AI provider abstraction so
-  API keys/credentials never reach the browser.
+  document (`server/data/db.json`, gitignored — seeded on first run from the
+  `dataSource` file named in root `config.json`, defaulting to
+  `mock-data/seed.json`). Hosts the AI provider abstraction so API
+  keys/credentials never reach the browser.
 - **AI provider abstraction** (`server/src/ai/`) — a single `AiClient`
   interface with two implementations selected by `AI_PROVIDER`:
   - `public` (default, built and tested against in this build phase) — calls
@@ -44,6 +45,38 @@ editable data tool with zero external API calls.
 
   Neither the UI nor the prompt-construction logic knows which provider is
   active — see `server/src/ai/index.ts`.
+
+### Reusable SE Webapp Architecture Guidance compliance
+
+This app is the reference implementation a companion cross-app architecture guidance doc (vendored at
+[`vendor/architecture-guidance-v1.3.0.md`](vendor/architecture-guidance-v1.3.0.md)) was informed by — the current
+guidance version is shown live in the app's bottom-right footer. That guidance separates a reusable
+**methodology layer** (SE logic, prompts, checklists — public-safe, program-agnostic) from a **data layer**
+(real program content — CUI-only, per-program). Its migration checklist has five phases; this app has completed
+the first four:
+
+- **`/methodology`** — `guidance/` holds the SE guidance modules the UI renders (relocated from
+  `client/src/data/`, same content, new address); `prompts/` holds the two AI prompt templates
+  (`system-prompt.md`, `pdr-summary.md`), loaded by both the server (`fs.readFileSync`) and the static client
+  build (Vite `?raw` import) from one shared source instead of three hand-duplicated copies.
+- **`/mock-data`** — the illustrative demo dataset (`seed.json` for the server, `seed.ts` for the static build),
+  relocated from `client/src/data/seed.ts` and `server/data/seed.json`.
+- **`/provider`** and **`/data-schema`** — documentation-only directories. This app's actual provider
+  implementation (`server/src/ai/`) and data-shape definitions (`client/src/types/index.ts`) stay where Vite/
+  Express project conventions expect them; each directory's `README.md` explains why physical relocation would be
+  high-churn/low-value here, and documents the pragmatic adaptation explicitly rather than silently deviating
+  from the guidance's literal directory convention.
+- **Root `config.json`** — a `dataSource` pointer (defaults to `./mock-data/seed.json`), resolved by
+  `server/src/db.ts` with a documented fallback when absent. Provider selection deliberately stays on the
+  existing `AI_PROVIDER`/`AWS_REGION` env vars rather than moving into `config.json`, per the guidance's own
+  scope note that `config.json` only needs to own settings without an existing home.
+- **`CHANGELOG.md`** — records the vendored guidance version and this app's phase-by-phase migration history.
+
+**Not yet done:** the guidance's fifth and highest-risk phase — untangling genuinely reusable SE methodology from
+Baseline-A/B-specific program narrative that's still interleaved inside several files under
+`/methodology/guidance` (most notably `recoveryProgramGuidance.ts` and parts of `dbxMbxGuidance.ts`/
+`setrGuidance.ts`). See `/methodology/README.md` and `CHANGELOG.md` for what's flagged and why it's deliberately
+sequenced last, file-by-file, rather than attempted as one large rewrite.
 
 ## Setup
 
@@ -110,7 +143,7 @@ plus an eleventh, `ContentEntry`, for editable site prose (see
   for showing how many CI-level interfaces actually implement what looks like
   one clean subsystem-level interface (integration bloat).
 - **Specifications** — DID-style HRS/SRS requirement specification templates
-  (see `client/src/data/didGuidance.ts`), adapted from MIL-STD-961E System/
+  (see `methodology/guidance/didGuidance.ts`), adapted from MIL-STD-961E System/
   Subsystem/CI specification conventions and the DI-IPSC-8143x SRS/SSS DIDs.
   Each spec has a `level` (System / Subsystem / CI), `domain` (Hardware /
   Software), `specType` (Development / Production), `baseline` (Baseline A /
@@ -148,7 +181,7 @@ plus an eleventh, `ContentEntry`, for editable site prose (see
   Section 2 (Applicable Documents) cites and requires compliance with (MIL-
   STDs, ASME/ANSI standards, handbooks like the JSSSEH), as distinct from
   requirements this program authors itself (see
-  `client/src/data/pointerSpecGuidance.ts`). The recommended approach: cite
+  `methodology/guidance/pointerSpecGuidance.ts`). The recommended approach: cite
   by reference rather than restating standard text, tailor each standard
   once (at the highest level it applies) rather than re-deriving the
   tailoring at every level, flow every applicable paragraph down into an
@@ -164,7 +197,7 @@ plus an eleventh, `ContentEntry`, for editable site prose (see
   this program's decomposition. The Specification Detail page also surfaces
   a pointer back to this guidance directly on the Applicable Documents field.
 - **Safety Deliverables** — MIL-STD-882E/JSSSEH CDRL-style safety artifacts
-  (see `client/src/data/safetyGuidance.ts`), one record per deliverable
+  (see `methodology/guidance/safetyGuidance.ts`), one record per deliverable
   instance. Each has a `level` (System / Subsystem / CI — the same three
   levels as Specifications, just relabeled in safety vocabulary as System
   Hazard / Functional Hazard / Physical Hazard, derived rather than stored so
@@ -184,7 +217,7 @@ plus an eleventh, `ContentEntry`, for editable site prose (see
   `status`, optional Subsystem/CI link, `cdrlDescription`,
   `deliveryMilestone`), but for **non-safety** program and software planning
   artifacts (SEMP, CMP, Risk/Requirements/Data Management Plans, SDP, STP,
-  SDD, VDD — see `client/src/data/planningGuidance.ts`; the Risk/Requirements/
+  SDD, VDD — see `methodology/guidance/planningGuidance.ts`; the Risk/Requirements/
   Data Management Plans were added specifically because DI-SESS-81785B
   paragraph 3.7 names them explicitly). Kept as a separate entity/tab
   rather than folded into Safety Deliverables' CDRL catalog, since a Software
@@ -196,7 +229,7 @@ plus an eleventh, `ContentEntry`, for editable site prose (see
 MIL-STD-882E and the JSSSEH (Joint Software Systems Safety Engineering
 Handbook) require hazard analysis and safety-requirements flow-down to ride on
 the same System → Subsystem → HWCI/CSCI hierarchy IEEE 12207 formalizes,
-rather than run as a parallel activity — see `client/src/data/safetyGuidance.ts`.
+rather than run as a parallel activity — see `methodology/guidance/safetyGuidance.ts`.
 A hazard analysis performed against an unvalidated or over-decomposed
 structure inherits that structure's weaknesses, so this app surfaces the
 connection at the points where it actually bites:
@@ -245,7 +278,7 @@ CDRLs (SSPP, SAR, Hazard Log) are program-wide and aren't gated by either.
 
 This app now models the whole SETR (Systems Engineering Technical Review)
 sequence from System Requirements Review through Production Readiness
-Review — see `client/src/data/setrGuidance.ts` for the guidance content,
+Review — see `methodology/guidance/setrGuidance.ts` for the guidance content,
 shown on the Specifications tab's "SETR Milestones: SRR → PRR" section (all
 eight events, four dimensions each: System Decomposition, System Safety
 Planning, System Software Planning, Spec Generation) and, more narrowly, on
@@ -309,7 +342,7 @@ The SETR sequence, spec maturity, and Program Planning CDRLs above aren't
 just internally consistent with each other — they're aligned to three
 external standards that define what a real program's Technical Data Package
 and configuration management program actually require (see
-`client/src/data/tdpGuidance.ts`):
+`methodology/guidance/tdpGuidance.ts`):
 
 - **MIL-STD-31000 (Technical Data Packages)** — defines three TDP maturity
   levels: **Conceptual** (requirements only, no design committed — SRR
@@ -373,7 +406,7 @@ the model: change-impact analysis becomes a query instead of an archaeology
 exercise across a document set.
 
 Every SE activity above can be executed two ways, independent of which
-review gate or CDRL governs it (see `client/src/data/dbxMbxGuidance.ts`,
+review gate or CDRL governs it (see `methodology/guidance/dbxMbxGuidance.ts`,
 `client/src/components/DbxMbxCard.tsx`):
 
 - **Document-Based (DBx)** — text specifications, ICDs, hazard-analysis
@@ -493,14 +526,14 @@ specifically, are now reflected:
 
 - **SSR is Software Specification Review**, not "System Specification
   Review" — this app previously hedged the name as an unverified working
-  assumption; that hedge is now resolved (`client/src/data/setrGuidance.ts`).
+  assumption; that hedge is now resolved (`methodology/guidance/setrGuidance.ts`).
 - **CI Tier doubles as Baseline B's configuration-delta classification.**
   Per this program's LSE, this app's existing CI Tier field isn't just a
   criticality ranking on Baseline B — assigning a CI's Tier **is** the
   decision of how much of that CI's prior design carries forward versus
   needs rework, mapped Class 1 (Carry Forward) → Tier 3, Class 2 (Modified)
   → Tier 2, Class 3 (Re-Architected) → Tier 1. See
-  `client/src/data/recoveryProgramGuidance.ts`, rendered on the **CI
+  `methodology/guidance/recoveryProgramGuidance.ts`, rendered on the **CI
   Inventory** tab (under the DBx/MBx guidance toggle) and folded into the
   SEMP export's 2.2 Architectures and Interface Control section. The scope
   note is explicit that this mapping is Baseline-B-specific, not a general
@@ -516,7 +549,7 @@ specifically, are now reflected:
   informal counterpart to PDR/CDR), and the **Change (Control) Review Board
   (CCB)** — the actual governance mechanism behind this app's Delta Matrix
   "ECP required" disposition and EIA-649 Configuration Change Management.
-  See `client/src/data/setrGuidance.ts` (`RECURRING_TECHNICAL_ACTIVITIES`),
+  See `methodology/guidance/setrGuidance.ts` (`RECURRING_TECHNICAL_ACTIVITIES`),
   rendered on the **Specifications** tab beneath the SETR Milestones grid
   and folded into the SEMP export's 3.2.13 Technical Reviews, Audits and
   Activities section.
@@ -548,7 +581,7 @@ verified source documents, both supplied by this app's user and read
 directly (not scraped): the governing DID, **DI-SESS-81785B** (approved
 2025-01-08), and the **Department of Defense Systems Engineering Plan (SEP)
 Outline, Version 4.1** (May 2023, OUSD(R&E), Distribution Statement A —
-publicly releasable; `client/src/data/sempGuidance.ts`,
+publicly releasable; `methodology/guidance/sempGuidance.ts`,
 `client/src/utils/sempExport.ts`).
 
 **Unlike most DIDs, DI-SESS-81785B does not prescribe a fixed table of
@@ -610,7 +643,7 @@ Section 1 (Introduction) is where the SEP Outline asks the program to
 *"describe the program's plan to align the Prime Contractor's SEMP with the
 PMO SEP"* — this app supplies the contractor-side half of that via an
 **INCOSE / ISO-IEC-IEEE 15288 process-group mapping**
-(`client/src/data/incoseGuidance.ts`, rendered on this tab below the section
+(`methodology/guidance/incoseGuidance.ts`, rendered on this tab below the section
 mapping), covering all four 15288 process groups (Agreement, Organizational
 Project-Enabling, Technical Management, Technical) and naming which of this
 app's tabs implements each sub-process — including the honest gaps
@@ -708,7 +741,7 @@ it is not the intended long-term home for this tool.
 Because GitHub Pages is static hosting, there is no backend in this build:
 
 - **Data** lives in the browser's `localStorage` instead of the server's JSON
-  file. Seeded from `client/src/data/seed.ts` (same illustrative data as
+  file. Seeded from `mock-data/seed.ts` (same illustrative data as
   `server/data/seed.json`) on first load. Data does not sync between devices
   or browsers, and clearing site data resets it back to the seed.
 - **AI Assistant** calls `api.anthropic.com` directly from the browser using

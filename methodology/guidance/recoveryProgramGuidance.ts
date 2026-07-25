@@ -1,4 +1,4 @@
-import type { CiTier } from "../types";
+import type { CiTier } from "../../client/src/types";
 
 // This program's own recovery-program context, per this program's Lead
 // Systems Engineer: Baseline B's existing CI Tier classification (already

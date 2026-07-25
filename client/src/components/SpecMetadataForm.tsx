@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { levelLabel } from "../data/didGuidance";
+import { levelLabel } from "../../../methodology/guidance/didGuidance";
 import {
   SPEC_BASELINES,
   SPEC_DOMAINS,

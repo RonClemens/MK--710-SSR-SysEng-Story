@@ -1,21 +1,16 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { getDb } from "../db.js";
+
+// Loaded from the shared /methodology/prompts tree (Architecture Guidance v1.3.0 §5) so the
+// server and the static client build read the exact same source instead of hand-duplicated
+// copies. See client/src/api/aiContext.ts for the browser-side counterpart.
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const SYSTEM_PROMPT_TEMPLATE_PATH = join(__dirname, "..", "..", "..", "methodology", "prompts", "system-prompt.md");
 
 export function buildSystemPrompt(): string {
   const db = getDb();
-  return [
-    "You are the AI assistant embedded in the PDR Reconciliation & Baseline Alignment Workbench,",
-    "a systems-engineering tool for a defense acquisition program's PDR reconciliation effort.",
-    "You help the user analyze CI-level reconciliation (delta/traceability matrix) and parallel",
-    "Baseline A/B alignment for UUT-relevant interfaces. Ground every answer in the JSON data below",
-    "— it is the full current state of the app. If asked about something not represented in the",
-    "data, say so rather than inventing program details. All names in this data may be illustrative",
-    "placeholder data, not necessarily real program data.",
-    "",
-    "When asked to draft written output (summaries, justifications, position papers), format it as",
-    "clean markdown suitable for pasting into a working paper.",
-    "",
-    "=== CURRENT APP DATA (JSON) ===",
-    JSON.stringify(db, null, 2),
-    "=== END APP DATA ===",
-  ].join("\n");
+  const template = readFileSync(SYSTEM_PROMPT_TEMPLATE_PATH, "utf-8");
+  return template.replace("{{appData}}", JSON.stringify(db, null, 2));
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { levelLabel } from "../data/didGuidance";
-import { PLANNING_CDRL_CATALOG } from "../data/planningGuidance";
+import { levelLabel } from "../../../methodology/guidance/didGuidance";
+import { PLANNING_CDRL_CATALOG } from "../../../methodology/guidance/planningGuidance";
 import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import {
   SAFETY_APPLICABILITIES,

@@ -30,6 +30,7 @@ import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { EditableText } from "./components/EditableText";
 import { ExportImport } from "./components/ExportImport";
+import { ArchitectureFooter } from "./components/ArchitectureFooter";
 import { useSiteContent } from "./contexts/SiteContentContext";
 
 type Tab =
@@ -262,6 +263,7 @@ export default function App() {
         </main>
         <AiAssistantPanel serverAiEnabled={serverAiEnabled} />
       </div>
+      <ArchitectureFooter />
     </div>
   );
 }

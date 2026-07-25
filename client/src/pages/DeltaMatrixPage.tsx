@@ -3,7 +3,7 @@ import { DataTable, type ColumnDef } from "../components/DataTable";
 import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
-import { TRACEABILITY_HAZARD_NOTE } from "../data/safetyGuidance";
+import { TRACEABILITY_HAZARD_NOTE } from "../../../methodology/guidance/safetyGuidance";
 import { DELTA_SOURCES, DISPOSITIONS, type ConfigurationItem, type DeltaMatrixRow } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 

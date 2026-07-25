@@ -1,4 +1,4 @@
-import type { Database } from "../types";
+import type { Database } from "../client/src/types";
 
 // ILLUSTRATIVE SAMPLE DATA ONLY (MHC/MCC/IPS Test Set example) — mirrors
 // server/data/seed.json for the static (GitHub Pages) build, which has no

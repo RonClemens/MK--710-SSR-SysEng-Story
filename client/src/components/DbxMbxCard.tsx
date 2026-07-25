@@ -1,5 +1,5 @@
 import { EditableText } from "./EditableText";
-import type { DbxMbxDimension } from "../data/dbxMbxGuidance";
+import type { DbxMbxDimension } from "../../../methodology/guidance/dbxMbxGuidance";
 
 interface Props {
   dimension: DbxMbxDimension;

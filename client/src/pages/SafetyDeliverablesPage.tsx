@@ -3,10 +3,10 @@ import { DataTable, type ColumnDef } from "../components/DataTable";
 import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { SafetyDeliverableForm, type SafetyDeliverableValues } from "../components/SafetyDeliverableForm";
-import { levelLabel } from "../data/didGuidance";
-import { CDRL_CATALOG, HAZARD_CATEGORY_META, SAFETY_DELIVERABLES_INTRO, hazardCategoryForLevel } from "../data/safetyGuidance";
+import { levelLabel } from "../../../methodology/guidance/didGuidance";
+import { CDRL_CATALOG, HAZARD_CATEGORY_META, SAFETY_DELIVERABLES_INTRO, hazardCategoryForLevel } from "../../../methodology/guidance/safetyGuidance";
 import { DbxMbxCard } from "../components/DbxMbxCard";
-import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../../../methodology/guidance/dbxMbxGuidance";
 import {
   SAFETY_APPLICABILITIES,
   SPEC_BASELINES,

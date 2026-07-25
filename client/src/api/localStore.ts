@@ -1,4 +1,4 @@
-import { SEED_DATA } from "../data/seed";
+import { SEED_DATA } from "../../../mock-data/seed";
 import type { Database } from "../types";
 import type { Crud } from "./client";
 

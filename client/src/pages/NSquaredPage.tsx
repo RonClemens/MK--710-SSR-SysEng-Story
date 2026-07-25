@@ -2,8 +2,8 @@ import { useRef, useState } from "react";
 import { EditableText } from "../components/EditableText";
 import { N2Grid } from "../components/N2Grid";
 import { DbxMbxCard } from "../components/DbxMbxCard";
-import { INTERFACE_HAZARD_NOTE } from "../data/safetyGuidance";
-import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
+import { INTERFACE_HAZARD_NOTE } from "../../../methodology/guidance/safetyGuidance";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../../../methodology/guidance/dbxMbxGuidance";
 import { SPEC_BASELINES, type ConfigurationItem, type InterfaceRecord, type LogicalSubsystem, type SpecBaseline } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 

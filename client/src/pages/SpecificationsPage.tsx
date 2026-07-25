@@ -10,16 +10,16 @@ import {
   COMPETENCY_CLASS,
   emptySections,
   levelLabel,
-} from "../data/didGuidance";
-import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL, SAFETY_FRAMEWORK_INTRO } from "../data/safetyGuidance";
+} from "../../../methodology/guidance/didGuidance";
+import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL, SAFETY_FRAMEWORK_INTRO } from "../../../methodology/guidance/safetyGuidance";
 import {
   RECURRING_TECHNICAL_ACTIVITIES,
   RECURRING_TECHNICAL_ACTIVITIES_INTRO,
   SETR_EVENTS,
   SETR_FRAMEWORK_INTRO,
   SETR_GUIDANCE,
-} from "../data/setrGuidance";
-import { POINTER_SPEC_CATALOG, POINTER_SPEC_INTRO, POINTER_SPEC_PRINCIPLES } from "../data/pointerSpecGuidance";
+} from "../../../methodology/guidance/setrGuidance";
+import { POINTER_SPEC_CATALOG, POINTER_SPEC_INTRO, POINTER_SPEC_PRINCIPLES } from "../../../methodology/guidance/pointerSpecGuidance";
 import {
   CM_FUNCTIONAL_AREAS,
   FCA_PCA_NOTE,
@@ -27,9 +27,9 @@ import {
   TDP_FRAMEWORK_INTRO,
   TDP_MATURITY_LEVELS,
   TDP_MATURITY_META,
-} from "../data/tdpGuidance";
+} from "../../../methodology/guidance/tdpGuidance";
 import { DbxMbxCard } from "../components/DbxMbxCard";
-import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../../../methodology/guidance/dbxMbxGuidance";
 
 const specWritingDimension = DBX_MBX_DIMENSIONS.find((d) => d.id === "specificationWriting")!;
 import {

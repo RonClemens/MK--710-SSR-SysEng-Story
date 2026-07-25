@@ -4,7 +4,7 @@ import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
 import { DbxMbxCard } from "../components/DbxMbxCard";
-import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../../../methodology/guidance/dbxMbxGuidance";
 import {
   LOGICAL_SUBSYSTEM_SOURCES,
   SPEC_BASELINES,

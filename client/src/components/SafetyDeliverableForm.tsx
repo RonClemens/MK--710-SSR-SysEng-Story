@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { levelLabel } from "../data/didGuidance";
-import { CDRL_CATALOG, hazardCategoryForLevel } from "../data/safetyGuidance";
+import { levelLabel } from "../../../methodology/guidance/didGuidance";
+import { CDRL_CATALOG, hazardCategoryForLevel } from "../../../methodology/guidance/safetyGuidance";
 import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import {
   SAFETY_APPLICABILITIES,

@@ -11,8 +11,8 @@ import {
   ORDERED_SECTION_KEYS,
   COMPETENCY_CLASS,
   levelLabel,
-} from "../data/didGuidance";
-import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL } from "../data/safetyGuidance";
+} from "../../../methodology/guidance/didGuidance";
+import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL } from "../../../methodology/guidance/safetyGuidance";
 import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import type { ConfigurationItem, LogicalSubsystem, SpecSections, Specification } from "../types";
 

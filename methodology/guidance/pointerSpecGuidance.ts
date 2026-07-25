@@ -1,4 +1,4 @@
-import type { SpecLevel } from "../types";
+import type { SpecLevel } from "../../client/src/types";
 
 // "Pointer specifications" — the industry/military standards a spec's
 // Applicable Documents section cites and the design/production is required

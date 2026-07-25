@@ -1,5 +1,5 @@
-import type { SpecDomain, SpecLevel, SpecSectionKey, SpecSections, SpecType } from "../types";
-import { SPEC_SECTION_KEYS } from "../types";
+import type { SpecDomain, SpecLevel, SpecSectionKey, SpecSections, SpecType } from "../../client/src/types";
+import { SPEC_SECTION_KEYS } from "../../client/src/types";
 
 export type SectionRelevance = "Required" | "Recommended" | "Typically N/A";
 

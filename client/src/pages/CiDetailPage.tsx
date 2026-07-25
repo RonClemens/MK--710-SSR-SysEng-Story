@@ -1,6 +1,6 @@
 import { AttachmentLinks } from "../components/AttachmentLinks";
 import { EditableText } from "../components/EditableText";
-import { OVER_DECOMPOSITION_SAFETY_NOTE } from "../data/safetyGuidance";
+import { OVER_DECOMPOSITION_SAFETY_NOTE } from "../../../methodology/guidance/safetyGuidance";
 import type {
   AbCompatibilityRow,
   ConfigurationItem,

@@ -4,13 +4,13 @@ import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
 import { DbxMbxCard } from "../components/DbxMbxCard";
-import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../data/dbxMbxGuidance";
+import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../../../methodology/guidance/dbxMbxGuidance";
 import {
   RECOVERY_DELTA_CLASSES,
   RECOVERY_DELTA_CLASS_SCOPE_NOTE,
   RECOVERY_DELTA_CLASS_TIER_MAPPING,
   RECOVERY_PROGRAM_INTRO,
-} from "../data/recoveryProgramGuidance";
+} from "../../../methodology/guidance/recoveryProgramGuidance";
 import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import { CI_TIERS, CI_TYPES, SPEC_BASELINES, type ConfigurationItem, type LogicalSubsystem } from "../types";
 import type { useEntity } from "../hooks/useEntity";
