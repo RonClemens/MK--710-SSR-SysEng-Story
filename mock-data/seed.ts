@@ -334,6 +334,7 @@ export const SEED_DATA: Database = {
       notes:
         "Primary UUT test interface assembly; consolidation target for over-decomposed COTS sub-items below.",
       attachments: [{ label: "ICD-TS-014 (Interface Control Document)", url: "https://example.com/docs/ICD-TS-014" }],
+      gapId: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -351,6 +352,7 @@ export const SEED_DATA: Database = {
       status: "In reconciliation",
       notes: "UUT-facing controller module within the Test Set.",
       attachments: [],
+      gapId: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -369,6 +371,7 @@ export const SEED_DATA: Database = {
       status: "Flagged for consolidation",
       notes: "Vendor COTS card, no unique program requirements beyond the Test Set's allocation.",
       attachments: [],
+      gapId: "gap-001",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -387,6 +390,7 @@ export const SEED_DATA: Database = {
       status: "Flagged for consolidation",
       notes: "Commercial power supply module.",
       attachments: [],
+      gapId: "gap-002",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -404,6 +408,60 @@ export const SEED_DATA: Database = {
       status: "Slated for replacement",
       notes: "Not UUT-facing; scheduled to be retired in a future increment.",
       attachments: [],
+      gapId: null,
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+  ],
+  // PKM Migration Step 6 (additive, first slice): unifies three real
+  // findings that were already tracked by separate mechanisms. gap-001
+  // unifies ci-003's own overDecompositionFlag/consolidationNotes with
+  // delta-002 -- both already described the exact same MCC finding through
+  // two different mechanisms; gap-002 covers ci-004's parallel IPS finding
+  // (no matching DeltaMatrixRow exists for it); gap-003 covers delta-001's
+  // own finding (ci-001's Test Set decomposing further than its SFR-agreed
+  // allocation), which has no CI-level flag to unify with since ci-001's
+  // own overDecompositionFlag is false. All three block Baseline A's
+  // current gate (TRR) -- consistent with this app's own framing that this
+  // over-decomposition problem wasn't caught until PDR should have caught
+  // it, and is still unresolved approaching TRR.
+  gaps: [
+    {
+      id: "gap-001",
+      baselineId: "BASELINE-A",
+      foundInEntityType: "ConfigurationItem",
+      foundInEntityId: "ci-003",
+      description:
+        "MCC (ci-003) tracked as standalone CI despite being a COTS sub-assembly with no independent verification path; should be consolidated into the Test Set CI.",
+      disposition: "Accept as-is",
+      blocksMilestoneId: "milestone-a-trr",
+      blocksChecklistItemId: null,
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "gap-002",
+      baselineId: "BASELINE-A",
+      foundInEntityType: "ConfigurationItem",
+      foundInEntityId: "ci-004",
+      description:
+        "IPS (ci-004) tracked as standalone CI despite being a commercial power supply module; candidate for reclassification as a COTS item record under the Test Set CI.",
+      disposition: "Accept as-is",
+      blocksMilestoneId: "milestone-a-trr",
+      blocksChecklistItemId: null,
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "gap-003",
+      baselineId: "BASELINE-A",
+      foundInEntityType: "DeltaMatrixRow",
+      foundInEntityId: "delta-001",
+      description:
+        "As-built Test Set (ci-001) decomposes stimulus/response function across MHC + MCC + IPS sub-modules, finer-grained than the SFR-agreed single-CI allocation.",
+      disposition: "ECP required",
+      blocksMilestoneId: "milestone-a-trr",
+      blocksChecklistItemId: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -497,6 +555,7 @@ export const SEED_DATA: Database = {
         "Sub-modules were introduced during detailed design for vendor sourcing reasons, not reflected back into the requirements model.",
       disposition: "ECP required",
       requirementId: "req-001",
+      gapId: "gap-003",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -512,6 +571,7 @@ export const SEED_DATA: Database = {
         "CI record was created early for CM tracking convenience and never reconciled against actual requirements allocation.",
       disposition: "Accept as-is",
       requirementId: "req-002",
+      gapId: "gap-001",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },

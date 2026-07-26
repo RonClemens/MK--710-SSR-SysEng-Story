@@ -112,6 +112,12 @@ app is deployed for.
   the name — see this entity's own comment), `status` (fixed enum),
   `milestoneId`/`evidenceType`/`evidenceId` (references).
 
+### Gap (added PKM Migration Step 6)
+- `description`
+- Not marked: `foundInEntityType`/`foundInEntityId` (polymorphic
+  reference), `disposition` (fixed enum, reused from `DeltaMatrixRow`),
+  `baselineId`/`blocksMilestoneId`/`blocksChecklistItemId` (references).
+
 ### Recommendation
 - `text`
 - `owner` — free text today; per PKM Migration Step 7 this should become a

@@ -13,6 +13,7 @@ import {
   type ConfigurationItem,
   type CotsRecord,
   type DeltaMatrixRow,
+  type Gap,
   type InterfaceRecord,
   type LogicalSubsystem,
   type Milestone,
@@ -33,6 +34,7 @@ interface Props {
   requirements: Requirement[];
   verificationEvents: VerificationEvent[];
   checklistItems: ChecklistItem[];
+  gaps: Gap[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];
@@ -129,6 +131,7 @@ export function PromisesPage({
   requirements,
   verificationEvents,
   checklistItems,
+  gaps,
   logicalSubsystems,
   cis,
   deltaMatrix,
@@ -148,6 +151,7 @@ export function PromisesPage({
       ...rowsFor("Requirement", requirements, (r) => r.id, ["statement"]),
       ...rowsFor("Verification Event", verificationEvents, (r) => r.requirementId, ["evidenceSummary"]),
       ...rowsFor("Checklist Item", checklistItems, (r) => r.milestoneId, ["criterion"]),
+      ...rowsFor("Gap", gaps, (r) => `${r.foundInEntityType}:${r.foundInEntityId}`, ["description"]),
       ...rowsFor("Logical Subsystem", logicalSubsystems, (r) => r.name, ["name", "description"]),
       ...rowsFor("Configuration Item", cis, (r) => r.name, ["name", "consolidationNotes", "status", "notes"]),
       ...attachmentRowsFor("Configuration Item", cis, (r) => r.name),
@@ -199,6 +203,7 @@ export function PromisesPage({
       requirements,
       verificationEvents,
       checklistItems,
+      gaps,
       logicalSubsystems,
       cis,
       deltaMatrix,

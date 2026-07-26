@@ -19,6 +19,7 @@ import {
   SPEC_BASELINES,
   type Baseline,
   type ConfigurationItem,
+  type Gap,
   type LogicalSubsystem,
 } from "../types";
 import type { useEntity } from "../hooks/useEntity";
@@ -44,14 +45,16 @@ interface Props {
   entity: ReturnType<typeof useEntity<ConfigurationItem>>;
   subsystems: LogicalSubsystem[];
   baselines: Baseline[];
+  gaps: Gap[];
   onSelectCi: (id: string) => void;
 }
 
-export function CisPage({ entity, subsystems, baselines, onSelectCi }: Props) {
+export function CisPage({ entity, subsystems, baselines, gaps, onSelectCi }: Props) {
   const { rows, loading, error, create, update, remove } = entity;
   const [editing, setEditing] = useState<ConfigurationItem | "new" | null>(null);
   const [showGuidance, setShowGuidance] = useState(false);
   const reconciliationTargetBaseline = findReconciliationTargetBaseline(baselines);
+  const gapsById = Object.fromEntries(gaps.map((g) => [g.id, g]));
 
   const subsystemLabels = Object.fromEntries(subsystems.map((s) => [s.id, s.name]));
   const subsystemNames = (ids: string[]) => ids.map((id) => subsystemLabels[id] ?? "(unknown)").join(", ");
@@ -119,6 +122,21 @@ export function CisPage({ entity, subsystems, baselines, onSelectCi }: Props) {
       render: (r) => (r.overDecompositionFlag ? "⚠️ Yes" : "No"),
       filterOptions: ["Yes", "No"],
       filterValue: (r) => (r.overDecompositionFlag ? "Yes" : "No"),
+    },
+    {
+      key: "gapId",
+      label: "Gap (structural)",
+      render: (r) => {
+        const gap = r.gapId ? gapsById[r.gapId] : null;
+        if (!gap) return "(unlinked)";
+        return (
+          <span title={gap.description}>
+            <span className="truncate">{gap.description}</span>
+            <br />
+            <span className="hint">{gap.disposition}</span>
+          </span>
+        );
+      },
     },
     { key: "status", label: "Status", sortValue: (r) => r.status },
     {

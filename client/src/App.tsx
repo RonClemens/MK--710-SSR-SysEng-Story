@@ -7,6 +7,7 @@ import {
   cisApi,
   cotsRecordsApi,
   deltaMatrixApi,
+  gapsApi,
   interfacesApi,
   logicalSubsystemsApi,
   milestonesApi,
@@ -78,6 +79,7 @@ export default function App() {
   const requirements = useEntity(requirementsApi);
   const verificationEvents = useEntity(verificationEventsApi);
   const checklistItems = useEntity(checklistItemsApi);
+  const gaps = useEntity(gapsApi);
   const logicalSubsystems = useEntity(logicalSubsystemsApi);
   const cis = useEntity(cisApi);
   const deltaMatrix = useEntity(deltaMatrixApi);
@@ -108,6 +110,7 @@ export default function App() {
     requirements.refresh();
     verificationEvents.refresh();
     checklistItems.refresh();
+    gaps.refresh();
     logicalSubsystems.refresh();
     cis.refresh();
     deltaMatrix.refresh();
@@ -249,11 +252,17 @@ export default function App() {
                   entity={cis}
                   subsystems={logicalSubsystems.rows}
                   baselines={baselines.rows}
+                  gaps={gaps.rows}
                   onSelectCi={selectCi}
                 />
               )}
               {tab === "delta" && (
-                <DeltaMatrixPage entity={deltaMatrix} cis={cis.rows} requirements={requirements.rows} />
+                <DeltaMatrixPage
+                  entity={deltaMatrix}
+                  cis={cis.rows}
+                  requirements={requirements.rows}
+                  gaps={gaps.rows}
+                />
               )}
               {tab === "ab" && <AbCompatibilityPage entity={abCompatibility} cis={cis.rows} />}
               {tab === "cots" && (
@@ -308,6 +317,7 @@ export default function App() {
                   requirements={requirements.rows}
                   verificationEvents={verificationEvents.rows}
                   checklistItems={checklistItems.rows}
+                  gaps={gaps.rows}
                   logicalSubsystems={logicalSubsystems.rows}
                   cis={cis.rows}
                   deltaMatrix={deltaMatrix.rows}

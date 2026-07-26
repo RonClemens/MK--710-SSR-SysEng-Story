@@ -8,6 +8,7 @@ import type {
   ConfigurationItem,
   CotsRecord,
   DeltaMatrixRow,
+  Gap,
   InterfaceRecord,
   LogicalSubsystem,
   Milestone,
@@ -32,6 +33,7 @@ export const milestonesApi = entity<Milestone>("/milestones", "milestones");
 export const requirementsApi = entity<Requirement>("/requirements", "requirements");
 export const verificationEventsApi = entity<VerificationEvent>("/verification-events", "verificationEvents");
 export const checklistItemsApi = entity<ChecklistItem>("/checklist-items", "checklistItems");
+export const gapsApi = entity<Gap>("/gaps", "gaps");
 export const logicalSubsystemsApi = entity<LogicalSubsystem>("/subsystems", "logicalSubsystems");
 export const interfacesApi = entity<InterfaceRecord>("/interfaces", "interfaces");
 export const specificationsApi = entity<Specification>("/specifications", "specifications");

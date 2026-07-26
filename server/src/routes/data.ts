@@ -10,6 +10,7 @@ const REQUIRED_KEYS: (keyof Database)[] = [
   "requirements",
   "verificationEvents",
   "checklistItems",
+  "gaps",
   "logicalSubsystems",
   "cis",
   "deltaMatrix",

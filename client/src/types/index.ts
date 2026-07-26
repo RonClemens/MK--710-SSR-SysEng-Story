@@ -173,6 +173,11 @@ export interface ConfigurationItem {
   // @domain-placeholder
   notes: string;
   attachments: Attachment[];
+  // PKM Migration Step 6 (additive): unifies this CI's own
+  // overDecompositionFlag/consolidationNotes finding with a real Gap
+  // record where one exists -- see Gap's own comment (below DeltaMatrixRow)
+  // for why overDecompositionFlag/consolidationNotes stay as-is.
+  gapId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -295,6 +300,53 @@ export interface DeltaMatrixRow {
   // historical free-text record of the gap itself, per the same
   // coexist-then-deprecate pattern Step 2 used for baseline/baselineId.
   requirementId: string | null;
+  // PKM Migration Step 6 (additive): this row's finding, unified under a
+  // Gap record where one exists -- see Gap's own comment below for why
+  // this row's fields stay as-is rather than being replaced.
+  gapId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type GapEntityType =
+  | "ConfigurationItem"
+  | "DeltaMatrixRow"
+  | "Requirement"
+  | "Specification"
+  | "SafetyDeliverable"
+  | "ProgramPlanningDeliverable"
+  | "LogicalSubsystem";
+
+// PKM Migration Step 6 (additive, first slice): consolidates three
+// existing, still-functioning mechanisms (DeltaMatrixRow findings,
+// ConfigurationItem.overDecompositionFlag/consolidationNotes, and
+// Recommendation) into one polymorphic Gap entity, per PKM's own proposed
+// shape for this entity ("foundInEntityType + foundInEntityId"). Per this
+// step's own risk note ("high, mainly due to breadth... most likely to
+// need its own sub-plan once scoped"), this is additive only: the three
+// existing mechanisms keep their current fields, UI, and behavior
+// untouched (CisPage's over-decomposition badge, DeltaMatrixPage's table,
+// filtering, and the SEMP export all still read them directly) -- Gap
+// coexists alongside them via a new gapId reference on ConfigurationItem
+// and DeltaMatrixRow (see those fields' own comments), not a replacement.
+//
+// Recommendation is deliberately not migrated here: PKM's own model has
+// Recommendation/ActionItem *resolve* a Gap, not *be* one -- that
+// relationship is Step 7's resolvesGapId, not this step's. This also
+// means a single real finding can now be tracked by more than one
+// mechanism at once (e.g. ci-003's own over-decomposition flag and
+// delta-002 both describe the same underlying gap below) -- exactly the
+// duplication Gap unification exists to eventually resolve.
+export interface Gap {
+  id: string;
+  baselineId: string;
+  foundInEntityType: GapEntityType;
+  foundInEntityId: string;
+  // @domain-placeholder
+  description: string;
+  disposition: Disposition;
+  blocksMilestoneId: string | null;
+  blocksChecklistItemId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -544,6 +596,7 @@ export interface Database {
   requirements: Requirement[];
   verificationEvents: VerificationEvent[];
   checklistItems: ChecklistItem[];
+  gaps: Gap[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];
