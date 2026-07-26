@@ -23,6 +23,10 @@ gives a CUI implementation team a grep-able, structural inventory
 (`grep -rn "@domain-placeholder" client/src/types/index.ts`) of exactly which
 fields need real content, without touching how the demo presents.
 
+This manifest is also rendered live, per current record, on the app's own
+**PDKM Promises** tab (`client/src/pages/PromisesPage.tsx`) — the field lists
+there must match this document's exactly; update both together.
+
 **Not marked**, by design: `id` fields, foreign-key references (`*Id`,
 `*Ids`), fixed enums/union types (status, category, tier, type, etc.),
 timestamps (`createdAt`/`updatedAt`), and any field whose value is structural
@@ -47,6 +51,13 @@ app is deployed for.
   (`"Baseline A" | "Baseline B"`); real baseline naming is a program-specific
   decision but is modeled as a constrained type, not free text, so there's
   nothing to backfill here beyond adding real values to that enum.
+
+### Milestone (added PKM Migration Step 3)
+- `actualDate`
+- `plannedDate`
+- Not marked: `event` (fixed `MilestoneEvent` enum), `status` (fixed
+  `MilestoneStatus` enum) — both are structural, not domain content, even
+  though their *values* reflect this program's real progress.
 
 ### LogicalSubsystem
 - `name`

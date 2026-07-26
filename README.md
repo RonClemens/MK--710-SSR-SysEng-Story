@@ -688,6 +688,22 @@ Explicit non-goal: no direct integration with any other tool (no API push, no
 file write to a shared/mounted location) — see
 [Non-goals](#non-goals-v1).
 
+## PDKM Promises
+
+The **PDKM Promises** tab is a read-only, cross-entity browser over every
+field this app marks `@domain-placeholder` in its type files (see
+`data-schema/DOMAIN_PLACEHOLDER_FIELDS.md` for the full manifest). Every row
+is a real value from a real record currently in this app's data — a CI name,
+a hazard example, a spec section's text — framed as a *promise*: in the
+spirit of a promissory note, this app commits that each of these fields will
+be updated once a real Product/Domain Knowledge Model (PDKM) exists for the
+program a given deployment actually serves, arriving either through a
+landing zone upload (a technical or management source file ingested through
+this app's import path) or direct user data entry through each entity's own
+tab. The tab itself has no edit affordance — it exists to make that
+inventory browsable and filterable by entity type, not to replace each
+entity's own editing UI.
+
 ## Editable site content
 
 Beyond the structured entity data above, most of the app's guidance prose
