@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useEntity } from "./hooks/useEntity";
 import {
   abCompatibilityApi,
+  baselinesApi,
   cisApi,
   cotsRecordsApi,
   deltaMatrixApi,
@@ -65,6 +66,7 @@ const TABS: { key: Tab; label: string }[] = [
 export default function App() {
   const programs = useEntity(programsApi);
   const projects = useEntity(projectsApi);
+  const baselines = useEntity(baselinesApi);
   const logicalSubsystems = useEntity(logicalSubsystemsApi);
   const cis = useEntity(cisApi);
   const deltaMatrix = useEntity(deltaMatrixApi);
@@ -90,6 +92,7 @@ export default function App() {
   function refreshAll() {
     programs.refresh();
     projects.refresh();
+    baselines.refresh();
     logicalSubsystems.refresh();
     cis.refresh();
     deltaMatrix.refresh();
@@ -226,7 +229,14 @@ export default function App() {
                   onSelectCi={selectCi}
                 />
               )}
-              {tab === "cis" && <CisPage entity={cis} subsystems={logicalSubsystems.rows} onSelectCi={selectCi} />}
+              {tab === "cis" && (
+                <CisPage
+                  entity={cis}
+                  subsystems={logicalSubsystems.rows}
+                  baselines={baselines.rows}
+                  onSelectCi={selectCi}
+                />
+              )}
               {tab === "delta" && <DeltaMatrixPage entity={deltaMatrix} cis={cis.rows} />}
               {tab === "ab" && <AbCompatibilityPage entity={abCompatibility} cis={cis.rows} />}
               {tab === "cots" && <CotsRecordsPage entity={cotsRecords} cis={cis.rows} />}
@@ -257,6 +267,7 @@ export default function App() {
               )}
               {tab === "sempMigration" && (
                 <SempMigrationPage
+                  baselines={baselines.rows}
                   logicalSubsystems={logicalSubsystems.rows}
                   cis={cis.rows}
                   deltaMatrix={deltaMatrix.rows}

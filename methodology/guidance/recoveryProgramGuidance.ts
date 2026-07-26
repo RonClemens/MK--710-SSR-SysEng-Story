@@ -1,17 +1,25 @@
-import type { CiTier } from "../../client/src/types";
+import type { Baseline, CiTier } from "../../client/src/types";
 
-// This program's own recovery-program context, per this program's Lead
-// Systems Engineer: Baseline B's existing CI Tier classification (already
-// modeled by this app — see the CI Inventory tab) doubles as this program's
-// configuration-delta classification for reconciling a prior baseline
-// against current requirements. This is not a generic MIL-STD-961E tiering
-// scheme layered on top of something else — the tier a CI is assigned IS
-// the delta-classification decision for that CI on Baseline B.
+// Architecture Guidance §7 Step 5 / PKM Migration Step 2 (coordinated pass —
+// see client/src/types/index.ts's Baseline entity comment for why these two
+// steps land together here): this file previously hardcoded "Baseline B" and
+// "Baseline A" as proper nouns in the two prose constants below. That's
+// exactly the §1.1 anti-pattern (editable override ≠ real separation) —
+// per-program specifics baked into methodology-layer defaultValue text.
+//
+// The fix: the prose below is now fully generic — it would read the same
+// for any program, any pair of baselines. The specific fact ("it's Baseline
+// B for this program") is no longer asserted in prose at all; it's derived
+// from the Baseline entity's own reconciledFromBaselineId field via
+// findReconciliationTargetBaseline() below, and rendered as an explicit,
+// data-sourced "Applies to" line by whichever page consumes this guidance
+// (see CisPage.tsx and sempExport.ts) — a real reference, not a string.
 export const RECOVERY_PROGRAM_INTRO =
-  "Per this program's Lead Systems Engineer: on Baseline B, this app's existing CI Tier field isn't just a " +
-  "criticality ranking — it doubles as this program's configuration-delta classification, reconciling each CI " +
-  "against a prior baseline. Assigning a CI's Tier on Baseline B is the same decision as classifying how much of " +
-  "that CI's prior design can be carried forward versus how much has to be reworked.";
+  "Per this program's Lead Systems Engineer: on the baseline currently undergoing reconciliation, this app's " +
+  "existing CI Tier field isn't just a criticality ranking — it doubles as this program's configuration-delta " +
+  "classification, reconciling each CI against a prior baseline. Assigning a CI's Tier on that baseline is the " +
+  "same decision as classifying how much of that CI's prior design can be carried forward versus how much has " +
+  "to be reworked.";
 
 export type RecoveryDeltaClass = "Class 1 — Carry Forward" | "Class 2 — Modified" | "Class 3 — Re-Architected";
 
@@ -59,7 +67,17 @@ export const RECOVERY_DELTA_CLASS_TIER_MAPPING: Record<RecoveryDeltaClass, Recov
 };
 
 export const RECOVERY_DELTA_CLASS_SCOPE_NOTE =
-  "This mapping is specific to Baseline B, per this program's LSE — it is not asserted here as a general rule " +
-  "for Baseline A or for programs generally. A CI's Tier assignment on Baseline B should be read as this " +
-  "reconciliation decision; changing a CI's Tier on Baseline B is a delta-classification decision, not just a " +
-  "criticality re-rating, and should be dispositioned with the same rigor as a Delta Matrix finding.";
+  "This mapping is specific to the baseline currently undergoing reconciliation, per this program's LSE — it is " +
+  "not asserted here as a general rule for every baseline or for programs generally. A CI's Tier assignment on " +
+  "that baseline should be read as this reconciliation decision; changing a CI's Tier there is a " +
+  "delta-classification decision, not just a criticality re-rating, and should be dispositioned with the same " +
+  "rigor as a Delta Matrix finding.";
+
+// The data-sourced fact the prose above deliberately no longer hardcodes:
+// which Baseline record this program's recovery delta-classification
+// convention actually applies to. Modeled as "whichever Baseline is
+// reconciling from a prior one" (PKM Entity Model §5 open question #1's
+// reconciledFromBaselineId), not a second hardcoded name.
+export function findReconciliationTargetBaseline(baselines: Baseline[]): Baseline | undefined {
+  return baselines.find((b) => b.reconciledFromBaselineId !== null);
+}

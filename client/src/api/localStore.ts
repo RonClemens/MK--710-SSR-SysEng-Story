@@ -14,32 +14,38 @@ function normalize(db: Partial<Database>): Database {
     subsystemIds: ci.subsystemIds ?? [],
     baseline: ci.baseline ?? "Baseline A",
     projectId: ci.projectId ?? null,
+    baselineId: ci.baselineId ?? null,
     attachments: ci.attachments ?? [],
   }));
   const logicalSubsystems = (db.logicalSubsystems ?? []).map((s) => ({
     ...s,
     baseline: s.baseline ?? "Baseline A",
     projectId: s.projectId ?? null,
+    baselineId: s.baselineId ?? null,
   }));
   const cotsRecords = (db.cotsRecords ?? []).map((r) => ({ ...r, attachments: r.attachments ?? [] }));
   const specifications = (db.specifications ?? []).map((s) => ({
     ...s,
     projectId: s.projectId ?? null,
+    baselineId: s.baselineId ?? null,
     attachments: s.attachments ?? [],
   }));
   const safetyDeliverables = (db.safetyDeliverables ?? []).map((s) => ({
     ...s,
     projectId: s.projectId ?? null,
+    baselineId: s.baselineId ?? null,
     attachments: s.attachments ?? [],
   }));
   const programPlanningDeliverables = (db.programPlanningDeliverables ?? []).map((p) => ({
     ...p,
     projectId: p.projectId ?? null,
+    baselineId: p.baselineId ?? null,
     attachments: p.attachments ?? [],
   }));
   return {
     programs: db.programs ?? [],
     projects: db.projects ?? [],
+    baselines: db.baselines ?? [],
     logicalSubsystems,
     cis,
     deltaMatrix: db.deltaMatrix ?? [],
@@ -68,7 +74,8 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.safetyDeliverables === undefined ||
     db.programPlanningDeliverables === undefined ||
     db.programs === undefined ||
-    db.projects === undefined;
+    db.projects === undefined ||
+    db.baselines === undefined;
   return {
     db: {
       ...db,
@@ -79,6 +86,7 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       programPlanningDeliverables: db.programPlanningDeliverables ?? SEED_DATA.programPlanningDeliverables,
       programs: db.programs ?? SEED_DATA.programs,
       projects: db.projects ?? SEED_DATA.projects,
+      baselines: db.baselines ?? SEED_DATA.baselines,
     },
     changed,
   };

@@ -36,6 +36,7 @@ async function start() {
 
   app.use("/api/programs", crudRouter("programs"));
   app.use("/api/projects", crudRouter("projects"));
+  app.use("/api/baselines", crudRouter("baselines"));
   app.use("/api/subsystems", crudRouter("logicalSubsystems"));
   app.use("/api/cis", crudRouter("cis"));
   app.use("/api/delta-matrix", crudRouter("deltaMatrix"));

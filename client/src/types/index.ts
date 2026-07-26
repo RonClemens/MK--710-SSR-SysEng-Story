@@ -32,6 +32,41 @@ export interface Project {
   updatedAt: string;
 }
 
+// PKM Migration Step 2 (coordinated with the recoveryProgramGuidance.ts content
+// split — see that file): promotes "Baseline A"/"Baseline B" from a plain
+// enum tag to a real, referenceable entity. `baseline: SpecBaseline` is kept
+// on every tagged entity during the transition (migration plan's own
+// recommendation) — `baselineId` is additive, not a replacement, until every
+// read/write path is confirmed migrated.
+//
+// Simplification, stated explicitly rather than left implicit: per PKM's own
+// definition, a technical Baseline (Functional/Allocated/Product) is "a
+// configuration state at a point in time," meaning a fully literal reading
+// would give this app three separate Baseline records per lineage (one per
+// technical-baseline-type snapshot). This app instead has one Baseline
+// record per lineage ("Baseline A", "Baseline B"), with `baselineType`
+// reflecting that lineage's current overall maturity -- matching how this
+// app has used "Baseline A"/"Baseline B" everywhere else since it was built.
+// Re-splitting each lineage into per-snapshot records is a bigger, separate
+// change than Step 2 was ever scoped to make.
+export type BaselineType = "Functional" | "Allocated" | "Product" | "Acquisition-Program";
+
+export interface Baseline {
+  id: string;
+  name: SpecBaseline;
+  baselineType: BaselineType;
+  projectId: string;
+  // Nullable until PKM Migration Step 3 (Milestone entity) exists.
+  establishedAtMilestoneId: string | null;
+  // Per PKM Entity Model §5 open question #1. Set on the newer/reconciling
+  // baseline; the corresponding sibling should set reconciledIntoBaselineId
+  // to point back, though nothing enforces that symmetry structurally yet.
+  reconciledFromBaselineId: string | null;
+  reconciledIntoBaselineId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type LogicalSubsystemSource =
   | "Validated"
   | "Proposed"
@@ -50,6 +85,7 @@ export interface LogicalSubsystem {
   // PKM Migration Step 1 (additive): optional until backfilled everywhere, per
   // the migration plan's own transition recommendation.
   projectId: string | null;
+  baselineId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -68,6 +104,7 @@ export interface ConfigurationItem {
   subsystemIds: string[];
   baseline: SpecBaseline;
   projectId: string | null;
+  baselineId: string | null;
   overDecompositionFlag: boolean;
   consolidationNotes: string;
   status: string;
@@ -204,6 +241,7 @@ export interface Specification {
   specType: SpecType;
   baseline: SpecBaseline;
   projectId: string | null;
+  baselineId: string | null;
   status: SpecStatus;
   linkedSubsystemId: string | null;
   linkedCiId: string | null;
@@ -228,6 +266,7 @@ export interface SafetyDeliverable {
   applicability: SafetyApplicability;
   baseline: SpecBaseline;
   projectId: string | null;
+  baselineId: string | null;
   status: SpecStatus;
   // Set when level === "Subsystem"; null otherwise.
   linkedSubsystemId: string | null;
@@ -254,6 +293,7 @@ export interface ProgramPlanningDeliverable {
   applicability: SafetyApplicability;
   baseline: SpecBaseline;
   projectId: string | null;
+  baselineId: string | null;
   status: SpecStatus;
   // Set when level === "Subsystem"; null otherwise.
   linkedSubsystemId: string | null;
@@ -287,6 +327,7 @@ export interface ContentEntry {
 export interface Database {
   programs: Program[];
   projects: Project[];
+  baselines: Baseline[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];

@@ -5,6 +5,7 @@ import type { Database } from "../types.js";
 const REQUIRED_KEYS: (keyof Database)[] = [
   "programs",
   "projects",
+  "baselines",
   "logicalSubsystems",
   "cis",
   "deltaMatrix",

@@ -9,6 +9,7 @@ import {
   SETR_GUIDANCE,
 } from "../../../methodology/guidance/setrGuidance";
 import {
+  findReconciliationTargetBaseline,
   RECOVERY_DELTA_CLASSES,
   RECOVERY_DELTA_CLASS_SCOPE_NOTE,
   RECOVERY_DELTA_CLASS_TIER_MAPPING,
@@ -39,6 +40,7 @@ import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from
 import type {
   AbCompatibilityRow,
   Attachment,
+  Baseline,
   ConfigurationItem,
   CotsRecord,
   DeltaMatrixRow,
@@ -52,6 +54,7 @@ import type {
 } from "../types";
 
 export interface SempExportData {
+  baselines: Baseline[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];
@@ -229,9 +232,15 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     lines.push("");
   }
 
-  lines.push("**Recovery Program: CI Tier ↔ Delta Classification (Baseline B)**");
+  lines.push("**Recovery Program: CI Tier ↔ Delta Classification**");
   lines.push("");
   lines.push(getValue("recovery.intro", RECOVERY_PROGRAM_INTRO));
+  lines.push("");
+  const reconciliationTargetBaseline = findReconciliationTargetBaseline(data.baselines);
+  lines.push(
+    `_Applies to: ${reconciliationTargetBaseline?.name ?? "—"} (Baseline entity data — the baseline with a set ` +
+      "reconciledFromBaselineId — not hardcoded guidance text)_",
+  );
   lines.push("");
   lines.push(
     mdTable(

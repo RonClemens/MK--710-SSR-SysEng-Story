@@ -19,6 +19,30 @@
       "updatedAt": "2026-01-06T00:00:00.000Z"
     }
   ],
+  "baselines": [
+    {
+      "id": "BASELINE-A",
+      "name": "Baseline A",
+      "baselineType": "Product",
+      "projectId": "project-001",
+      "establishedAtMilestoneId": null,
+      "reconciledFromBaselineId": null,
+      "reconciledIntoBaselineId": "BASELINE-B",
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "BASELINE-B",
+      "name": "Baseline B",
+      "baselineType": "Allocated",
+      "projectId": "project-001",
+      "establishedAtMilestoneId": null,
+      "reconciledFromBaselineId": "BASELINE-A",
+      "reconciledIntoBaselineId": null,
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-20T00:00:00.000Z"
+    }
+  ],
   "logicalSubsystems": [
     {
       "id": "sub-001",
@@ -28,7 +52,8 @@
       "baseline": "Baseline A",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "sub-002",
@@ -38,7 +63,8 @@
       "baseline": "Baseline A",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "sub-003",
@@ -48,7 +74,8 @@
       "baseline": "Baseline A",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "sub-004",
@@ -58,7 +85,8 @@
       "baseline": "Baseline A",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "sub-b-001",
@@ -68,7 +96,8 @@
       "baseline": "Baseline B",
       "createdAt": "2026-06-01T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "sub-b-002",
@@ -78,7 +107,8 @@
       "baseline": "Baseline B",
       "createdAt": "2026-06-01T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "sub-b-003",
@@ -88,7 +118,8 @@
       "baseline": "Baseline B",
       "createdAt": "2026-06-01T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     }
   ],
   "cis": [
@@ -115,7 +146,8 @@
       ],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "ci-002",
@@ -134,7 +166,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "ci-003",
@@ -152,7 +185,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "ci-004",
@@ -170,7 +204,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "ci-005",
@@ -188,7 +223,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     }
   ],
   "deltaMatrix": [
@@ -368,7 +404,8 @@
       ],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-06-01T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "spec-002",
@@ -397,7 +434,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-06-10T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "spec-003",
@@ -426,7 +464,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "spec-004",
@@ -455,7 +494,8 @@
       "attachments": [],
       "createdAt": "2026-06-20T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "spec-005",
@@ -484,7 +524,8 @@
       "attachments": [],
       "createdAt": "2026-06-20T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     }
   ],
   "safetyDeliverables": [
@@ -509,7 +550,8 @@
       ],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-002",
@@ -527,7 +569,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-003",
@@ -545,7 +588,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-004",
@@ -563,7 +607,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-005",
@@ -581,7 +626,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-006",
@@ -599,7 +645,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-007",
@@ -617,7 +664,8 @@
       "attachments": [],
       "createdAt": "2026-06-01T00:00:00.000Z",
       "updatedAt": "2026-06-01T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "safety-008",
@@ -635,7 +683,8 @@
       "attachments": [],
       "createdAt": "2026-06-20T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "safety-009",
@@ -653,7 +702,8 @@
       "attachments": [],
       "createdAt": "2026-06-20T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     }
   ],
   "programPlanningDeliverables": [
@@ -677,7 +727,8 @@
       ],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "plan-002",
@@ -694,7 +745,8 @@
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "plan-003",
@@ -711,7 +763,8 @@
       "attachments": [],
       "createdAt": "2026-06-01T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "plan-004",
@@ -728,7 +781,8 @@
       "attachments": [],
       "createdAt": "2026-06-15T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "plan-005",
@@ -745,7 +799,8 @@
       "attachments": [],
       "createdAt": "2026-05-01T00:00:00.000Z",
       "updatedAt": "2026-06-10T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "plan-006",
@@ -762,7 +817,8 @@
       "attachments": [],
       "createdAt": "2026-06-15T00:00:00.000Z",
       "updatedAt": "2026-06-15T00:00:00.000Z",
-      "projectId": "project-001"
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     }
   ],
   "content": []
