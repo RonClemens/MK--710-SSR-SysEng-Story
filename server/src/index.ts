@@ -39,6 +39,8 @@ async function start() {
   app.use("/api/baselines", crudRouter("baselines"));
   app.use("/api/milestones", crudRouter("milestones"));
   app.use("/api/requirements", crudRouter("requirements"));
+  app.use("/api/verification-events", crudRouter("verificationEvents"));
+  app.use("/api/checklist-items", crudRouter("checklistItems"));
   app.use("/api/subsystems", crudRouter("logicalSubsystems"));
   app.use("/api/cis", crudRouter("cis"));
   app.use("/api/delta-matrix", crudRouter("deltaMatrix"));

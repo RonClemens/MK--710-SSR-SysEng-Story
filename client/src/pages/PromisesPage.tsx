@@ -9,6 +9,7 @@ import {
   SPEC_SECTION_KEYS,
   type AbCompatibilityRow,
   type Attachment,
+  type ChecklistItem,
   type ConfigurationItem,
   type CotsRecord,
   type DeltaMatrixRow,
@@ -22,6 +23,7 @@ import {
   type Requirement,
   type SafetyDeliverable,
   type Specification,
+  type VerificationEvent,
 } from "../types";
 
 interface Props {
@@ -29,6 +31,8 @@ interface Props {
   projects: Project[];
   milestones: Milestone[];
   requirements: Requirement[];
+  verificationEvents: VerificationEvent[];
+  checklistItems: ChecklistItem[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];
@@ -123,6 +127,8 @@ export function PromisesPage({
   projects,
   milestones,
   requirements,
+  verificationEvents,
+  checklistItems,
   logicalSubsystems,
   cis,
   deltaMatrix,
@@ -140,6 +146,8 @@ export function PromisesPage({
       ...rowsFor("Project", projects, (r) => r.name, ["name", "description"]),
       ...rowsFor("Milestone", milestones, (r) => `${r.event} (${r.baselineId})`, ["actualDate", "plannedDate"]),
       ...rowsFor("Requirement", requirements, (r) => r.id, ["statement"]),
+      ...rowsFor("Verification Event", verificationEvents, (r) => r.requirementId, ["evidenceSummary"]),
+      ...rowsFor("Checklist Item", checklistItems, (r) => r.milestoneId, ["criterion"]),
       ...rowsFor("Logical Subsystem", logicalSubsystems, (r) => r.name, ["name", "description"]),
       ...rowsFor("Configuration Item", cis, (r) => r.name, ["name", "consolidationNotes", "status", "notes"]),
       ...attachmentRowsFor("Configuration Item", cis, (r) => r.name),
@@ -158,6 +166,7 @@ export function PromisesPage({
         "functionalRequirement",
         "interfaceRequirement",
         "formFitConstraints",
+        "verificationMethod",
         "rationale",
         "partsListEntry",
         "obsolescenceMonitoringNotes",
@@ -188,6 +197,8 @@ export function PromisesPage({
       projects,
       milestones,
       requirements,
+      verificationEvents,
+      checklistItems,
       logicalSubsystems,
       cis,
       deltaMatrix,

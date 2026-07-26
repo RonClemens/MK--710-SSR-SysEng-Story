@@ -206,6 +206,74 @@ export interface Requirement {
   updatedAt: string;
 }
 
+export type VerificationMethod = "Test" | "Analysis" | "Inspection" | "Demonstration";
+export type VerificationResult = "Pass" | "Fail" | "Pending";
+
+// PKM Migration Step 5 (additive, first slice): promotes CotsRecord's own
+// `verificationMethod` free text into a real, referenceable record -- see
+// that field's own comment below. Per the migration plan's explicit risk
+// note for this step ("genuine content authoring, not mechanical
+// conversion... do incrementally per guidance-content file"), this first
+// slice covers only CotsRecord; `Specification.sections.verificationProvisions`
+// is a separate, later slice, not addressed here.
+export interface VerificationEvent {
+  id: string;
+  requirementId: string;
+  method: VerificationMethod;
+  result: VerificationResult;
+  // @domain-placeholder
+  evidenceSummary: string;
+  eventDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ChecklistItemStatus = "Not Evaluated" | "Met" | "Not Met" | "Waived";
+
+// Polymorphic single-reference evidence pointer -- one piece of evidence per
+// criterion, not a full evidence graph. The same pattern PKM's own model
+// proposes for Gap (Step 6: `foundInEntityType` + `foundInEntityId`), reused
+// here proactively for consistency across both entities.
+export type ChecklistItemEvidenceType =
+  | "Requirement"
+  | "ConfigurationItem"
+  | "SafetyDeliverable"
+  | "ProgramPlanningDeliverable"
+  | "VerificationEvent";
+
+// PKM Migration Step 5 (additive, first slice): promotes a small, real set
+// of DID/TDP/DBx-MBx-style readiness criteria from guidance prose into
+// individually evaluable records, each belonging to a Milestone and
+// evaluated against a piece of existing evidence. Per this step's risk
+// note, only a representative slice is seeded (Baseline A's TRR and
+// Baseline B's SFR -- both currently in-progress milestones), not a full
+// sweep of every guidance-content file.
+//
+// `domain` is a plain string attribute, not a first-class PKM entity --
+// deliberately provisional pending PKM Entity Model §5 open question #2
+// ("should Domain be first-class?"), which is still unresolved upstream.
+//
+// Forward-compatibility note: this entity's shape (a discrete,
+// user-answerable criterion with a toggleable status and a structured
+// evidence reference) is what a future wizard/guided-form interface is
+// meant to read and write directly -- the same criterion catalog that
+// drives this app's tables today is intended to also drive a prompted,
+// "TurboTax-style" flow later, toggling which CDRLs apply as each
+// criterion is answered. Nothing here assumes that UI exists yet; the
+// structure just shouldn't need to change when it does.
+export interface ChecklistItem {
+  id: string;
+  milestoneId: string;
+  domain: string;
+  // @domain-placeholder
+  criterion: string;
+  status: ChecklistItemStatus;
+  evidenceType: ChecklistItemEvidenceType | null;
+  evidenceId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type DeltaSource = "Design reality vs. model" | "Model unvalidated vs. design" | "None";
 export type Disposition = "Accept as-is" | "ECP required" | "TBD pending analysis";
 
@@ -264,7 +332,15 @@ export interface CotsRecord {
   interfaceRequirement: string;
   // @domain-placeholder
   formFitConstraints: string;
+  // PKM Migration Step 5 (additive): superseded by verificationEventId for
+  // the structural relationship, per the same coexist-then-deprecate
+  // pattern used elsewhere in this migration. This field's own value is
+  // domain-specific free text (see data-schema/DOMAIN_PLACEHOLDER_FIELDS.md
+  // -- an earlier pass at that manifest incorrectly assumed this was a
+  // fixed set of standard labels; it is not).
+  // @domain-placeholder
   verificationMethod: string;
+  verificationEventId: string | null;
   // @domain-placeholder
   rationale: string;
   // @domain-placeholder
@@ -466,6 +542,8 @@ export interface Database {
   baselines: Baseline[];
   milestones: Milestone[];
   requirements: Requirement[];
+  verificationEvents: VerificationEvent[];
+  checklistItems: ChecklistItem[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];

@@ -24,7 +24,11 @@ function normalize(db: Partial<Database>): Database {
     baselineId: s.baselineId ?? null,
   }));
   const deltaMatrix = (db.deltaMatrix ?? []).map((r) => ({ ...r, requirementId: r.requirementId ?? null }));
-  const cotsRecords = (db.cotsRecords ?? []).map((r) => ({ ...r, attachments: r.attachments ?? [] }));
+  const cotsRecords = (db.cotsRecords ?? []).map((r) => ({
+    ...r,
+    verificationEventId: r.verificationEventId ?? null,
+    attachments: r.attachments ?? [],
+  }));
   const specifications = (db.specifications ?? []).map((s) => ({
     ...s,
     projectId: s.projectId ?? null,
@@ -51,6 +55,8 @@ function normalize(db: Partial<Database>): Database {
     baselines: db.baselines ?? [],
     milestones: db.milestones ?? [],
     requirements: db.requirements ?? [],
+    verificationEvents: db.verificationEvents ?? [],
+    checklistItems: db.checklistItems ?? [],
     logicalSubsystems,
     cis,
     deltaMatrix,
@@ -82,7 +88,9 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.projects === undefined ||
     db.baselines === undefined ||
     db.milestones === undefined ||
-    db.requirements === undefined;
+    db.requirements === undefined ||
+    db.verificationEvents === undefined ||
+    db.checklistItems === undefined;
   return {
     db: {
       ...db,
@@ -96,6 +104,8 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       baselines: db.baselines ?? SEED_DATA.baselines,
       milestones: db.milestones ?? SEED_DATA.milestones,
       requirements: db.requirements ?? SEED_DATA.requirements,
+      verificationEvents: db.verificationEvents ?? SEED_DATA.verificationEvents,
+      checklistItems: db.checklistItems ?? SEED_DATA.checklistItems,
     },
     changed,
   };

@@ -3,6 +3,7 @@ import { useEntity } from "./hooks/useEntity";
 import {
   abCompatibilityApi,
   baselinesApi,
+  checklistItemsApi,
   cisApi,
   cotsRecordsApi,
   deltaMatrixApi,
@@ -16,6 +17,7 @@ import {
   requirementsApi,
   safetyDeliverablesApi,
   specificationsApi,
+  verificationEventsApi,
 } from "./api/entities";
 import { api } from "./api/client";
 import { SubsystemsPage } from "./pages/SubsystemsPage";
@@ -74,6 +76,8 @@ export default function App() {
   const baselines = useEntity(baselinesApi);
   const milestones = useEntity(milestonesApi);
   const requirements = useEntity(requirementsApi);
+  const verificationEvents = useEntity(verificationEventsApi);
+  const checklistItems = useEntity(checklistItemsApi);
   const logicalSubsystems = useEntity(logicalSubsystemsApi);
   const cis = useEntity(cisApi);
   const deltaMatrix = useEntity(deltaMatrixApi);
@@ -102,6 +106,8 @@ export default function App() {
     baselines.refresh();
     milestones.refresh();
     requirements.refresh();
+    verificationEvents.refresh();
+    checklistItems.refresh();
     logicalSubsystems.refresh();
     cis.refresh();
     deltaMatrix.refresh();
@@ -250,7 +256,9 @@ export default function App() {
                 <DeltaMatrixPage entity={deltaMatrix} cis={cis.rows} requirements={requirements.rows} />
               )}
               {tab === "ab" && <AbCompatibilityPage entity={abCompatibility} cis={cis.rows} />}
-              {tab === "cots" && <CotsRecordsPage entity={cotsRecords} cis={cis.rows} />}
+              {tab === "cots" && (
+                <CotsRecordsPage entity={cotsRecords} cis={cis.rows} verificationEvents={verificationEvents.rows} />
+              )}
               {tab === "specifications" && (
                 <SpecificationsPage
                   entity={specifications}
@@ -298,6 +306,8 @@ export default function App() {
                   projects={projects.rows}
                   milestones={milestones.rows}
                   requirements={requirements.rows}
+                  verificationEvents={verificationEvents.rows}
+                  checklistItems={checklistItems.rows}
                   logicalSubsystems={logicalSubsystems.rows}
                   cis={cis.rows}
                   deltaMatrix={deltaMatrix.rows}

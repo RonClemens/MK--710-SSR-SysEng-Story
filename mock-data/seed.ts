@@ -435,6 +435,54 @@ export const SEED_DATA: Database = {
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
+    // PKM Migration Step 5 (additive, first slice): a Requirement record per
+    // COTS record's own functionalRequirement text, so cots-001/cots-002's
+    // verificationMethod below has something real to attach a
+    // VerificationEvent to -- see that field's own comment.
+    {
+      id: "req-003",
+      baselineId: "BASELINE-A",
+      statement:
+        "Shall provide module-level control signaling sufficient to support Test Set stimulus/response timing per SFR-4.2.1 (capability-based; no vendor-specific behavior required).",
+      satisfiedByCiIds: ["ci-003"],
+      parentRequirementId: "req-001",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "req-004",
+      baselineId: "BASELINE-A",
+      statement: "Shall provide regulated 28VDC output at up to 15A to support UUT test fixture power needs (capability-based).",
+      satisfiedByCiIds: ["ci-004"],
+      parentRequirementId: null,
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+  ],
+  // PKM Migration Step 5 (additive, first slice): promotes the two existing
+  // CotsRecord.verificationMethod free-text values ("inspection of vendor
+  // data sheet") into real event records against their own requirement.
+  verificationEvents: [
+    {
+      id: "ve-001",
+      requirementId: "req-003",
+      method: "Inspection",
+      result: "Pass",
+      evidenceSummary: "Inspection of vendor data sheet (Acme Corp MCC-200, Rev C) confirms capability is met.",
+      eventDate: "2026-01-06",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "ve-002",
+      requirementId: "req-004",
+      method: "Inspection",
+      result: "Pass",
+      evidenceSummary: "Inspection of vendor data sheet (Volt Dynamics IPS-28-15, Rev A) confirms capability is met.",
+      eventDate: "2026-01-06",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
   ],
   deltaMatrix: [
     {
@@ -503,6 +551,7 @@ export const SEED_DATA: Database = {
       interfaceRequirement: "Per ICD-TS-014, Section 3 (referenced, not restated).",
       formFitConstraints: "Must fit existing Test Set card cage slot 3; conduction-cooled per chassis spec.",
       verificationMethod: "inspection of vendor data sheet",
+      verificationEventId: "ve-001",
       rationale:
         "Capability is bounded by the Test Set's overall stimulus/response requirement; no need for a standalone CI-level requirement set.",
       partsListEntry: "Acme Corp MCC-200, Rev C",
@@ -523,6 +572,7 @@ export const SEED_DATA: Database = {
       interfaceRequirement: "Per ICD-TS-014, Section 5 (referenced, not restated).",
       formFitConstraints: "1U rack-mount form factor; existing chassis cutout.",
       verificationMethod: "inspection of vendor data sheet",
+      verificationEventId: "ve-002",
       rationale:
         "Commercial power supply meeting a bounded capability; verification by vendor data sheet is sufficient per program COTS policy.",
       partsListEntry: "Volt Dynamics IPS-28-15, Rev A",
@@ -1083,6 +1133,56 @@ export const SEED_DATA: Database = {
       attachments: [],
       createdAt: "2026-06-15T00:00:00.000Z",
       updatedAt: "2026-06-15T00:00:00.000Z",
+    },
+  ],
+  // PKM Migration Step 5 (additive, first slice): a representative set of
+  // readiness criteria against the two currently in-progress milestones
+  // (Baseline A's TRR, Baseline B's SFR), each evaluated against real
+  // existing evidence rather than invented findings.
+  checklistItems: [
+    {
+      id: "check-001",
+      milestoneId: "milestone-a-trr",
+      domain: "System Safety",
+      criterion: "CI-level System Hazard Analysis for MCC (ci-003) must be complete before TRR closes.",
+      status: "Not Met",
+      evidenceType: "SafetyDeliverable",
+      evidenceId: "safety-005",
+      createdAt: "2026-06-15T00:00:00.000Z",
+      updatedAt: "2026-06-15T00:00:00.000Z",
+    },
+    {
+      id: "check-002",
+      milestoneId: "milestone-a-trr",
+      domain: "Verification & Validation",
+      criterion: "Requirement req-001 (Test Set stimulus/response) must have a passing verification event on record.",
+      status: "Not Met",
+      evidenceType: "Requirement",
+      evidenceId: "req-001",
+      createdAt: "2026-06-15T00:00:00.000Z",
+      updatedAt: "2026-06-15T00:00:00.000Z",
+    },
+    {
+      id: "check-003",
+      milestoneId: "milestone-b-sfr",
+      domain: "System Safety",
+      criterion: "Functional Hazard Analysis for the Diagnostic Messaging subsystem (sub-b-002) must be validated before SFR closes.",
+      status: "Not Met",
+      evidenceType: "SafetyDeliverable",
+      evidenceId: "safety-009",
+      createdAt: "2026-06-20T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
+    },
+    {
+      id: "check-004",
+      milestoneId: "milestone-b-sfr",
+      domain: "Verification & Validation",
+      criterion: "COTS power supply (cots-002 / ci-004) capability must have a documented, passing verification method.",
+      status: "Met",
+      evidenceType: "VerificationEvent",
+      evidenceId: "ve-002",
+      createdAt: "2026-06-20T00:00:00.000Z",
+      updatedAt: "2026-06-20T00:00:00.000Z",
     },
   ],
   content: [],

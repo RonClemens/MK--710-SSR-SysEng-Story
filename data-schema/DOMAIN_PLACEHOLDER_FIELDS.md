@@ -94,14 +94,23 @@ app is deployed for.
 - `functionalRequirement`
 - `interfaceRequirement`
 - `formFitConstraints`
+- `verificationMethod` (added PKM Migration Step 5 — an earlier pass at
+  this manifest incorrectly assumed this was a fixed set of standard
+  labels; it is free text, and is now additionally superseded by
+  `verificationEventId` for the structural relationship)
 - `rationale`
 - `partsListEntry`
 - `obsolescenceMonitoringNotes`
-- Not marked: `verificationMethod` — kept out because in this demo's data
-  it's populated from a small fixed set of standard verification-method
-  labels (Test/Analysis/Inspection/Demonstration-style values), not
-  freeform program-specific prose. A real deployment should confirm this
-  still holds for its own data before assuming it needs no replacement.
+
+### VerificationEvent (added PKM Migration Step 5)
+- `evidenceSummary`
+- Not marked: `method`, `result` (fixed enums), `requirementId` (reference).
+
+### ChecklistItem (added PKM Migration Step 5)
+- `criterion`
+- Not marked: `domain` (structural attribute, not domain content, despite
+  the name — see this entity's own comment), `status` (fixed enum),
+  `milestoneId`/`evidenceType`/`evidenceId` (references).
 
 ### Recommendation
 - `text`
