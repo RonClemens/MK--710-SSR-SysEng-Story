@@ -9,6 +9,29 @@ export interface Attachment {
   url: string;
 }
 
+// PKM Migration Step 1 (additive): explicit Program/Project entities, per the
+// Process Knowledge Model's Program -> Project -> Baseline hierarchy. This app
+// currently has exactly one Program and one Project — see mock-data/seed.ts —
+// but the entities exist as real, referenceable records rather than assumed
+// implicitly, so later steps (Baseline as an entity, Step 2) have something
+// to scope to.
+export interface Program {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  programId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type LogicalSubsystemSource =
   | "Validated"
   | "Proposed"
@@ -24,6 +47,9 @@ export interface LogicalSubsystem {
   // structure with two states — a Baseline B subsystem is its own record,
   // even if its name/function mirrors a Baseline A subsystem.
   baseline: SpecBaseline;
+  // PKM Migration Step 1 (additive): optional until backfilled everywhere, per
+  // the migration plan's own transition recommendation.
+  projectId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,6 +67,7 @@ export interface ConfigurationItem {
   // reference subsystems of this same CI's baseline.
   subsystemIds: string[];
   baseline: SpecBaseline;
+  projectId: string | null;
   overDecompositionFlag: boolean;
   consolidationNotes: string;
   status: string;
@@ -176,6 +203,7 @@ export interface Specification {
   domain: SpecDomain;
   specType: SpecType;
   baseline: SpecBaseline;
+  projectId: string | null;
   status: SpecStatus;
   linkedSubsystemId: string | null;
   linkedCiId: string | null;
@@ -199,6 +227,7 @@ export interface SafetyDeliverable {
   cdrlType: string;
   applicability: SafetyApplicability;
   baseline: SpecBaseline;
+  projectId: string | null;
   status: SpecStatus;
   // Set when level === "Subsystem"; null otherwise.
   linkedSubsystemId: string | null;
@@ -224,6 +253,7 @@ export interface ProgramPlanningDeliverable {
   cdrlType: string;
   applicability: SafetyApplicability;
   baseline: SpecBaseline;
+  projectId: string | null;
   status: SpecStatus;
   // Set when level === "Subsystem"; null otherwise.
   linkedSubsystemId: string | null;
@@ -255,6 +285,8 @@ export interface ContentEntry {
 }
 
 export interface Database {
+  programs: Program[];
+  projects: Project[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];

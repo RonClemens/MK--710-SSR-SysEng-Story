@@ -8,7 +8,9 @@ import type {
   DeltaMatrixRow,
   InterfaceRecord,
   LogicalSubsystem,
+  Program,
   ProgramPlanningDeliverable,
+  Project,
   Recommendation,
   SafetyDeliverable,
   Specification,
@@ -18,6 +20,8 @@ function entity<T extends { id: string }>(path: string, collection: Parameters<t
   return IS_STATIC_MODE ? makeLocalCrud<T>(collection) : makeCrud<T>(path);
 }
 
+export const programsApi = entity<Program>("/programs", "programs");
+export const projectsApi = entity<Project>("/projects", "projects");
 export const logicalSubsystemsApi = entity<LogicalSubsystem>("/subsystems", "logicalSubsystems");
 export const interfacesApi = entity<InterfaceRecord>("/interfaces", "interfaces");
 export const specificationsApi = entity<Specification>("/specifications", "specifications");

@@ -13,20 +13,33 @@ function normalize(db: Partial<Database>): Database {
     ...ci,
     subsystemIds: ci.subsystemIds ?? [],
     baseline: ci.baseline ?? "Baseline A",
+    projectId: ci.projectId ?? null,
     attachments: ci.attachments ?? [],
   }));
   const logicalSubsystems = (db.logicalSubsystems ?? []).map((s) => ({
     ...s,
     baseline: s.baseline ?? "Baseline A",
+    projectId: s.projectId ?? null,
   }));
   const cotsRecords = (db.cotsRecords ?? []).map((r) => ({ ...r, attachments: r.attachments ?? [] }));
-  const specifications = (db.specifications ?? []).map((s) => ({ ...s, attachments: s.attachments ?? [] }));
-  const safetyDeliverables = (db.safetyDeliverables ?? []).map((s) => ({ ...s, attachments: s.attachments ?? [] }));
+  const specifications = (db.specifications ?? []).map((s) => ({
+    ...s,
+    projectId: s.projectId ?? null,
+    attachments: s.attachments ?? [],
+  }));
+  const safetyDeliverables = (db.safetyDeliverables ?? []).map((s) => ({
+    ...s,
+    projectId: s.projectId ?? null,
+    attachments: s.attachments ?? [],
+  }));
   const programPlanningDeliverables = (db.programPlanningDeliverables ?? []).map((p) => ({
     ...p,
+    projectId: p.projectId ?? null,
     attachments: p.attachments ?? [],
   }));
   return {
+    programs: db.programs ?? [],
+    projects: db.projects ?? [],
     logicalSubsystems,
     cis,
     deltaMatrix: db.deltaMatrix ?? [],
@@ -53,7 +66,9 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.interfaces === undefined ||
     db.specifications === undefined ||
     db.safetyDeliverables === undefined ||
-    db.programPlanningDeliverables === undefined;
+    db.programPlanningDeliverables === undefined ||
+    db.programs === undefined ||
+    db.projects === undefined;
   return {
     db: {
       ...db,
@@ -62,6 +77,8 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       specifications: db.specifications ?? SEED_DATA.specifications,
       safetyDeliverables: db.safetyDeliverables ?? SEED_DATA.safetyDeliverables,
       programPlanningDeliverables: db.programPlanningDeliverables ?? SEED_DATA.programPlanningDeliverables,
+      programs: db.programs ?? SEED_DATA.programs,
+      projects: db.projects ?? SEED_DATA.projects,
     },
     changed,
   };

@@ -3,6 +3,8 @@ import { getDb, replaceDb } from "../db.js";
 import type { Database } from "../types.js";
 
 const REQUIRED_KEYS: (keyof Database)[] = [
+  "programs",
+  "projects",
   "logicalSubsystems",
   "cis",
   "deltaMatrix",

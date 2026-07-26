@@ -8,6 +8,8 @@ import {
   interfacesApi,
   logicalSubsystemsApi,
   programPlanningDeliverablesApi,
+  programsApi,
+  projectsApi,
   recommendationsApi,
   safetyDeliverablesApi,
   specificationsApi,
@@ -61,6 +63,8 @@ const TABS: { key: Tab; label: string }[] = [
 ];
 
 export default function App() {
+  const programs = useEntity(programsApi);
+  const projects = useEntity(projectsApi);
   const logicalSubsystems = useEntity(logicalSubsystemsApi);
   const cis = useEntity(cisApi);
   const deltaMatrix = useEntity(deltaMatrixApi);
@@ -84,6 +88,8 @@ export default function App() {
   }, []);
 
   function refreshAll() {
+    programs.refresh();
+    projects.refresh();
     logicalSubsystems.refresh();
     cis.refresh();
     deltaMatrix.refresh();
@@ -137,6 +143,11 @@ export default function App() {
             as="p"
             className="subtitle"
           />
+          {projects.rows[0] && (
+            <p className="hint" title="PKM Migration Step 1: Program / Project scope">
+              {programs.rows[0]?.name ?? "—"} → {projects.rows[0].name}
+            </p>
+          )}
         </div>
         <div className="header-actions">
           <label className="edit-mode-toggle">
