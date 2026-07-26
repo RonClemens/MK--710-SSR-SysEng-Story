@@ -405,6 +405,32 @@
       "baselineId": "BASELINE-A"
     }
   ],
+  "requirements": [
+    {
+      "id": "req-001",
+      "baselineId": "BASELINE-A",
+      "statement": "Test Set shall provide UUT stimulus/response interface per SFR-4.2.1.",
+      "satisfiedByCiIds": [
+        "ci-002",
+        "ci-003",
+        "ci-004"
+      ],
+      "parentRequirementId": null,
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "req-002",
+      "baselineId": "BASELINE-A",
+      "statement": "No independent SFR allocation exists for MCC; it is implicitly part of Test Set allocation.",
+      "satisfiedByCiIds": [
+        "ci-003"
+      ],
+      "parentRequirementId": "req-001",
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    }
+  ],
   "deltaMatrix": [
     {
       "id": "delta-001",
@@ -415,6 +441,7 @@
       "deltaSource": "Design reality vs. model",
       "rationale": "Sub-modules were introduced during detailed design for vendor sourcing reasons, not reflected back into the requirements model.",
       "disposition": "ECP required",
+      "requirementId": "req-001",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     },
@@ -427,6 +454,7 @@
       "deltaSource": "Model unvalidated vs. design",
       "rationale": "CI record was created early for CM tracking convenience and never reconciled against actual requirements allocation.",
       "disposition": "Accept as-is",
+      "requirementId": "req-002",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     }

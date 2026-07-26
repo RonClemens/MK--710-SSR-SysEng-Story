@@ -408,6 +408,34 @@ export const SEED_DATA: Database = {
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
   ],
+  // PKM Migration Step 4 (additive): promotes what delta-001/delta-002 below
+  // already implied -- a real requirement node, not just prose describing
+  // one. req-001 is the SFR-4.2.1 requirement itself, with satisfiedByCiIds
+  // reflecting the *as-built* decomposition (MHC/MCC/IPS) that delta-001
+  // exists to flag as a gap against the original single-CI allocation.
+  // req-002 has no clean "shall" statement to extract (see the migration
+  // plan's own allowance for this) and is modeled as implicitly part of
+  // req-001 via parentRequirementId, matching its own free-text description.
+  requirements: [
+    {
+      id: "req-001",
+      baselineId: "BASELINE-A",
+      statement: "Test Set shall provide UUT stimulus/response interface per SFR-4.2.1.",
+      satisfiedByCiIds: ["ci-002", "ci-003", "ci-004"],
+      parentRequirementId: null,
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "req-002",
+      baselineId: "BASELINE-A",
+      statement: "No independent SFR allocation exists for MCC; it is implicitly part of Test Set allocation.",
+      satisfiedByCiIds: ["ci-003"],
+      parentRequirementId: "req-001",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+  ],
   deltaMatrix: [
     {
       id: "delta-001",
@@ -420,6 +448,7 @@ export const SEED_DATA: Database = {
       rationale:
         "Sub-modules were introduced during detailed design for vendor sourcing reasons, not reflected back into the requirements model.",
       disposition: "ECP required",
+      requirementId: "req-001",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -434,6 +463,7 @@ export const SEED_DATA: Database = {
       rationale:
         "CI record was created early for CM tracking convenience and never reconciled against actual requirements allocation.",
       disposition: "Accept as-is",
+      requirementId: "req-002",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },

@@ -59,6 +59,11 @@ app is deployed for.
   `MilestoneStatus` enum) — both are structural, not domain content, even
   though their *values* reflect this program's real progress.
 
+### Requirement (added PKM Migration Step 4)
+- `statement`
+- Not marked: `satisfiedByCiIds`, `parentRequirementId` (both structural
+  references), `baselineId` (reference).
+
 ### LogicalSubsystem
 - `name`
 - `description`

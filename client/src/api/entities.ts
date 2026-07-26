@@ -14,6 +14,7 @@ import type {
   ProgramPlanningDeliverable,
   Project,
   Recommendation,
+  Requirement,
   SafetyDeliverable,
   Specification,
 } from "../types";
@@ -26,6 +27,7 @@ export const programsApi = entity<Program>("/programs", "programs");
 export const projectsApi = entity<Project>("/projects", "projects");
 export const baselinesApi = entity<Baseline>("/baselines", "baselines");
 export const milestonesApi = entity<Milestone>("/milestones", "milestones");
+export const requirementsApi = entity<Requirement>("/requirements", "requirements");
 export const logicalSubsystemsApi = entity<LogicalSubsystem>("/subsystems", "logicalSubsystems");
 export const interfacesApi = entity<InterfaceRecord>("/interfaces", "interfaces");
 export const specificationsApi = entity<Specification>("/specifications", "specifications");

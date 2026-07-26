@@ -13,6 +13,7 @@ import {
   programsApi,
   projectsApi,
   recommendationsApi,
+  requirementsApi,
   safetyDeliverablesApi,
   specificationsApi,
 } from "./api/entities";
@@ -72,6 +73,7 @@ export default function App() {
   const projects = useEntity(projectsApi);
   const baselines = useEntity(baselinesApi);
   const milestones = useEntity(milestonesApi);
+  const requirements = useEntity(requirementsApi);
   const logicalSubsystems = useEntity(logicalSubsystemsApi);
   const cis = useEntity(cisApi);
   const deltaMatrix = useEntity(deltaMatrixApi);
@@ -99,6 +101,7 @@ export default function App() {
     projects.refresh();
     baselines.refresh();
     milestones.refresh();
+    requirements.refresh();
     logicalSubsystems.refresh();
     cis.refresh();
     deltaMatrix.refresh();
@@ -243,7 +246,9 @@ export default function App() {
                   onSelectCi={selectCi}
                 />
               )}
-              {tab === "delta" && <DeltaMatrixPage entity={deltaMatrix} cis={cis.rows} />}
+              {tab === "delta" && (
+                <DeltaMatrixPage entity={deltaMatrix} cis={cis.rows} requirements={requirements.rows} />
+              )}
               {tab === "ab" && <AbCompatibilityPage entity={abCompatibility} cis={cis.rows} />}
               {tab === "cots" && <CotsRecordsPage entity={cotsRecords} cis={cis.rows} />}
               {tab === "specifications" && (
@@ -292,6 +297,7 @@ export default function App() {
                   programs={programs.rows}
                   projects={projects.rows}
                   milestones={milestones.rows}
+                  requirements={requirements.rows}
                   logicalSubsystems={logicalSubsystems.rows}
                   cis={cis.rows}
                   deltaMatrix={deltaMatrix.rows}

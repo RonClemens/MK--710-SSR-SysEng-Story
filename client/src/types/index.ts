@@ -177,6 +177,35 @@ export interface ConfigurationItem {
   updatedAt: string;
 }
 
+// PKM Migration Step 4 (additive): promotes the requirement-level structure
+// `DeltaMatrixRow` already implied (an SFR-agreed allocation vs. an as-built
+// decomposition) into a first-class, referenceable node. Per PKM's own
+// definition a Requirement is "a structural requirement node (not the
+// requirement text itself)" — real requirement content belongs in a
+// program's PDKM — but this app follows the same pragmatic pattern already
+// used for Specification/SafetyDeliverable/etc.: it stores illustrative
+// content directly (`statement`) rather than only a bare reference, marked
+// `@domain-placeholder` like those other entities' content fields.
+export interface Requirement {
+  id: string;
+  baselineId: string;
+  // @domain-placeholder
+  statement: string;
+  // Many-to-many, for the same reason `ConfigurationItem.subsystemIds` is:
+  // `delta-001`'s own over-decomposition finding is a real-world case of one
+  // requirement whose as-built satisfaction spans three separate CIs, not
+  // the single CI its SFR-agreed allocation named. Reflects the *current*
+  // as-built truth, not the historical paper allocation -- DeltaMatrixRow
+  // below is what tracks the gap between the two.
+  satisfiedByCiIds: string[];
+  // Supports requirement decomposition (e.g. req-002 below is implicitly
+  // part of req-001, per its own statement) -- not yet used for anything
+  // beyond a plain reference; no cycle/depth enforcement.
+  parentRequirementId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type DeltaSource = "Design reality vs. model" | "Model unvalidated vs. design" | "None";
 export type Disposition = "Accept as-is" | "ECP required" | "TBD pending analysis";
 
@@ -193,6 +222,11 @@ export interface DeltaMatrixRow {
   // @domain-placeholder
   rationale: string;
   disposition: Disposition;
+  // PKM Migration Step 4 (additive): superseded by requirementId for the
+  // structural relationship; sfrAllocation/actualDecomposition stay as the
+  // historical free-text record of the gap itself, per the same
+  // coexist-then-deprecate pattern Step 2 used for baseline/baselineId.
+  requirementId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -431,6 +465,7 @@ export interface Database {
   projects: Project[];
   baselines: Baseline[];
   milestones: Milestone[];
+  requirements: Requirement[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];

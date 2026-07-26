@@ -19,6 +19,7 @@ import {
   type ProgramPlanningDeliverable,
   type Project,
   type Recommendation,
+  type Requirement,
   type SafetyDeliverable,
   type Specification,
 } from "../types";
@@ -27,6 +28,7 @@ interface Props {
   programs: Program[];
   projects: Project[];
   milestones: Milestone[];
+  requirements: Requirement[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];
@@ -120,6 +122,7 @@ export function PromisesPage({
   programs,
   projects,
   milestones,
+  requirements,
   logicalSubsystems,
   cis,
   deltaMatrix,
@@ -136,6 +139,7 @@ export function PromisesPage({
       ...rowsFor("Program", programs, (r) => r.name, ["name", "description"]),
       ...rowsFor("Project", projects, (r) => r.name, ["name", "description"]),
       ...rowsFor("Milestone", milestones, (r) => `${r.event} (${r.baselineId})`, ["actualDate", "plannedDate"]),
+      ...rowsFor("Requirement", requirements, (r) => r.id, ["statement"]),
       ...rowsFor("Logical Subsystem", logicalSubsystems, (r) => r.name, ["name", "description"]),
       ...rowsFor("Configuration Item", cis, (r) => r.name, ["name", "consolidationNotes", "status", "notes"]),
       ...attachmentRowsFor("Configuration Item", cis, (r) => r.name),
@@ -183,6 +187,7 @@ export function PromisesPage({
       programs,
       projects,
       milestones,
+      requirements,
       logicalSubsystems,
       cis,
       deltaMatrix,

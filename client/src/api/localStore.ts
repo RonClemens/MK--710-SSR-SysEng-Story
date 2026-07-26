@@ -23,6 +23,7 @@ function normalize(db: Partial<Database>): Database {
     projectId: s.projectId ?? null,
     baselineId: s.baselineId ?? null,
   }));
+  const deltaMatrix = (db.deltaMatrix ?? []).map((r) => ({ ...r, requirementId: r.requirementId ?? null }));
   const cotsRecords = (db.cotsRecords ?? []).map((r) => ({ ...r, attachments: r.attachments ?? [] }));
   const specifications = (db.specifications ?? []).map((s) => ({
     ...s,
@@ -49,9 +50,10 @@ function normalize(db: Partial<Database>): Database {
     projects: db.projects ?? [],
     baselines: db.baselines ?? [],
     milestones: db.milestones ?? [],
+    requirements: db.requirements ?? [],
     logicalSubsystems,
     cis,
-    deltaMatrix: db.deltaMatrix ?? [],
+    deltaMatrix,
     abCompatibility: db.abCompatibility ?? [],
     cotsRecords,
     recommendations: db.recommendations ?? [],
@@ -79,7 +81,8 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.programs === undefined ||
     db.projects === undefined ||
     db.baselines === undefined ||
-    db.milestones === undefined;
+    db.milestones === undefined ||
+    db.requirements === undefined;
   return {
     db: {
       ...db,
@@ -92,6 +95,7 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       projects: db.projects ?? SEED_DATA.projects,
       baselines: db.baselines ?? SEED_DATA.baselines,
       milestones: db.milestones ?? SEED_DATA.milestones,
+      requirements: db.requirements ?? SEED_DATA.requirements,
     },
     changed,
   };

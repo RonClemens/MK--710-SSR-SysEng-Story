@@ -4,21 +4,29 @@ import { EditableText } from "../components/EditableText";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
 import { TRACEABILITY_HAZARD_NOTE } from "../../../methodology/guidance/safetyGuidance";
-import { DELTA_SOURCES, DISPOSITIONS, type ConfigurationItem, type DeltaMatrixRow } from "../types";
+import { DELTA_SOURCES, DISPOSITIONS, type ConfigurationItem, type DeltaMatrixRow, type Requirement } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
 interface Props {
   entity: ReturnType<typeof useEntity<DeltaMatrixRow>>;
   cis: ConfigurationItem[];
+  requirements: Requirement[];
 }
 
-export function DeltaMatrixPage({ entity, cis }: Props) {
+export function DeltaMatrixPage({ entity, cis, requirements }: Props) {
   const { rows, loading, error, create, update, remove } = entity;
   const [editing, setEditing] = useState<DeltaMatrixRow | "new" | null>(null);
 
   const ciOptions = cis.map((c) => c.id);
   const ciLabels = Object.fromEntries(cis.map((c) => [c.id, c.name]));
   const ciName = (id: string) => ciLabels[id] ?? "(unknown CI)";
+  const requirementsById = Object.fromEntries(requirements.map((r) => [r.id, r]));
+  // PKM Migration Step 4: the requirement's *current* as-built satisfaction,
+  // which can differ from this row's own sfrAllocation/actualDecomposition
+  // text -- that's exactly the gap this row exists to record.
+  function satisfiedBy(req: Requirement): string {
+    return req.satisfiedByCiIds.length === 0 ? "(none)" : req.satisfiedByCiIds.map(ciName).join(", ");
+  }
 
   const fields: FieldDef<DeltaMatrixRow>[] = [
     { key: "ciId", label: "CI", type: "select", options: ciOptions, optionLabels: ciLabels },
@@ -54,6 +62,21 @@ export function DeltaMatrixPage({ entity, cis }: Props) {
       label: "Disposition",
       filterOptions: DISPOSITIONS,
       filterValue: (r) => r.disposition,
+    },
+    {
+      key: "requirementId",
+      label: "Requirement (structural)",
+      render: (r) => {
+        const req = r.requirementId ? requirementsById[r.requirementId] : null;
+        if (!req) return "(unlinked)";
+        return (
+          <span title={req.statement}>
+            <span className="truncate">{req.statement}</span>
+            <br />
+            <span className="hint">satisfied by: {satisfiedBy(req)}</span>
+          </span>
+        );
+      },
     },
   ];
 
