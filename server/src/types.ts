@@ -1,3 +1,12 @@
+// Field marker convention: `@domain-placeholder` above a field means its
+// *value* in this app's mock-data is illustrative/fictional content a real
+// CUI deployment's PDKM must replace — as opposed to structural fields (ids,
+// foreign-key references, fixed enums, timestamps) that stay as-is
+// regardless of which program the app serves. See
+// data-schema/DOMAIN_PLACEHOLDER_FIELDS.md for the full per-entity manifest.
+// Deliberately schema-level, not applied to the mock-data strings themselves
+// — see that manifest's own note for why.
+
 // A link-only reference to a file/document the record relates to — no file
 // content is stored or uploaded, just a label and a URL (SharePoint, DOORS,
 // a network share, wherever the real CM system already hosts it). This app
@@ -5,6 +14,7 @@
 // files here — especially in the public static/Pages build — would be a CUI
 // exposure this app is explicitly built to avoid.
 export interface Attachment {
+  // @domain-placeholder
   label: string;
   url: string;
 }
@@ -17,7 +27,9 @@ export interface Attachment {
 // to scope to.
 export interface Program {
   id: string;
+  // @domain-placeholder
   name: string;
+  // @domain-placeholder
   description: string;
   createdAt: string;
   updatedAt: string;
@@ -25,7 +37,9 @@ export interface Program {
 
 export interface Project {
   id: string;
+  // @domain-placeholder
   name: string;
+  // @domain-placeholder
   description: string;
   programId: string;
   createdAt: string;
@@ -74,7 +88,9 @@ export type LogicalSubsystemSource =
 
 export interface LogicalSubsystem {
   id: string;
+  // @domain-placeholder
   name: string;
+  // @domain-placeholder
   description: string;
   source: LogicalSubsystemSource;
   // Which baseline's decomposition this subsystem belongs to. Baseline A and
@@ -95,6 +111,7 @@ export type CiTier = "Tier 1" | "Tier 2" | "Tier 3";
 
 export interface ConfigurationItem {
   id: string;
+  // @domain-placeholder
   name: string;
   type: CiType;
   tier: CiTier;
@@ -106,8 +123,11 @@ export interface ConfigurationItem {
   projectId: string | null;
   baselineId: string | null;
   overDecompositionFlag: boolean;
+  // @domain-placeholder
   consolidationNotes: string;
+  // @domain-placeholder
   status: string;
+  // @domain-placeholder
   notes: string;
   attachments: Attachment[];
   createdAt: string;
@@ -120,10 +140,14 @@ export type Disposition = "Accept as-is" | "ECP required" | "TBD pending analysi
 export interface DeltaMatrixRow {
   id: string;
   ciId: string;
+  // @domain-placeholder
   sfrAllocation: string;
+  // @domain-placeholder
   actualDecomposition: string;
+  // @domain-placeholder
   delta: string;
   deltaSource: DeltaSource;
+  // @domain-placeholder
   rationale: string;
   disposition: Disposition;
   createdAt: string;
@@ -135,9 +159,12 @@ export type CompatibilityStatus = "Aligned" | "Diverging" | "Divergence accepted
 export interface AbCompatibilityRow {
   id: string;
   ciId: string;
+  // @domain-placeholder
   baselineAState: string;
+  // @domain-placeholder
   baselineBIntent: string;
   compatibilityStatus: CompatibilityStatus;
+  // @domain-placeholder
   riskNote: string;
   lastReviewedDate: string;
   createdAt: string;
@@ -145,20 +172,28 @@ export interface AbCompatibilityRow {
 }
 
 export interface QualifiedAlternate {
+  // @domain-placeholder
   makeModelPartNumber: string;
+  // @domain-placeholder
   lifecycleStatus: string;
 }
 
 export interface CotsRecord {
   id: string;
   ciId: string;
+  // @domain-placeholder
   functionalRequirement: string;
+  // @domain-placeholder
   interfaceRequirement: string;
+  // @domain-placeholder
   formFitConstraints: string;
   verificationMethod: string;
+  // @domain-placeholder
   rationale: string;
+  // @domain-placeholder
   partsListEntry: string;
   qualifiedAlternates: QualifiedAlternate[];
+  // @domain-placeholder
   obsolescenceMonitoringNotes: string;
   attachments: Attachment[];
   createdAt: string;
@@ -176,9 +211,12 @@ export type RecommendationStatus = "open" | "in progress" | "done";
 
 export interface Recommendation {
   id: string;
+  // @domain-placeholder
   text: string;
   category: RecommendationCategory;
   status: RecommendationStatus;
+  // @domain-placeholder -- see PKM Migration Step 7: should become a
+  // constrained role type, not free text, before any real deployment.
   owner: string;
   relatedCiId: string | null;
   createdAt: string;
@@ -197,6 +235,7 @@ export interface InterfaceRecord {
   scope: InterfaceScope;
   aId: string;
   bId: string;
+  // @domain-placeholder
   description: string;
   createdAt: string;
   updatedAt: string;
@@ -231,10 +270,14 @@ export const SPEC_SECTION_KEYS = [
 ] as const;
 export type SpecSectionKey = (typeof SPEC_SECTION_KEYS)[number];
 
+// @domain-placeholder -- every section's text is program-specific requirement
+// content, not generic structure. The 12 keys themselves (scope, safety,
+// etc.) are the reusable DID-derived structure and stay as-is.
 export type SpecSections = Record<SpecSectionKey, string>;
 
 export interface Specification {
   id: string;
+  // @domain-placeholder
   title: string;
   level: SpecLevel;
   domain: SpecDomain;
@@ -262,6 +305,7 @@ export type SafetyApplicability = "Development" | "Production" | "Both";
 
 export interface SafetyDeliverable {
   id: string;
+  // @domain-placeholder
   title: string;
   level: SpecLevel;
   cdrlType: string;
@@ -274,8 +318,12 @@ export interface SafetyDeliverable {
   linkedSubsystemId: string | null;
   // Set when level === "CI"; null otherwise.
   linkedCiId: string | null;
+  // @domain-placeholder
   hazardExample: string;
+  // @domain-placeholder
   cdrlDescription: string;
+  // @domain-placeholder -- free text today; candidate for a milestoneId
+  // reference once PKM Migration Step 3 (Milestone entity) lands.
   deliveryMilestone: string;
   attachments: Attachment[];
   createdAt: string;
@@ -289,6 +337,7 @@ export interface SafetyDeliverable {
 // program/software planning documents SETR events also gate on.
 export interface ProgramPlanningDeliverable {
   id: string;
+  // @domain-placeholder
   title: string;
   level: SpecLevel;
   cdrlType: string;
@@ -301,7 +350,10 @@ export interface ProgramPlanningDeliverable {
   linkedSubsystemId: string | null;
   // Set when level === "CI"; null otherwise.
   linkedCiId: string | null;
+  // @domain-placeholder
   cdrlDescription: string;
+  // @domain-placeholder -- free text today; candidate for a milestoneId
+  // reference once PKM Migration Step 3 (Milestone entity) lands.
   deliveryMilestone: string;
   attachments: Attachment[];
   createdAt: string;
