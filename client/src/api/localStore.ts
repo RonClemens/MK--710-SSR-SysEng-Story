@@ -34,18 +34,21 @@ function normalize(db: Partial<Database>): Database {
     ...s,
     projectId: s.projectId ?? null,
     baselineId: s.baselineId ?? null,
+    milestoneId: s.milestoneId ?? null,
     attachments: s.attachments ?? [],
   }));
   const programPlanningDeliverables = (db.programPlanningDeliverables ?? []).map((p) => ({
     ...p,
     projectId: p.projectId ?? null,
     baselineId: p.baselineId ?? null,
+    milestoneId: p.milestoneId ?? null,
     attachments: p.attachments ?? [],
   }));
   return {
     programs: db.programs ?? [],
     projects: db.projects ?? [],
     baselines: db.baselines ?? [],
+    milestones: db.milestones ?? [],
     logicalSubsystems,
     cis,
     deltaMatrix: db.deltaMatrix ?? [],
@@ -75,7 +78,8 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.programPlanningDeliverables === undefined ||
     db.programs === undefined ||
     db.projects === undefined ||
-    db.baselines === undefined;
+    db.baselines === undefined ||
+    db.milestones === undefined;
   return {
     db: {
       ...db,
@@ -87,6 +91,7 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       programs: db.programs ?? SEED_DATA.programs,
       projects: db.projects ?? SEED_DATA.projects,
       baselines: db.baselines ?? SEED_DATA.baselines,
+      milestones: db.milestones ?? SEED_DATA.milestones,
     },
     changed,
   };

@@ -8,6 +8,7 @@ import {
   deltaMatrixApi,
   interfacesApi,
   logicalSubsystemsApi,
+  milestonesApi,
   programPlanningDeliverablesApi,
   programsApi,
   projectsApi,
@@ -67,6 +68,7 @@ export default function App() {
   const programs = useEntity(programsApi);
   const projects = useEntity(projectsApi);
   const baselines = useEntity(baselinesApi);
+  const milestones = useEntity(milestonesApi);
   const logicalSubsystems = useEntity(logicalSubsystemsApi);
   const cis = useEntity(cisApi);
   const deltaMatrix = useEntity(deltaMatrixApi);
@@ -93,6 +95,7 @@ export default function App() {
     programs.refresh();
     projects.refresh();
     baselines.refresh();
+    milestones.refresh();
     logicalSubsystems.refresh();
     cis.refresh();
     deltaMatrix.refresh();
@@ -268,6 +271,7 @@ export default function App() {
               {tab === "sempMigration" && (
                 <SempMigrationPage
                   baselines={baselines.rows}
+                  milestones={milestones.rows}
                   logicalSubsystems={logicalSubsystems.rows}
                   cis={cis.rows}
                   deltaMatrix={deltaMatrix.rows}

@@ -46,6 +46,7 @@ import type {
   DeltaMatrixRow,
   InterfaceRecord,
   LogicalSubsystem,
+  Milestone,
   ProgramPlanningDeliverable,
   Recommendation,
   SafetyDeliverable,
@@ -55,6 +56,7 @@ import type {
 
 export interface SempExportData {
   baselines: Baseline[];
+  milestones: Milestone[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];
@@ -592,6 +594,26 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     ),
   );
   lines.push(getValue("tdp.fcaPcaNote", FCA_PCA_NOTE));
+  lines.push("");
+
+  // PKM Migration Step 3: this Project's actual per-baseline milestone
+  // instance data (Workbench data, from the new Milestone entity) — kept as
+  // its own table, separate from the generic SETR_GUIDANCE table above, per
+  // this step's own explicit methodology/data split.
+  lines.push("**This Project's actual milestone status, by baseline** (Workbench data, not generic guidance):");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Baseline", "Event", "Status", "Actual Date", "Planned Date"],
+      data.milestones.map((m) => [
+        data.baselines.find((b) => b.id === m.baselineId)?.name ?? m.baselineId,
+        m.event,
+        m.status,
+        m.actualDate ?? "—",
+        m.plannedDate ?? "—",
+      ]),
+    ),
+  );
   lines.push("");
   lines.push(getValue("recurringTechActivities.intro", RECURRING_TECHNICAL_ACTIVITIES_INTRO));
   lines.push("");

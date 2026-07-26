@@ -70,13 +70,57 @@ export interface Baseline {
   name: SpecBaseline;
   baselineType: BaselineType;
   projectId: string;
-  // Nullable until PKM Migration Step 3 (Milestone entity) exists.
+  // References a Milestone below — the last Complete gate that currently
+  // defines this baseline's state (see Milestone's own comment for why
+  // "last Complete," not "current," gate). Nullable pending backfill.
   establishedAtMilestoneId: string | null;
   // Per PKM Entity Model §5 open question #1. Set on the newer/reconciling
   // baseline; the corresponding sibling should set reconciledIntoBaselineId
   // to point back, though nothing enforces that symmetry structurally yet.
   reconciledFromBaselineId: string | null;
   reconciledIntoBaselineId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type MilestoneEvent = "SRR" | "SFR" | "SSR" | "PDR" | "CDR" | "TRR" | "SVR" | "PRR";
+
+export const MILESTONE_EVENTS: MilestoneEvent[] = ["SRR", "SFR", "SSR", "PDR", "CDR", "TRR", "SVR", "PRR"];
+
+export type MilestoneStatus = "Not Started" | "In Progress" | "Complete";
+
+// PKM Migration Step 3 (additive): promotes SETR gate occurrences from the
+// `deliveryMilestone` free-text fields below to real, referenceable records.
+// `MilestoneEvent` mirrors ../../methodology/guidance/setrGuidance.ts's
+// `SetrEvent` values exactly and must be kept in sync with it by hand — the
+// same independently-maintained-mirror pattern this file already has with
+// client/src/types/index.ts (see this file's own header comment), extended
+// here to a second file for the same reason: no shared package to import
+// through.
+//
+// Explicit methodology/data split, per the migration plan's own instruction
+// for this step: `SETR_GUIDANCE` in the methodology layer stays the
+// permanent, generic definition of what SRR/SFR/PDR/etc. *mean* — nothing
+// about that moves here. This entity holds only this Project's actual
+// per-baseline instance data (status, dates) for each gate.
+//
+// Baseline A and Baseline B are independent timelines (see Baseline above),
+// so the same event (e.g. SRR) occurs as two distinct Milestone records, one
+// per baseline lineage, not one shared record. PKM's own model states a
+// Milestone "establishes one or more Baselines," which would allow a single
+// shared record; this app simplifies to exactly one baseline per Milestone
+// record, consistent with how Baseline's own per-lineage simplification
+// above already treats Baseline A and B as fully independent timelines.
+export interface Milestone {
+  id: string;
+  event: MilestoneEvent;
+  projectId: string;
+  baselineId: string;
+  status: MilestoneStatus;
+  // @domain-placeholder
+  actualDate: string | null;
+  // @domain-placeholder
+  plannedDate: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -322,9 +366,15 @@ export interface SafetyDeliverable {
   hazardExample: string;
   // @domain-placeholder
   cdrlDescription: string;
-  // @domain-placeholder -- free text today; candidate for a milestoneId
-  // reference once PKM Migration Step 3 (Milestone entity) lands.
+  // PKM Migration Step 3 (additive): superseded by milestoneId below for the
+  // closed set of known SETR events; kept during the transition per the
+  // same coexist-then-deprecate pattern Step 2 used for `baseline`/
+  // `baselineId`. A handful of pre-existing values here (e.g. "TBD pending
+  // subsystem validation") don't map to any single gate and are left with a
+  // null milestoneId rather than forced onto one.
   deliveryMilestone: string;
+  // Null where deliveryMilestone's value isn't one of the known SETR events.
+  milestoneId: string | null;
   attachments: Attachment[];
   createdAt: string;
   updatedAt: string;
@@ -352,9 +402,10 @@ export interface ProgramPlanningDeliverable {
   linkedCiId: string | null;
   // @domain-placeholder
   cdrlDescription: string;
-  // @domain-placeholder -- free text today; candidate for a milestoneId
-  // reference once PKM Migration Step 3 (Milestone entity) lands.
+  // PKM Migration Step 3 (additive): see the same field on SafetyDeliverable
+  // above for the coexist-then-deprecate rationale and the null-mapping note.
   deliveryMilestone: string;
+  milestoneId: string | null;
   attachments: Attachment[];
   createdAt: string;
   updatedAt: string;
@@ -382,6 +433,7 @@ export interface Database {
   programs: Program[];
   projects: Project[];
   baselines: Baseline[];
+  milestones: Milestone[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
   deltaMatrix: DeltaMatrixRow[];

@@ -9,6 +9,7 @@ import type {
   DeltaMatrixRow,
   InterfaceRecord,
   LogicalSubsystem,
+  Milestone,
   Program,
   ProgramPlanningDeliverable,
   Project,
@@ -24,6 +25,7 @@ function entity<T extends { id: string }>(path: string, collection: Parameters<t
 export const programsApi = entity<Program>("/programs", "programs");
 export const projectsApi = entity<Project>("/projects", "projects");
 export const baselinesApi = entity<Baseline>("/baselines", "baselines");
+export const milestonesApi = entity<Milestone>("/milestones", "milestones");
 export const logicalSubsystemsApi = entity<LogicalSubsystem>("/subsystems", "logicalSubsystems");
 export const interfacesApi = entity<InterfaceRecord>("/interfaces", "interfaces");
 export const specificationsApi = entity<Specification>("/specifications", "specifications");
