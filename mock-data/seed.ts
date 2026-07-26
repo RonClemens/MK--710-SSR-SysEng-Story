@@ -643,14 +643,21 @@ export const SEED_DATA: Database = {
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
   ],
+  // PKM Migration Step 7: owner is now a constrained role, assigned per
+  // recommendation (all three were previously unset free text -- no real
+  // value was lost in this conversion). resolvesGapId links rec-001/002
+  // to the real Gap records each one proposes to resolve; rec-003 has no
+  // corresponding Gap (it's an A/B alignment risk, not an over-decomposition
+  // finding) and stays null, per that field's own single-reference note.
   recommendations: [
     {
       id: "rec-001",
       text: "Consolidate MCC and IPS as COTS item records under the Test Set CI rather than standalone CIs; retire their independent CI records after CCB approval.",
       category: "CI structure",
       status: "open",
-      owner: "",
+      owner: "CM Lead",
       relatedCiId: "ci-001",
+      resolvesGapId: "gap-001",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -659,8 +666,9 @@ export const SEED_DATA: Database = {
       text: "Submit ECP to reconcile SFR-4.2.1 allocation with as-built Test Set sub-module decomposition.",
       category: "delta matrix",
       status: "open",
-      owner: "",
+      owner: "Lead Systems Engineer",
       relatedCiId: "ci-001",
+      resolvesGapId: "gap-003",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -669,8 +677,9 @@ export const SEED_DATA: Database = {
       text: "Stand up an adapter layer (or plan a UUT script rewrite) to bridge MHC's serial diagnostic protocol to Baseline B's Ethernet-based messaging before Baseline B System TRR.",
       category: "A-B alignment",
       status: "in progress",
-      owner: "",
+      owner: "Software Lead",
       relatedCiId: "ci-002",
+      resolvesGapId: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-06-15T00:00:00.000Z",
     },

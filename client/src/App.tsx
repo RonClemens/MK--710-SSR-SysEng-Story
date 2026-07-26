@@ -291,7 +291,7 @@ export default function App() {
                 />
               )}
               {tab === "recommendations" && (
-                <RecommendationsPage entity={recommendations} cis={cis.rows} />
+                <RecommendationsPage entity={recommendations} cis={cis.rows} gaps={gaps.rows} />
               )}
               {tab === "sempMigration" && (
                 <SempMigrationPage

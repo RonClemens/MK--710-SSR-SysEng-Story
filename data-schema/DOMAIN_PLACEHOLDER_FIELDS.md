@@ -120,9 +120,10 @@ app is deployed for.
 
 ### Recommendation
 - `text`
-- `owner` — free text today; per PKM Migration Step 7 this should become a
-  constrained role type before any real deployment, at which point this
-  entry should move to the "not marked" (fixed enum) category instead.
+- Not marked: `owner` (converted to the fixed `RecommendationOwnerRole`
+  enum in PKM Migration Step 7 — see that type's own comment on why this
+  taxonomy is a starting point, not a definitive one), `resolvesGapId`
+  (reference, added Step 7).
 
 ### InterfaceRecord
 - `description`

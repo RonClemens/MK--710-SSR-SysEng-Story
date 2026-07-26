@@ -177,7 +177,7 @@ export function PromisesPage({
       ]),
       ...attachmentRowsFor("COTS Record", cotsRecords, (r) => r.ciId),
       ...qualifiedAlternateRows(cotsRecords),
-      ...rowsFor("Recommendation", recommendations, (r) => r.category, ["text", "owner"]),
+      ...rowsFor("Recommendation", recommendations, (r) => r.category, ["text"]),
       ...rowsFor("Interface", interfaces, (r) => `${r.aId} ↔ ${r.bId}`, ["description"]),
       ...rowsFor("Specification", specifications, (r) => r.title, ["title"]),
       ...attachmentRowsFor("Specification", specifications, (r) => r.title),

@@ -414,16 +414,48 @@ export type RecommendationCategory =
   | "other";
 export type RecommendationStatus = "open" | "in progress" | "done";
 
+// PKM Migration Step 7: a starting SE program role taxonomy, per PKM's own
+// model (ActionItem assigned to a role, not a named person, by default).
+// Per the migration plan's own explicit deferral on this step ("worth a
+// short separate discussion... flag as an open question for Workbench's
+// own team, not something this plan should presume"), this is a
+// pragmatic first cut, not a definitive taxonomy -- a real deployment's
+// actual RACI conventions should replace it. "Lead Systems Engineer" is
+// the one role already referenced throughout this app's own guidance
+// content (see e.g. methodology/guidance/recoveryProgramGuidance.ts).
+export type RecommendationOwnerRole =
+  | "Lead Systems Engineer"
+  | "CM Lead"
+  | "Software Lead"
+  | "Safety Lead"
+  | "Program Manager";
+
+export const RECOMMENDATION_OWNER_ROLES: RecommendationOwnerRole[] = [
+  "Lead Systems Engineer",
+  "CM Lead",
+  "Software Lead",
+  "Safety Lead",
+  "Program Manager",
+];
+
 export interface Recommendation {
   id: string;
   // @domain-placeholder
   text: string;
   category: RecommendationCategory;
   status: RecommendationStatus;
-  // @domain-placeholder -- see PKM Migration Step 7: should become a
-  // constrained role type, not free text, before any real deployment.
-  owner: string;
+  // PKM Migration Step 7: constrained to RecommendationOwnerRole (was free
+  // text) -- null means not yet assigned to a role.
+  owner: RecommendationOwnerRole | null;
   relatedCiId: string | null;
+  // PKM Migration Step 7 (additive): the Gap this recommendation proposes
+  // to resolve, where one exists -- a single reference, not an array, per
+  // the same one-primary-reference simplification used elsewhere in this
+  // migration (see e.g. Requirement.parentRequirementId). relatedCiId is
+  // kept as-is rather than replaced, since it still carries information
+  // resolvesGapId doesn't (recommendations with no associated Gap, like
+  // rec-003's A/B alignment risk, still need a CI reference).
+  resolvesGapId: string | null;
   createdAt: string;
   updatedAt: string;
 }
