@@ -688,6 +688,46 @@ Explicit non-goal: no direct integration with any other tool (no API push, no
 file write to a shared/mounted location) — see
 [Non-goals](#non-goals-v1).
 
+## Acquisition Phase Workbench
+
+The app's **default landing view** is no longer the flat tab bar — it's a
+"left-to-right," time/phase-driven guided navigation built around the DoD
+Adaptive Acquisition Framework's Major Capability Acquisition (MCA)
+pathway: Materiel Solution Analysis → Technology Maturation & Risk
+Reduction → Engineering & Manufacturing Development → Production &
+Deployment → Operations & Support.
+
+- **Phase taxonomy** (`methodology/guidance/aafPhaseGuidance.ts`) bands the
+  same 8 SETR events this app already tracks (SRR through PRR) under the 5
+  MCA phases, the same banding technique `tdpGuidance.ts` already uses for
+  TDP maturity levels and IEEE 12207 software life-cycle groups — this is a
+  coarser lens over existing data, not a new taxonomy competing with it.
+  Materiel Solution Analysis and Operations & Support are explicit,
+  visibly-marked **stub phases**: this app's SETR modeling only spans
+  SRR–PRR, so those two phases show an out-of-scope note rather than
+  fabricated content. The pathway type (`AcquisitionPathway`) is
+  deliberately a one-member union (`"MCA"` only) — extensible later if a
+  program needs a different AAF pathway, but no pathway-selection UI or
+  schema field exists yet, since there's only one option to choose from
+  today.
+- **Baseline selector + phase stepper**: pick a baseline (Baseline A /
+  Baseline B), and the stepper highlights that baseline's *current* phase —
+  derived client-side from its `Milestone` records (the first SETR event
+  that isn't yet `Complete`), not a stored field. Browsing a different phase
+  than the current one shows its guidance and gate context read-only.
+- **Guided checklist panel**: when viewing a baseline's current phase, a
+  domain-grouped, click-to-answer panel over that milestone's `ChecklistItem`
+  records appears — status toggles (Not Evaluated/Met/Not Met/Waived) save
+  immediately on click, and a full-record edit/create form covers everything
+  else. This is the first real consumer of `ChecklistItem`'s own
+  forward-compatibility design intent from the PKM migration (a discrete,
+  user-answerable criterion + toggleable status + evidence reference).
+- **The original flat tab bar is fully preserved**, reachable via the **All
+  Tabs** toggle in the header (or the button inside the workbench itself) —
+  nothing about the 12 existing tabs' internals changed. Which view you land
+  on is remembered per-browser via `localStorage`, the same pattern used for
+  Edit Mode.
+
 ## PDKM Promises
 
 The **PDKM Promises** tab is a read-only, cross-entity browser over every
