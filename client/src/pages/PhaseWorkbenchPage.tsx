@@ -1,22 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { EditableText } from "../components/EditableText";
 import { PhaseStepper } from "../components/PhaseStepper";
+import { GuidedChecklistPanel } from "../components/GuidedChecklistPanel";
 import {
   AAF_PHASE_FRAMEWORK_INTRO,
   MCA_MILESTONE_GATES,
   MCA_PHASES,
   type AcquisitionPhaseId,
 } from "../../../methodology/guidance/aafPhaseGuidance";
-import { deriveCurrentPhase, milestoneStatusesForPhase } from "../utils/acquisitionPhase";
-import type { Baseline, Milestone } from "../types";
+import { deriveCurrentMilestone, deriveCurrentPhase, milestoneStatusesForPhase } from "../utils/acquisitionPhase";
+import type { Baseline, ChecklistItem, Milestone } from "../types";
+import type { useEntity } from "../hooks/useEntity";
 
 interface Props {
   baselines: Baseline[];
   milestones: Milestone[];
+  checklistItems: ReturnType<typeof useEntity<ChecklistItem>>;
   onSwitchToAllTabs: () => void;
 }
 
-export function PhaseWorkbenchPage({ baselines, milestones, onSwitchToAllTabs }: Props) {
+export function PhaseWorkbenchPage({ baselines, milestones, checklistItems, onSwitchToAllTabs }: Props) {
   const [selectedBaselineId, setSelectedBaselineId] = useState<string>("");
   const [selectedPhaseId, setSelectedPhaseId] = useState<AcquisitionPhaseId>("tmrr");
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -50,6 +53,9 @@ export function PhaseWorkbenchPage({ baselines, milestones, onSwitchToAllTabs }:
     : [];
   const entryGate = selectedPhase.entryMilestone ? MCA_MILESTONE_GATES[selectedPhase.entryMilestone] : null;
   const exitGate = selectedPhase.exitMilestone ? MCA_MILESTONE_GATES[selectedPhase.exitMilestone] : null;
+
+  const currentMilestone = selectedBaselineId ? deriveCurrentMilestone(milestones, selectedBaselineId) : null;
+  const isViewingCurrentPhase = currentPhase !== null && selectedPhaseId === currentPhase.id;
 
   return (
     <div className="page">
@@ -133,6 +139,10 @@ export function PhaseWorkbenchPage({ baselines, milestones, onSwitchToAllTabs }:
               </>
             )}
           </div>
+
+          {isViewingCurrentPhase && currentMilestone && (
+            <GuidedChecklistPanel milestone={currentMilestone} entity={checklistItems} />
+          )}
         </>
       )}
     </div>

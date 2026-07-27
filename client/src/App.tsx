@@ -235,6 +235,7 @@ export default function App() {
             <PhaseWorkbenchPage
               baselines={baselines.rows}
               milestones={milestones.rows}
+              checklistItems={checklistItems}
               onSwitchToAllTabs={() => setNavMode("allTabs")}
             />
           ) : (

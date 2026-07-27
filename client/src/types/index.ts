@@ -679,3 +679,12 @@ export const SPEC_STATUSES: SpecStatus[] = ["Draft", "In Review", "Approved", "U
 export const SAFETY_APPLICABILITIES: SafetyApplicability[] = ["Development", "Production", "Both"];
 
 export const MILESTONE_STATUSES: MilestoneStatus[] = ["Not Started", "In Progress", "Complete"];
+
+export const CHECKLIST_ITEM_STATUSES: ChecklistItemStatus[] = ["Not Evaluated", "Met", "Not Met", "Waived"];
+export const CHECKLIST_ITEM_EVIDENCE_TYPES: ChecklistItemEvidenceType[] = [
+  "Requirement",
+  "ConfigurationItem",
+  "SafetyDeliverable",
+  "ProgramPlanningDeliverable",
+  "VerificationEvent",
+];

@@ -1114,3 +1114,65 @@ button {
   margin: 0 0 0.3rem;
   color: var(--navy);
 }
+
+.guided-checklist-panel {
+  margin-top: 1.5rem;
+}
+
+.checklist-item-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--ice);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.checklist-item-card p {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.checklist-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.checklist-status-pill {
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.checklist-status-pill:hover {
+  border-color: var(--ice);
+}
+
+.checklist-status-pill.met.selected {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
+}
+
+.checklist-status-pill.not-met.selected {
+  background: #fbe9dd;
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.checklist-status-pill.waived.selected {
+  background: var(--ice-light);
+  border-color: var(--ice);
+  color: var(--navy);
+}
+
+.checklist-status-pill.not-evaluated.selected {
+  background: var(--ice-light);
+  border-color: var(--border);
+  color: var(--navy-dark);
+}
