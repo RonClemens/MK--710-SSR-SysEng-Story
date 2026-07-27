@@ -69,6 +69,11 @@ button {
 
 .app-main {
   flex: 1;
+  /* Flex items default to min-width: auto, which refuses to shrink below
+     the intrinsic width of their content (e.g. a fixed-width grid column) --
+     without this, narrow-viewport content pushes wider than the space left
+     by the AI panel rail and renders underneath it instead of wrapping. */
+  min-width: 0;
   padding: 1.5rem;
   overflow-y: auto;
 }
@@ -747,6 +752,19 @@ button {
     inset: 0;
     width: 100%;
     z-index: 100;
+  }
+
+  /* A fixed 160px label column is too cramped next to real sentence-length
+     values (e.g. Phase Workbench entry/exit gate text) on a narrow Android
+     portrait screen -- stack label above value instead of squeezing both
+     into one row. */
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 0.15rem 0;
+  }
+
+  .detail-grid dd {
+    margin-bottom: 0.6rem;
   }
 }
 
