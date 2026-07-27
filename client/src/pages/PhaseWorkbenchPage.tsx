@@ -9,6 +9,7 @@ import {
   type AcquisitionPhaseId,
 } from "../../../methodology/guidance/aafPhaseGuidance";
 import { deriveCurrentMilestone, deriveCurrentPhase, milestoneStatusesForPhase } from "../utils/acquisitionPhase";
+import { findIncoseSubProcess } from "../../../methodology/guidance/incoseGuidance";
 import type { Baseline, ChecklistItem, Milestone } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
@@ -155,6 +156,35 @@ export function PhaseWorkbenchPage({ baselines, milestones, checklistItems, onSw
                       {event}: {milestone ? milestone.status : "Not yet scheduled"}
                     </li>
                   ))}
+                </ul>
+              </>
+            )}
+
+            {selectedPhase.incoseFraming && (
+              <>
+                <p className="did-guidance-label">INCOSE Systems Engineering Handbook framing</p>
+                <EditableText
+                  contentKey={`aafPhase.${selectedPhase.id}.incoseFraming`}
+                  defaultValue={selectedPhase.incoseFraming}
+                  as="p"
+                  className="hint"
+                />
+              </>
+            )}
+
+            {selectedPhase.emphasizedIncoseSubProcesses.length > 0 && (
+              <>
+                <p className="did-guidance-label">Emphasized INCOSE technical processes</p>
+                <ul>
+                  {selectedPhase.emphasizedIncoseSubProcesses.map((name) => {
+                    const subProcess = findIncoseSubProcess(name);
+                    return (
+                      <li key={name}>
+                        <strong>{name}</strong>
+                        {subProcess && <> — {subProcess.appMapping}</>}
+                      </li>
+                    );
+                  })}
                 </ul>
               </>
             )}

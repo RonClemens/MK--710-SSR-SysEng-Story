@@ -52,6 +52,19 @@ export interface AcquisitionPhaseMeta {
   setrEvents: SetrEvent[];
   inScope: boolean;
   outOfScopeNote?: string;
+  // Sub-process names from incoseGuidance.ts's INCOSE_GROUP_META (Technical
+  // Processes and Technical Management Processes groups only -- Agreement
+  // and Organizational Project-Enabling Processes are already flagged
+  // out-of-scope there). Manually kept in sync by name, the same
+  // hand-mirrored-string convention this app already uses elsewhere (e.g.
+  // MilestoneEvent/SetrEvent) since there's no shared type to import
+  // through. Empty for stub phases.
+  emphasizedIncoseSubProcesses: string[];
+  // Optional deeper framing paragraph grounded in the INCOSE Handbook
+  // citations in incoseGuidance.ts (Vee model, DoD phase naming, baseline
+  // maturity) -- populated where that grounding adds real explanatory
+  // value, not on every phase.
+  incoseFraming?: string;
 }
 
 export const MCA_PHASES: AcquisitionPhaseMeta[] = [
@@ -65,6 +78,7 @@ export const MCA_PHASES: AcquisitionPhaseMeta[] = [
     setrEvents: [],
     inScope: false,
     outOfScopeNote: "This app's SETR modeling begins at SRR (TMRR-era); Materiel Solution Analysis has no represented content here.",
+    emphasizedIncoseSubProcesses: [],
   },
   {
     id: "tmrr",
@@ -75,16 +89,37 @@ export const MCA_PHASES: AcquisitionPhaseMeta[] = [
     exitMilestone: "MS-B",
     setrEvents: ["SRR", "SFR"],
     inScope: true,
+    emphasizedIncoseSubProcesses: ["Stakeholder Needs / System Requirements Definition", "Architecture Definition"],
+    incoseFraming:
+      "In the SEH 5th Edition's Vee model (§2.2.1), this phase is squarely on the left side, which INCOSE names " +
+      "\"system definition\": top-down elaboration from stakeholder needs through system requirements toward a " +
+      "validated functional architecture -- the same arc SRR and SFR close out in this app's SETR sequence.",
   },
   {
     id: "emd",
     name: "Engineering & Manufacturing Development",
     summary:
-      "Detailed design and build-to/code-to maturity -- from software/CI-level specification review through critical design.",
+      "Detailed design and build-to/code-to maturity -- from software/CI-level specification review through critical design. In INCOSE's own terms, this is where system definition gives way to system realization: architecture and design close out, and implementation, integration, and early verification activity ramp up.",
     entryMilestone: "MS-B",
     exitMilestone: "MS-C",
     setrEvents: ["SSR", "PDR", "CDR"],
     inScope: true,
+    emphasizedIncoseSubProcesses: [
+      "Architecture Definition",
+      "Design Definition",
+      "Implementation / Integration",
+      "Configuration Management",
+    ],
+    incoseFraming:
+      "This phase is where the SEH 5th Edition's Vee model pivots. System definition (architecture, largely " +
+      "closed out by SSR/PDR) gives way to what the Handbook calls system realization: \"the evolving baseline " +
+      "of system elements that are implemented, integrated, verified, and validated\" (§2.2.1). PDR establishes " +
+      "the Allocated Baseline and CDR an initial Product Baseline (§2.1.4, Figure 2.4) -- independently " +
+      "corroborating this app's existing OSD SEP Outline baseline-maturity citation (see DBx/MBx guidance) from " +
+      "a second source. INCOSE's own DoD comparison figure (Figure 2.2) names \"Engineering and Manufacturing " +
+      "Development\" explicitly, though — consistent with the Handbook's deliberately acquisition-neutral " +
+      "posture since its 2004/2006 editions — without further DoD-specific elaboration beyond that naming; the " +
+      "SSR/PDR/CDR banding used here is this app's own synthesis, not an INCOSE claim.",
   },
   {
     id: "pd",
@@ -95,6 +130,11 @@ export const MCA_PHASES: AcquisitionPhaseMeta[] = [
     exitMilestone: null,
     setrEvents: ["TRR", "SVR", "PRR"],
     inScope: true,
+    emphasizedIncoseSubProcesses: ["Verification / Validation", "Transition", "Configuration Management"],
+    incoseFraming:
+      "System realization continues here: Verification and Transition (SEH 5th Ed. §2.3.5.9–10) carry the " +
+      "Product Baseline from CDR through FCA/PCA to a final Product Baseline (§2.1.4, Figure 2.4) -- the same " +
+      "TRR/SVR/PRR range this app already tracks.",
   },
   {
     id: "os",
@@ -105,6 +145,7 @@ export const MCA_PHASES: AcquisitionPhaseMeta[] = [
     setrEvents: [],
     inScope: false,
     outOfScopeNote: "This app's SETR modeling ends at PRR; Operations & Support has no represented content here.",
+    emphasizedIncoseSubProcesses: [],
   },
 ];
 
