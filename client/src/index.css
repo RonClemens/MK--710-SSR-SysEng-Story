@@ -1133,7 +1133,8 @@ button {
   font-size: 0.9rem;
 }
 
-.checklist-status-row {
+.checklist-status-row,
+.cdrl-badge-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;

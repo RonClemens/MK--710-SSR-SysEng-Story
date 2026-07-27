@@ -236,7 +236,12 @@ export default function App() {
               baselines={baselines.rows}
               milestones={milestones.rows}
               checklistItems={checklistItems}
-              onSwitchToAllTabs={() => setNavMode("allTabs")}
+              safetyDeliverables={safetyDeliverables.rows}
+              planningDeliverables={planningDeliverables.rows}
+              onSwitchToAllTabs={(targetTab) => {
+                if (targetTab) setTab(targetTab);
+                setNavMode("allTabs");
+              }}
             />
           ) : (
             <>

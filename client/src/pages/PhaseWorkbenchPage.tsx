@@ -2,25 +2,42 @@ import { useEffect, useMemo, useState } from "react";
 import { EditableText } from "../components/EditableText";
 import { PhaseStepper } from "../components/PhaseStepper";
 import { GuidedChecklistPanel } from "../components/GuidedChecklistPanel";
+import { CdrlPhasePanel } from "../components/CdrlPhasePanel";
 import {
   AAF_PHASE_FRAMEWORK_INTRO,
   MCA_MILESTONE_GATES,
   MCA_PHASES,
   type AcquisitionPhaseId,
 } from "../../../methodology/guidance/aafPhaseGuidance";
-import { deriveCurrentMilestone, deriveCurrentPhase, milestoneStatusesForPhase } from "../utils/acquisitionPhase";
+import {
+  cdrlsForPhase,
+  deriveCurrentMilestone,
+  deriveCurrentPhase,
+  milestoneStatusesForPhase,
+} from "../utils/acquisitionPhase";
 import { findIncoseSubProcess } from "../../../methodology/guidance/incoseGuidance";
-import type { Baseline, ChecklistItem, Milestone } from "../types";
+import type { Baseline, ChecklistItem, Milestone, ProgramPlanningDeliverable, SafetyDeliverable } from "../types";
 import type { useEntity } from "../hooks/useEntity";
+
+type AllTabsTarget = "safetyDeliverables" | "planningDeliverables";
 
 interface Props {
   baselines: Baseline[];
   milestones: Milestone[];
   checklistItems: ReturnType<typeof useEntity<ChecklistItem>>;
-  onSwitchToAllTabs: () => void;
+  safetyDeliverables: SafetyDeliverable[];
+  planningDeliverables: ProgramPlanningDeliverable[];
+  onSwitchToAllTabs: (tab?: AllTabsTarget) => void;
 }
 
-export function PhaseWorkbenchPage({ baselines, milestones, checklistItems, onSwitchToAllTabs }: Props) {
+export function PhaseWorkbenchPage({
+  baselines,
+  milestones,
+  checklistItems,
+  safetyDeliverables,
+  planningDeliverables,
+  onSwitchToAllTabs,
+}: Props) {
   const [selectedBaselineId, setSelectedBaselineId] = useState<string>("");
   const [selectedPhaseId, setSelectedPhaseId] = useState<AcquisitionPhaseId>("tmrr");
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -57,12 +74,15 @@ export function PhaseWorkbenchPage({ baselines, milestones, checklistItems, onSw
 
   const currentMilestone = selectedBaselineId ? deriveCurrentMilestone(milestones, selectedBaselineId) : null;
   const isViewingCurrentPhase = currentPhase !== null && selectedPhaseId === currentPhase.id;
+  const cdrls = selectedBaselineId
+    ? cdrlsForPhase(safetyDeliverables, planningDeliverables, milestones, selectedBaselineId, selectedPhase)
+    : [];
 
   return (
     <div className="page">
       <div className="page-header">
         <h2>Acquisition Phase Workbench</h2>
-        <button className="button-secondary" onClick={onSwitchToAllTabs}>
+        <button className="button-secondary" onClick={() => onSwitchToAllTabs()}>
           All Tabs
         </button>
       </div>
@@ -189,6 +209,10 @@ export function PhaseWorkbenchPage({ baselines, milestones, checklistItems, onSw
               </>
             )}
           </div>
+
+          {selectedPhase.inScope && (
+            <CdrlPhasePanel cdrls={cdrls} onViewInAllTabs={onSwitchToAllTabs} />
+          )}
 
           {isViewingCurrentPhase && currentMilestone && (
             <GuidedChecklistPanel milestone={currentMilestone} entity={checklistItems} />

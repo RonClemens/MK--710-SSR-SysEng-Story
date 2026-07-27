@@ -1,4 +1,9 @@
-import { MILESTONE_EVENTS, type Milestone } from "../types";
+import {
+  MILESTONE_EVENTS,
+  type Milestone,
+  type ProgramPlanningDeliverable,
+  type SafetyDeliverable,
+} from "../types";
 import {
   AAF_PATHWAYS,
   type AcquisitionPathway,
@@ -52,4 +57,35 @@ export function milestoneStatusesForPhase(
 ): PhaseMilestoneStatus[] {
   const byEvent = new Map(milestones.filter((m) => m.baselineId === baselineId).map((m) => [m.event, m]));
   return phase.setrEvents.map((event) => ({ event, milestone: byEvent.get(event) }));
+}
+
+export type PhaseCdrl =
+  | { kind: "safety"; record: SafetyDeliverable }
+  | { kind: "planning"; record: ProgramPlanningDeliverable };
+
+// Which CDRLs (Safety + Program Planning deliverables) are due in this
+// phase, for this baseline -- derived entirely from each record's existing
+// milestoneId (set during the PKM migration), never a stored field of its
+// own. Records with a null milestoneId (deliveryMilestone values that don't
+// map onto a known SETR event) are intentionally excluded rather than
+// guessed at, matching those entities' own "not forced onto one" comment.
+export function cdrlsForPhase(
+  safetyDeliverables: SafetyDeliverable[],
+  planningDeliverables: ProgramPlanningDeliverable[],
+  milestones: Milestone[],
+  baselineId: string,
+  phase: AcquisitionPhaseMeta,
+): PhaseCdrl[] {
+  const inPhaseMilestoneIds = new Set(
+    milestones
+      .filter((m) => m.baselineId === baselineId && phase.setrEvents.includes(m.event))
+      .map((m) => m.id),
+  );
+  const safety: PhaseCdrl[] = safetyDeliverables
+    .filter((d) => d.milestoneId && inPhaseMilestoneIds.has(d.milestoneId))
+    .map((record) => ({ kind: "safety", record }));
+  const planning: PhaseCdrl[] = planningDeliverables
+    .filter((d) => d.milestoneId && inPhaseMilestoneIds.has(d.milestoneId))
+    .map((record) => ({ kind: "planning", record }));
+  return [...safety, ...planning];
 }
