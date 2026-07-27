@@ -55,6 +55,18 @@ interface PromiseRow {
   value: string;
 }
 
+interface PromiseElement {
+  entity: string;
+  recordId: string;
+  recordLabel: string;
+  fields: { field: string; value: string }[];
+}
+
+interface PromiseGroup {
+  group: string;
+  elements: PromiseElement[];
+}
+
 // This entity/field list must match data-schema/DOMAIN_PLACEHOLDER_FIELDS.md
 // exactly -- kept in sync by hand, the same as every other dual-maintained
 // list in this app (see that manifest's own note pointing back here).
@@ -122,6 +134,51 @@ function specSectionRows(specifications: Specification[]): PromiseRow[] {
       value: s.sections[key],
     })),
   );
+}
+
+// Major groups are a curated consolidation of the ~18 underlying entity
+// types above, grouped by SE domain area rather than 1:1 with each type --
+// this is what makes the collapse/expand view usable instead of just
+// replacing one long flat list with 18 short ones.
+const ENTITY_GROUPS: Record<string, string> = {
+  Program: "Program & Project",
+  Project: "Program & Project",
+  Milestone: "Schedule & Milestones",
+  Requirement: "Requirements & Verification",
+  "Verification Event": "Requirements & Verification",
+  "Checklist Item": "Requirements & Verification",
+  Gap: "Gaps & Recommendations",
+  Recommendation: "Gaps & Recommendations",
+  "Logical Subsystem": "Technical Baseline",
+  "Configuration Item": "Technical Baseline",
+  Interface: "Technical Baseline",
+  "Delta Matrix Row": "Traceability & Compatibility",
+  "A/B Compatibility Row": "Traceability & Compatibility",
+  "COTS Record": "COTS & Parts",
+  "Qualified Alternate (COTS Record)": "COTS & Parts",
+  Specification: "Specifications",
+  "Specification Section": "Specifications",
+  "Safety Deliverable": "Safety",
+  "Program Planning Deliverable": "Program Planning",
+};
+
+const GROUP_ORDER = [
+  "Program & Project",
+  "Schedule & Milestones",
+  "Requirements & Verification",
+  "Gaps & Recommendations",
+  "Technical Baseline",
+  "Traceability & Compatibility",
+  "COTS & Parts",
+  "Specifications",
+  "Safety",
+  "Program Planning",
+  "Attachments",
+];
+
+function groupFor(entity: string): string {
+  if (entity.startsWith("Attachment")) return "Attachments";
+  return ENTITY_GROUPS[entity] ?? "Other";
 }
 
 export function PromisesPage({
@@ -217,10 +274,95 @@ export function PromisesPage({
     ],
   );
 
-  const entities = useMemo(() => Array.from(new Set(allRows.map((r) => r.entity))).sort(), [allRows]);
-  const [entityFilter, setEntityFilter] = useState("");
+  // Two-level hierarchy: major group -> data element (entity + record),
+  // each element carrying its own field/value pairs as leaves.
+  const groupedData = useMemo<PromiseGroup[]>(() => {
+    const elementsByGroup = new Map<string, Map<string, PromiseElement>>();
+    for (const row of allRows) {
+      const group = groupFor(row.entity);
+      if (!elementsByGroup.has(group)) elementsByGroup.set(group, new Map());
+      const elements = elementsByGroup.get(group)!;
+      const key = `${row.entity}::${row.recordId}`;
+      let element = elements.get(key);
+      if (!element) {
+        element = { entity: row.entity, recordId: row.recordId, recordLabel: row.recordLabel, fields: [] };
+        elements.set(key, element);
+      }
+      element.fields.push({ field: row.field, value: row.value });
+    }
+    const extraGroups = Array.from(elementsByGroup.keys()).filter((g) => !GROUP_ORDER.includes(g));
+    return [...GROUP_ORDER, ...extraGroups]
+      .filter((g) => elementsByGroup.has(g))
+      .map((group) => ({ group, elements: Array.from(elementsByGroup.get(group)!.values()) }));
+  }, [allRows]);
 
-  const visibleRows = entityFilter ? allRows.filter((r) => r.entity === entityFilter) : allRows;
+  const groupCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const g of groupedData) {
+      counts.set(
+        g.group,
+        g.elements.reduce((sum, el) => sum + el.fields.length, 0),
+      );
+    }
+    return counts;
+  }, [groupedData]);
+
+  const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set());
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [search, setSearch] = useState("");
+  const searchTerm = search.trim().toLowerCase();
+
+  function toggleGroupFilter(group: string) {
+    setSelectedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(group)) next.delete(group);
+      else next.add(group);
+      return next;
+    });
+  }
+
+  function toggleCollapsed(group: string) {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(group)) next.delete(group);
+      else next.add(group);
+      return next;
+    });
+  }
+
+  // Search filters down to matching field rows, but never drops the
+  // group/element headers wrapping them -- a match always stays visible
+  // inside its full hierarchical context, never as a bare flat row.
+  const visibleGroups = useMemo(() => {
+    return groupedData
+      .filter((g) => selectedGroups.size === 0 || selectedGroups.has(g.group))
+      .map((g) => {
+        if (!searchTerm) return g;
+        const elements = g.elements
+          .map((el) => {
+            const wholeRecordMatches =
+              el.entity.toLowerCase().includes(searchTerm) || el.recordLabel.toLowerCase().includes(searchTerm);
+            const fields = wholeRecordMatches
+              ? el.fields
+              : el.fields.filter(
+                  (f) => f.field.toLowerCase().includes(searchTerm) || f.value.toLowerCase().includes(searchTerm),
+                );
+            return { ...el, fields };
+          })
+          .filter((el) => el.fields.length > 0);
+        return { ...g, elements };
+      })
+      .filter((g) => g.elements.length > 0);
+  }, [groupedData, selectedGroups, searchTerm]);
+
+  const visibleValueCount = visibleGroups.reduce(
+    (sum, g) => sum + g.elements.reduce((s, el) => s + el.fields.length, 0),
+    0,
+  );
+
+  // A search match always forces its group open, regardless of manual
+  // collapse state, so results are never hidden behind a closed header.
+  const isExpanded = (group: string) => searchTerm !== "" || !collapsedGroups.has(group);
 
   return (
     <div className="page">
@@ -239,51 +381,85 @@ export function PromisesPage({
       <EditableText contentKey="promises.rippleNote" defaultValue={PDKM_PROMISE_RIPPLE_NOTE} as="p" className="hint" />
 
       <p className="did-guidance-label">
-        {visibleRows.length} promised value{visibleRows.length === 1 ? "" : "s"} shown, {allRows.length} total across{" "}
-        {entities.length} entity types
+        {visibleValueCount} promised value{visibleValueCount === 1 ? "" : "s"} shown, {allRows.length} total across{" "}
+        {groupedData.length} groups
       </p>
 
-      <label className="filter-control">
-        <span>Entity</span>
-        <select value={entityFilter} onChange={(e) => setEntityFilter(e.target.value)}>
-          <option value="">All</option>
-          {entities.map((e) => (
-            <option key={e} value={e}>
-              {e}
-            </option>
-          ))}
-        </select>
+      <div className="pill-filter-row">
+        <button
+          type="button"
+          className={`pill-filter${selectedGroups.size === 0 ? " active" : ""}`}
+          onClick={() => setSelectedGroups(new Set())}
+        >
+          All
+        </button>
+        {groupedData.map((g) => (
+          <button
+            key={g.group}
+            type="button"
+            className={`pill-filter${selectedGroups.has(g.group) ? " active" : ""}`}
+            onClick={() => toggleGroupFilter(g.group)}
+          >
+            {g.group} ({groupCounts.get(g.group) ?? 0})
+          </button>
+        ))}
+      </div>
+
+      <label className="filter-control search-control">
+        <span>Search</span>
+        <input
+          type="text"
+          placeholder="Search entity, record, field, or value…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </label>
 
-      <div className="table-scroll">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Entity</th>
-              <th>Record</th>
-              <th>Field</th>
-              <th>Current (synthetic) value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visibleRows.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="empty-row">
-                  No promised values.
-                </td>
-              </tr>
-            ) : (
-              visibleRows.map((r) => (
-                <tr key={`${r.entity}-${r.recordId}-${r.field}`}>
-                  <td>{r.entity}</td>
-                  <td className="truncate">{r.recordLabel}</td>
-                  <td>{r.field}</td>
-                  <td className="truncate">{r.value}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      <div className="promises-groups">
+        {visibleGroups.length === 0 ? (
+          <p className="empty-row">No promised values match this filter.</p>
+        ) : (
+          visibleGroups.map((g) => {
+            const expanded = isExpanded(g.group);
+            const groupValueCount = g.elements.reduce((s, el) => s + el.fields.length, 0);
+            return (
+              <div className="promise-group" key={g.group}>
+                <button
+                  type="button"
+                  className="promise-group-header"
+                  onClick={() => toggleCollapsed(g.group)}
+                  aria-expanded={expanded}
+                >
+                  <span className={`promise-group-chevron${expanded ? " expanded" : ""}`}>▶</span>
+                  <span className="promise-group-title">{g.group}</span>
+                  <span className="promise-group-count">
+                    {groupValueCount} value{groupValueCount === 1 ? "" : "s"}
+                  </span>
+                </button>
+                {expanded && (
+                  <div className="promise-group-body">
+                    {g.elements.map((el) => (
+                      <div className="promise-element" key={`${el.entity}-${el.recordId}`}>
+                        <div className="promise-element-name">
+                          <span className="promise-element-entity">{el.entity}</span>
+                          <span className="promise-element-label">{el.recordLabel}</span>
+                        </div>
+                        <dl className="promise-element-fields">
+                          {el.fields.map((f) => (
+                            <div className="promise-field-row" key={f.field}>
+                              <dt>{f.field}</dt>
+                              <dd>{f.value}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

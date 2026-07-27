@@ -857,6 +857,158 @@ button {
   resize: none;
 }
 
+.pill-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.pill-filter {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.8rem;
+}
+
+.pill-filter:hover {
+  border-color: var(--ice);
+  color: var(--navy);
+}
+
+.pill-filter.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
+}
+
+.search-control {
+  min-width: 260px;
+  max-width: 420px;
+  margin: 0.75rem 0 1rem;
+}
+
+.search-control input[type="text"] {
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.promises-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.promise-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.promise-group-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--ice-light);
+  border: none;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.promise-group-chevron {
+  display: inline-block;
+  transition: transform 0.15s ease;
+  color: var(--navy);
+  font-size: 0.7rem;
+}
+
+.promise-group-chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.promise-group-title {
+  flex: 1;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.promise-group-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.promise-group-body {
+  padding: 0.75rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.promise-element {
+  border-top: 1px solid var(--border);
+  padding-top: 0.7rem;
+}
+
+.promise-element:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.promise-element-name {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.promise-element-entity {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--amber);
+}
+
+.promise-element-label {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.promise-element-fields {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.promise-field-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.promise-field-row dt {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.promise-field-row dd {
+  margin: 0;
+  color: var(--text);
+}
+
 .architecture-footer {
   position: fixed;
   bottom: 0;
