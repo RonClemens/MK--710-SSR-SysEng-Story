@@ -99,10 +99,20 @@ export function PhaseWorkbenchPage({ baselines, milestones, checklistItems, onSw
 
           <div className="phase-detail-panel">
             <h3>{selectedPhase.name}</h3>
-            <p className="hint">{selectedPhase.summary}</p>
+            <EditableText
+              contentKey={`aafPhase.${selectedPhase.id}.summary`}
+              defaultValue={selectedPhase.summary}
+              as="p"
+              className="hint"
+            />
 
             {!selectedPhase.inScope && selectedPhase.outOfScopeNote && (
-              <p className="hint">{selectedPhase.outOfScopeNote}</p>
+              <EditableText
+                contentKey={`aafPhase.${selectedPhase.id}.outOfScopeNote`}
+                defaultValue={selectedPhase.outOfScopeNote}
+                as="p"
+                className="hint"
+              />
             )}
 
             {(entryGate || exitGate) && (
@@ -111,7 +121,12 @@ export function PhaseWorkbenchPage({ baselines, milestones, checklistItems, onSw
                   <>
                     <dt>Entry gate</dt>
                     <dd>
-                      {entryGate.name} — {entryGate.decisionSummary}
+                      {entryGate.name} —{" "}
+                      <EditableText
+                        contentKey={`aafMilestone.${entryGate.id}.decisionSummary`}
+                        defaultValue={entryGate.decisionSummary}
+                        as="span"
+                      />
                     </dd>
                   </>
                 )}
@@ -119,7 +134,12 @@ export function PhaseWorkbenchPage({ baselines, milestones, checklistItems, onSw
                   <>
                     <dt>Exit gate</dt>
                     <dd>
-                      {exitGate.name} — {exitGate.decisionSummary}
+                      {exitGate.name} —{" "}
+                      <EditableText
+                        contentKey={`aafMilestone.${exitGate.id}.decisionSummary`}
+                        defaultValue={exitGate.decisionSummary}
+                        as="span"
+                      />
                     </dd>
                   </>
                 )}
