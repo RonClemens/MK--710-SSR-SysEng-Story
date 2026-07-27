@@ -16,8 +16,16 @@ import {
   milestoneStatusesForPhase,
 } from "../utils/acquisitionPhase";
 import { findIncoseSubProcess } from "../../../methodology/guidance/incoseGuidance";
-import type { Baseline, ChecklistItem, Milestone, ProgramPlanningDeliverable, SafetyDeliverable } from "../types";
+import type {
+  Baseline,
+  ChecklistItem,
+  Milestone,
+  ProgramPlanningDeliverable,
+  SafetyDeliverable,
+  SpecStatus,
+} from "../types";
 import type { useEntity } from "../hooks/useEntity";
+import type { PhaseCdrl } from "../utils/acquisitionPhase";
 
 type AllTabsTarget = "safetyDeliverables" | "planningDeliverables";
 
@@ -25,8 +33,8 @@ interface Props {
   baselines: Baseline[];
   milestones: Milestone[];
   checklistItems: ReturnType<typeof useEntity<ChecklistItem>>;
-  safetyDeliverables: SafetyDeliverable[];
-  planningDeliverables: ProgramPlanningDeliverable[];
+  safetyDeliverables: ReturnType<typeof useEntity<SafetyDeliverable>>;
+  planningDeliverables: ReturnType<typeof useEntity<ProgramPlanningDeliverable>>;
   onSwitchToAllTabs: (tab?: AllTabsTarget) => void;
 }
 
@@ -75,8 +83,13 @@ export function PhaseWorkbenchPage({
   const currentMilestone = selectedBaselineId ? deriveCurrentMilestone(milestones, selectedBaselineId) : null;
   const isViewingCurrentPhase = currentPhase !== null && selectedPhaseId === currentPhase.id;
   const cdrls = selectedBaselineId
-    ? cdrlsForPhase(safetyDeliverables, planningDeliverables, milestones, selectedBaselineId, selectedPhase)
+    ? cdrlsForPhase(safetyDeliverables.rows, planningDeliverables.rows, milestones, selectedBaselineId, selectedPhase)
     : [];
+
+  function updateCdrlStatus(cdrl: PhaseCdrl, status: SpecStatus) {
+    if (cdrl.kind === "safety") safetyDeliverables.update(cdrl.record.id, { status });
+    else planningDeliverables.update(cdrl.record.id, { status });
+  }
 
   return (
     <div className="page">
@@ -211,7 +224,7 @@ export function PhaseWorkbenchPage({
           </div>
 
           {selectedPhase.inScope && (
-            <CdrlPhasePanel cdrls={cdrls} onViewInAllTabs={onSwitchToAllTabs} />
+            <CdrlPhasePanel cdrls={cdrls} onUpdateStatus={updateCdrlStatus} onViewInAllTabs={onSwitchToAllTabs} />
           )}
 
           {isViewingCurrentPhase && currentMilestone && (

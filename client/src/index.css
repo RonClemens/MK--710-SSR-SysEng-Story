@@ -1177,3 +1177,22 @@ button {
   border-color: var(--border);
   color: var(--navy-dark);
 }
+
+.cdrl-status-pill {
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.cdrl-status-pill:hover {
+  border-color: var(--ice);
+}
+
+.cdrl-status-pill.selected {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
+}
