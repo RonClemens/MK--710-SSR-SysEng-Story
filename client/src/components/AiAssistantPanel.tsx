@@ -94,7 +94,16 @@ export function AiAssistantPanel({ serverAiEnabled }: Props) {
   return (
     <div className={`ai-panel ${open ? "open" : "closed"}`}>
       <button className="ai-panel-toggle" onClick={() => setOpen((v) => !v)}>
-        {open ? "Close AI Assistant ▸" : "◂ AI Assistant"}
+        {open ? (
+          <>
+            <span>Close AI Assistant</span>
+            <span className="ai-panel-close-icon" aria-hidden="true">
+              ×
+            </span>
+          </>
+        ) : (
+          "◂ AI Assistant"
+        )}
       </button>
       {open && (
         <div className="ai-panel-body">

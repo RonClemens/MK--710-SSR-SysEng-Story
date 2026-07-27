@@ -742,8 +742,18 @@ button {
 }
 
 .ai-panel.open .ai-panel-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
   padding: 0.6rem 0.9rem;
-  text-align: left;
+  text-align: right;
+}
+
+.ai-panel-close-icon {
+  font-size: 1.3rem;
+  line-height: 1;
 }
 
 @media (max-width: 720px) {
