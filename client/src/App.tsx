@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useEntity } from "./hooks/useEntity";
+import { useNavMode } from "./hooks/useNavMode";
 import {
   abCompatibilityApi,
   baselinesApi,
@@ -35,6 +36,7 @@ import { SafetyDeliverablesPage } from "./pages/SafetyDeliverablesPage";
 import { PlanningDeliverablesPage } from "./pages/PlanningDeliverablesPage";
 import { SempMigrationPage } from "./pages/SempMigrationPage";
 import { PromisesPage } from "./pages/PromisesPage";
+import { PhaseWorkbenchPage } from "./pages/PhaseWorkbenchPage";
 import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { EditableText } from "./components/EditableText";
@@ -97,6 +99,7 @@ export default function App() {
   const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
   const [serverAiEnabled, setServerAiEnabled] = useState(false);
   const { editMode, setEditMode } = useSiteContent();
+  const [navMode, setNavMode] = useNavMode();
 
   useEffect(() => {
     api.config().then((cfg) => setServerAiEnabled(cfg.aiEnabled));
@@ -171,6 +174,12 @@ export default function App() {
           )}
         </div>
         <div className="header-actions">
+          <button
+            className="button-secondary"
+            onClick={() => setNavMode(navMode === "wizard" ? "allTabs" : "wizard")}
+          >
+            {navMode === "wizard" ? "All Tabs" : "Guided View"}
+          </button>
           <label className="edit-mode-toggle">
             <input type="checkbox" checked={editMode} onChange={(e) => setEditMode(e.target.checked)} />
             Edit Mode
@@ -221,6 +230,12 @@ export default function App() {
               }}
               onSelectSubsystem={selectSubsystem}
               onSelectCi={selectCi}
+            />
+          ) : navMode === "wizard" ? (
+            <PhaseWorkbenchPage
+              baselines={baselines.rows}
+              milestones={milestones.rows}
+              onSwitchToAllTabs={() => setNavMode("allTabs")}
             />
           ) : (
             <>

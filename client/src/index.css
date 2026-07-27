@@ -1028,3 +1028,89 @@ button {
 .architecture-footer a:hover {
   text-decoration: underline;
 }
+
+/* Acquisition Phase Workbench */
+
+.phase-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 1rem;
+  margin: 1rem 0;
+}
+
+.phase-step {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  min-width: 160px;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.phase-step:hover {
+  border-color: var(--ice);
+}
+
+.phase-step.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
+}
+
+.phase-step.active .phase-step-gate-badge {
+  background: var(--ice-light);
+  color: var(--navy-dark);
+}
+
+.phase-step.current {
+  border-bottom: 3px solid var(--amber);
+}
+
+.phase-step.out-of-scope {
+  opacity: 0.55;
+}
+
+.phase-step-name {
+  font-weight: 600;
+}
+
+.phase-step-gate-badge {
+  display: inline-block;
+  background: var(--ice);
+  color: var(--navy-dark);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.phase-step-current-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--amber);
+}
+
+.phase-step.active .phase-step-current-label {
+  color: var(--ice-light);
+}
+
+.phase-detail-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.phase-detail-panel h3 {
+  margin: 0 0 0.3rem;
+  color: var(--navy);
+}

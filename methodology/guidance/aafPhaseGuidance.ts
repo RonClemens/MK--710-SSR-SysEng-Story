@@ -1,0 +1,123 @@
+import type { SetrEvent } from "./setrGuidance";
+
+// Only MCA (Major Capability Acquisition) is populated today. This is
+// deliberately extensible -- adding a second pathway (e.g. the Software
+// Acquisition Pathway) later means adding a new key to AAF_PATHWAYS, not
+// changing this shape or touching any MCA content. No `pathway` field
+// exists anywhere in the entity schema yet; every consumer of this module
+// hardcodes "MCA" until a program actually needs to choose between
+// pathways.
+export type AcquisitionPathway = "MCA";
+
+export type AcquisitionPhaseId = "msa" | "tmrr" | "emd" | "pd" | "os";
+
+export type AcquisitionMilestoneId = "MS-A" | "MS-B" | "MS-C";
+
+export interface AcquisitionMilestoneMeta {
+  id: AcquisitionMilestoneId;
+  name: string;
+  decisionSummary: string;
+}
+
+export const MCA_MILESTONE_GATES: Record<AcquisitionMilestoneId, AcquisitionMilestoneMeta> = {
+  "MS-A": {
+    id: "MS-A",
+    name: "Milestone A",
+    decisionSummary:
+      "Authorizes entry into Technology Maturation & Risk Reduction -- approves pursuing one or more specific technology/design approaches.",
+  },
+  "MS-B": {
+    id: "MS-B",
+    name: "Milestone B",
+    decisionSummary:
+      "Authorizes entry into Engineering & Manufacturing Development -- the program commits to a specific design approach and enters detailed design.",
+  },
+  "MS-C": {
+    id: "MS-C",
+    name: "Milestone C",
+    decisionSummary:
+      "Authorizes entry into Production & Deployment -- Low-Rate Initial Production and/or fielding, gated by developmental test results from EMD.",
+  },
+};
+
+export interface AcquisitionPhaseMeta {
+  id: AcquisitionPhaseId;
+  name: string;
+  summary: string;
+  entryMilestone: AcquisitionMilestoneId | null;
+  exitMilestone: AcquisitionMilestoneId | null;
+  // The SETR events (from setrGuidance.ts) this phase bands together --
+  // empty for stub phases, since this app has no represented content
+  // outside SRR through PRR.
+  setrEvents: SetrEvent[];
+  inScope: boolean;
+  outOfScopeNote?: string;
+}
+
+export const MCA_PHASES: AcquisitionPhaseMeta[] = [
+  {
+    id: "msa",
+    name: "Materiel Solution Analysis",
+    summary:
+      "Analysis of Alternatives (AoA) and initial requirements development, prior to committing to a technology approach.",
+    entryMilestone: null,
+    exitMilestone: "MS-A",
+    setrEvents: [],
+    inScope: false,
+    outOfScopeNote: "This app's SETR modeling begins at SRR (TMRR-era); Materiel Solution Analysis has no represented content here.",
+  },
+  {
+    id: "tmrr",
+    name: "Technology Maturation & Risk Reduction",
+    summary:
+      "Reduces technology risk and validates the system's functional architecture before committing to detailed design.",
+    entryMilestone: "MS-A",
+    exitMilestone: "MS-B",
+    setrEvents: ["SRR", "SFR"],
+    inScope: true,
+  },
+  {
+    id: "emd",
+    name: "Engineering & Manufacturing Development",
+    summary:
+      "Detailed design and build-to/code-to maturity -- from software/CI-level specification review through critical design.",
+    entryMilestone: "MS-B",
+    exitMilestone: "MS-C",
+    setrEvents: ["SSR", "PDR", "CDR"],
+    inScope: true,
+  },
+  {
+    id: "pd",
+    name: "Production & Deployment",
+    summary:
+      "Test readiness, verification against requirements, and production readiness -- from developmental test through the production decision.",
+    entryMilestone: "MS-C",
+    exitMilestone: null,
+    setrEvents: ["TRR", "SVR", "PRR"],
+    inScope: true,
+  },
+  {
+    id: "os",
+    name: "Operations & Support",
+    summary: "Sustainment of the fielded system after production.",
+    entryMilestone: null,
+    exitMilestone: null,
+    setrEvents: [],
+    inScope: false,
+    outOfScopeNote: "This app's SETR modeling ends at PRR; Operations & Support has no represented content here.",
+  },
+];
+
+export const AAF_PATHWAYS: Record<AcquisitionPathway, AcquisitionPhaseMeta[]> = {
+  MCA: MCA_PHASES,
+};
+
+export const AAF_PHASE_FRAMEWORK_INTRO =
+  "The Major Capability Acquisition (MCA) pathway's five phases aren't a separate taxonomy from the SRR-PRR " +
+  "SETR sequence this app already tracks -- they're a coarser lens over the same eight events, the same way " +
+  "MIL-STD-31000 TDP maturity and IEEE 12207 software life-cycle groups already band the identical eight events " +
+  "at a different granularity for a different purpose (see tdpGuidance.ts). Technology Maturation & Risk " +
+  "Reduction's SRR-SFR range matches Conceptual TDP maturity's own range exactly; Engineering & Manufacturing " +
+  "Development and Production & Deployment split what TDP guidance treats as one continuous " +
+  "Developmental-to-Product transition into the two acquisition-decision phases (Milestone B and C) that " +
+  "actually gate it programmatically.";
