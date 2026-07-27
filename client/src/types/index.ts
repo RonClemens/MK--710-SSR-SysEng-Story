@@ -244,7 +244,8 @@ export type ChecklistItemEvidenceType =
   | "ConfigurationItem"
   | "SafetyDeliverable"
   | "ProgramPlanningDeliverable"
-  | "VerificationEvent";
+  | "VerificationEvent"
+  | "Specification";
 
 // PKM Migration Step 5 (additive, first slice): promotes a small, real set
 // of DID/TDP/DBx-MBx-style readiness criteria from guidance prose into
@@ -687,4 +688,5 @@ export const CHECKLIST_ITEM_EVIDENCE_TYPES: ChecklistItemEvidenceType[] = [
   "SafetyDeliverable",
   "ProgramPlanningDeliverable",
   "VerificationEvent",
+  "Specification",
 ];
