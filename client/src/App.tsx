@@ -40,9 +40,9 @@ import { PhaseWorkbenchPage } from "./pages/PhaseWorkbenchPage";
 import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { EditableText } from "./components/EditableText";
+import { EditModeFab } from "./components/EditModeFab";
 import { ExportImport } from "./components/ExportImport";
 import { ArchitectureFooter } from "./components/ArchitectureFooter";
-import { useSiteContent } from "./contexts/SiteContentContext";
 
 type Tab =
   | "subsystems"
@@ -98,7 +98,6 @@ export default function App() {
   const [selectedSubsystemId, setSelectedSubsystemId] = useState<string | null>(null);
   const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
   const [serverAiEnabled, setServerAiEnabled] = useState(false);
-  const { editMode, setEditMode } = useSiteContent();
   const [navMode, setNavMode] = useNavMode();
 
   useEffect(() => {
@@ -180,10 +179,6 @@ export default function App() {
           >
             {navMode === "wizard" ? "All Tabs" : "Guided View"}
           </button>
-          <label className="edit-mode-toggle">
-            <input type="checkbox" checked={editMode} onChange={(e) => setEditMode(e.target.checked)} />
-            Edit Mode
-          </label>
           <ExportImport onImported={refreshAll} />
         </div>
       </header>
@@ -356,6 +351,7 @@ export default function App() {
         </main>
         <AiAssistantPanel serverAiEnabled={serverAiEnabled} />
       </div>
+      <EditModeFab />
       <ArchitectureFooter />
     </div>
   );

@@ -752,12 +752,18 @@ descriptions, page hints, and a few SE-judgment sentences on the CI/Subsystem
 detail views) is itself editable in place, versioned separately from the
 structured entities:
 
-- Toggle **Edit Mode** in the header (persisted per-browser via
-  `localStorage`). While on, editable prose is outlined with a pencil (✎)
-  button; click it to open an editor with Save/Cancel, a **Reset to
-  original** option (removes the override, reverting to the hardcoded
-  default), and a **version history** panel listing every prior value with a
-  **Revert to this** action per entry.
+- Click the pencil **FAB** in the bottom-left corner to enter Edit Mode —
+  it prompts for a password (currently a hardcoded placeholder, `edit`; not
+  real access control, just deliberate friction against accidental edits
+  while multiple people share this environment). The FAB turns amber while
+  active; click it again to exit (no password needed to leave). The on/off
+  state persists per-browser via `localStorage`. While on, editable prose is
+  outlined with a pencil (✎) button; click it to open an editor with
+  Save/Cancel, a **Reset to original** option (removes the override,
+  reverting to the hardcoded default), and a **version history** panel
+  listing every prior value with a **Revert to this** action per entry.
+  Saved overrides are visible immediately whether or not Edit Mode is on —
+  Edit Mode only controls whether the pencil buttons themselves are shown.
 - Backed by a ninth entity, `ContentEntry` (`key`, `value`, `history[]`,
   `updatedAt`), stored the same way as the rest of the data — server-side
   JSON in normal mode, `localStorage` in the static/Pages build — and
