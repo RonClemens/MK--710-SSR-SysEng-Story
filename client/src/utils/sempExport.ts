@@ -138,7 +138,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
       mdTable(
         ["Sub-Process", "Contractor Process In This App"],
         INCOSE_GROUP_META[group].subProcesses.map((sp, i) => [
-          sp.name,
+          getValue(`incose.group.${group}.subProcess.${i}.name`, sp.name),
           getValue(`incose.group.${group}.subProcess.${i}.appMapping`, sp.appMapping),
         ]),
       ),
@@ -249,7 +249,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
       ["Delta Class", "CI Tier", "Description", "Reconciliation Effort"],
       RECOVERY_DELTA_CLASSES.map((cls) => [
         cls,
-        RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].tier,
+        getValue(`recovery.class.${cls}.tier`, RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].tier),
         getValue(`recovery.class.${cls}.description`, RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].description),
         getValue(`recovery.class.${cls}.workRequired`, RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].workRequired),
       ]),
@@ -282,7 +282,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     mdTable(
       ["SE Dimension", "Document-Based (DBx)", "Model-Based (MBx)", "Tradeoff", "In This App"],
       DBX_MBX_DIMENSIONS.map((d) => [
-        d.name,
+        getValue(`dbxMbx.${d.id}.name`, d.name),
         getValue(`dbxMbx.${d.id}.dbxDescription`, d.dbxDescription),
         getValue(`dbxMbx.${d.id}.mbxDescription`, d.mbxDescription),
         getValue(`dbxMbx.${d.id}.tradeoff`, d.tradeoff),
@@ -299,7 +299,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     mdTable(
       ["Dimension", "Challenge", "Extra Work Required While Straddling"],
       DBX_MBX_TRANSITION_DIMENSIONS.map((d) => [
-        d.name,
+        getValue(`dbxMbx.transition.${d.id}.name`, d.name),
         getValue(`dbxMbx.transition.${d.id}.challenge`, d.challenge),
         getValue(`dbxMbx.transition.${d.id}.duplicationTax`, d.duplicationTax),
       ]),
@@ -421,7 +421,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
       mdTable(
         ["CDRL", "Applicability", "Description"],
         CDRL_CATALOG[level].map((c, i) => [
-          c.name,
+          getValue(`safety.cdrl.${level}.${i}.name`, c.name),
           c.applicability,
           getValue(`safety.cdrl.${level}.${i}.description`, c.description),
         ]),
@@ -489,9 +489,9 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     mdTable(
       ["Process Group", "Description", "SETR Range", "Planning CDRL(s)"],
       SOFTWARE_LIFECYCLE_GROUPS.map((g) => [
-        g.name,
+        getValue(`softwareLifecycle.${g.id}.name`, g.name),
         getValue(`softwareLifecycle.${g.id}.description`, g.description),
-        g.setrRange,
+        getValue(`softwareLifecycle.${g.id}.setrRange`, g.setrRange),
         getValue(`softwareLifecycle.${g.id}.planningCdrls`, g.planningCdrls),
       ]),
     ),
@@ -511,7 +511,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     mdTable(
       ["Functional Area", "Description", "Implemented In This App As"],
       CM_FUNCTIONAL_AREAS.map((area) => [
-        area.name,
+        getValue(`cm.area.${area.id}.name`, area.name),
         getValue(`cm.area.${area.id}.description`, area.description),
         getValue(`cm.area.${area.id}.appMapping`, area.appMapping),
       ]),
@@ -550,10 +550,10 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     mdTable(
       ["TDP Maturity Level", "Description", "Spec-Type Correlation", "SETR Range"],
       TDP_MATURITY_LEVELS.map((level) => [
-        TDP_MATURITY_META[level].name,
+        getValue(`tdp.maturity.${level}.name`, TDP_MATURITY_META[level].name),
         getValue(`tdp.maturity.${level}.description`, TDP_MATURITY_META[level].description),
         getValue(`tdp.maturity.${level}.specTypeCorrelation`, TDP_MATURITY_META[level].specTypeCorrelation),
-        TDP_MATURITY_META[level].setrRange,
+        getValue(`tdp.maturity.${level}.setrRange`, TDP_MATURITY_META[level].setrRange),
       ]),
     ),
   );
@@ -564,8 +564,8 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     mdTable(
       ["Content Element", "Description", "In This App"],
       TDP_CONTENT_ELEMENTS.map((el) => [
-        el.name,
-        el.description,
+        getValue(`tdp.content.${el.id}.name`, el.name),
+        getValue(`tdp.content.${el.id}.description`, el.description),
         getValue(`tdp.content.${el.id}.appMapping`, el.appMapping),
       ]),
     ),
@@ -583,7 +583,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
       ["Event", "Name", "Summary", "Decomposition", "Safety Planning", "Software Planning", "Spec Generation", "TDP Maturity (MIL-STD-31000)"],
       SETR_EVENTS.map((event) => [
         event,
-        SETR_GUIDANCE[event].name,
+        getValue(`setr.${event}.name`, SETR_GUIDANCE[event].name),
         getValue(`setr.${event}.summary`, SETR_GUIDANCE[event].summary),
         getValue(`setr.${event}.decomposition`, SETR_GUIDANCE[event].decomposition),
         getValue(`setr.${event}.safetyPlanning`, SETR_GUIDANCE[event].safetyPlanning),
@@ -621,7 +621,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     mdTable(
       ["Activity", "Cadence", "Purpose", "Distinction from a SETR milestone gate"],
       RECURRING_TECHNICAL_ACTIVITIES.map((activity) => [
-        activity.name,
+        getValue(`recurringTechActivities.${activity.id}.name`, activity.name),
         getValue(`recurringTechActivities.${activity.id}.cadence`, activity.cadence),
         getValue(`recurringTechActivities.${activity.id}.purpose`, activity.purpose),
         getValue(`recurringTechActivities.${activity.id}.distinctionFromSetr`, activity.distinctionFromSetr),
@@ -658,7 +658,12 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   lines.push(
     mdTable(
       ["Designator", "Title", "Domain", "Levels"],
-      POINTER_SPEC_CATALOG.map((p) => [p.designator, p.title, p.domain, p.levels.join(", ")]),
+      POINTER_SPEC_CATALOG.map((p) => [
+        getValue(`pointerSpec.catalog.${p.id}.designator`, p.designator),
+        getValue(`pointerSpec.catalog.${p.id}.title`, p.title),
+        p.domain,
+        p.levels.join(", "),
+      ]),
     ),
   );
   lines.push("_Full guidance for each, including recommended cite/tailor/flow-down approach, is on the Specifications tab._");

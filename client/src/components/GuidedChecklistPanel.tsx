@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Modal } from "./Modal";
+import { EditableText } from "./EditableText";
 import { EntityForm, type FieldDef } from "./EntityForm";
 import {
   CHECKLIST_ITEM_EVIDENCE_TYPES,
@@ -76,7 +77,8 @@ export function GuidedChecklistPanel({ milestone, entity }: Props) {
     <div className="guided-checklist-panel">
       <div className="page-header">
         <p className="did-guidance-label">
-          Readiness criteria for {milestone.event} ({items.length} item{items.length === 1 ? "" : "s"})
+          <EditableText contentKey="guidedChecklist.readinessLabelPrefix" defaultValue="Readiness criteria for" as="span" />{" "}
+          {milestone.event} ({items.length} item{items.length === 1 ? "" : "s"})
         </p>
         <button className="button-primary" onClick={() => setEditing("new")}>
           + Add Checklist Item
@@ -84,7 +86,12 @@ export function GuidedChecklistPanel({ milestone, entity }: Props) {
       </div>
 
       {items.length === 0 ? (
-        <p className="empty-row">No checklist items yet for this milestone.</p>
+        <EditableText
+          contentKey="guidedChecklist.emptyState"
+          defaultValue="No checklist items yet for this milestone."
+          as="p"
+          className="empty-row"
+        />
       ) : (
         domains.map((domain) => {
           const expanded = !collapsedDomains.has(domain);
@@ -123,7 +130,8 @@ export function GuidedChecklistPanel({ milestone, entity }: Props) {
                         ))}
                       </div>
                       <p className="hint">
-                        Evidence: {item.evidenceType ? `${item.evidenceType} — ${item.evidenceId ?? "—"}` : "—"}
+                        <EditableText contentKey="guidedChecklist.evidenceLabel" defaultValue="Evidence:" as="span" />{" "}
+                        {item.evidenceType ? `${item.evidenceType} — ${item.evidenceId ?? "—"}` : "—"}
                       </p>
                       <button className="link-button" onClick={() => setEditing(item)}>
                         Edit full record

@@ -91,26 +91,32 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
         {spec.level === "Subsystem" &&
           (linkedSubsystem ? (
             <>
-              Linked subsystem:{" "}
+              <EditableText contentKey="specDetail.linkedSubsystemLabel" defaultValue="Linked subsystem:" as="span" />{" "}
               <button className="link-button" onClick={() => onSelectSubsystem(linkedSubsystem.id)}>
                 {linkedSubsystem.name}
               </button>
             </>
           ) : (
-            "Not yet linked to a subsystem."
+            <EditableText contentKey="specDetail.notLinkedSubsystemHint" defaultValue="Not yet linked to a subsystem." as="span" />
           ))}
         {spec.level === "CI" &&
           (linkedCi ? (
             <>
-              Linked CI:{" "}
+              <EditableText contentKey="specDetail.linkedCiLabel" defaultValue="Linked CI:" as="span" />{" "}
               <button className="link-button" onClick={() => onSelectCi(linkedCi.id)}>
                 {linkedCi.name}
               </button>
             </>
           ) : (
-            "Not yet linked to a CI."
+            <EditableText contentKey="specDetail.notLinkedCiHint" defaultValue="Not yet linked to a CI." as="span" />
           ))}
-        {spec.level === "System" && "Scoped to the whole system — not linked to a specific subsystem or CI."}
+        {spec.level === "System" && (
+          <EditableText
+            contentKey="specDetail.systemScopedHint"
+            defaultValue="Scoped to the whole system — not linked to a specific subsystem or CI."
+            as="span"
+          />
+        )}
       </p>
 
       <div className="form-actions" style={{ justifyContent: "flex-start" }}>
@@ -128,7 +134,11 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
       </div>
 
       <section>
-        <h3>Why {levelLabel(spec.level, spec.domain)}-level?</h3>
+        <h3>
+          <EditableText contentKey="specDetail.whyLevelPrefix" defaultValue="Why" as="span" />{" "}
+          {levelLabel(spec.level, spec.domain)}
+          <EditableText contentKey="specDetail.whyLevelSuffix" defaultValue="-level?" as="span" />
+        </h3>
         <EditableText contentKey={`did.level.${spec.level}.summary`} defaultValue={LEVEL_GUIDANCE[spec.level].summary} as="p" />
         <p className={`did-guidance-label ${COMPETENCY_CLASS[LEVEL_GUIDANCE[spec.level].competency.weight]}`}>
           {LEVEL_GUIDANCE[spec.level].competency.weight}
@@ -140,7 +150,7 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
         />
         <div className="did-guidance-grid did-guidance-grid-2">
           <div>
-            <p className="did-guidance-label did-pro">Pros</p>
+            <EditableText contentKey="did.prosLabel" defaultValue="Pros" as="p" className="did-guidance-label did-pro" />
             <ul>
               {LEVEL_GUIDANCE[spec.level].pros.map((p, i) => (
                 <EditableText key={i} contentKey={`did.level.${spec.level}.pros.${i}`} defaultValue={p} as="li" />
@@ -148,7 +158,7 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
             </ul>
           </div>
           <div>
-            <p className="did-guidance-label did-con">Cons</p>
+            <EditableText contentKey="did.consLabel" defaultValue="Cons" as="p" className="did-guidance-label did-con" />
             <ul>
               {LEVEL_GUIDANCE[spec.level].cons.map((c, i) => (
                 <EditableText key={i} contentKey={`did.level.${spec.level}.cons.${i}`} defaultValue={c} as="li" />
@@ -170,7 +180,12 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
           />
         </p>
 
-        <p className="did-guidance-label">System safety at this level (MIL-STD-882E / JSSSEH)</p>
+        <EditableText
+          contentKey="specDetail.systemSafetyLabel"
+          defaultValue="System safety at this level (MIL-STD-882E / JSSSEH)"
+          as="p"
+          className="did-guidance-label"
+        />
         <div className="safety-badge-row">
           {SAFETY_BY_LEVEL[spec.level].analyses.map((type) => (
             <span key={type} className="safety-badge" title={HAZARD_ANALYSIS_META[type].name}>
@@ -192,11 +207,11 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
       </section>
 
       <section>
-        <h3>Sections</h3>
+        <EditableText contentKey="specDetail.sectionsLabel" defaultValue="Sections" as="h3" />
         {ORDERED_SECTION_KEYS.map((key) => (
           <div className="form-field spec-section" key={key}>
             <span className="spec-section-heading">
-              {SECTION_META[key].label}{" "}
+              <EditableText contentKey={`did.section.${key}.label`} defaultValue={SECTION_META[key].label} as="span" />{" "}
               <span className={`badge ${RELEVANCE_CLASS[relevance[key]]}`}>{relevance[key]}</span>
               {key === "safety" &&
                 SAFETY_BY_LEVEL[spec.level].analyses.map((type) => (
@@ -235,11 +250,13 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
       </section>
 
       <section>
-        <h3>Attachments</h3>
-        <p className="hint">
-          Linked files/documents (one per line: label | url) — no file content is stored in this app, just
-          references to wherever the real document lives.
-        </p>
+        <EditableText contentKey="specDetail.attachmentsLabel" defaultValue="Attachments" as="h3" />
+        <EditableText
+          contentKey="specDetail.attachmentsHint"
+          defaultValue="Linked files/documents (one per line: label | url) — no file content is stored in this app, just references to wherever the real document lives."
+          as="p"
+          className="hint"
+        />
         <AttachmentLinks attachments={spec.attachments} />
         <textarea
           value={attachmentsDraft}

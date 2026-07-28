@@ -94,12 +94,19 @@ export function DeltaMatrixPage({ entity, cis, requirements, gaps }: Props) {
   return (
     <div className="page">
       <div className="page-header">
-        <h2>Delta / Traceability Matrix</h2>
+        <EditableText contentKey="deltaMatrix.heading" defaultValue="Delta / Traceability Matrix" as="h2" />
         <button className="button-primary" onClick={() => setEditing("new")} disabled={cis.length === 0}>
           + Add Row
         </button>
       </div>
-      {cis.length === 0 && <p className="hint">Add a CI first before creating delta matrix rows.</p>}
+      {cis.length === 0 && (
+        <EditableText
+          contentKey="deltaMatrix.noCiHint"
+          defaultValue="Add a CI first before creating delta matrix rows."
+          as="p"
+          className="hint"
+        />
+      )}
       <div className="safety-callout">
         <EditableText contentKey="safety.deltaMatrix.traceabilityNote" defaultValue={TRACEABILITY_HAZARD_NOTE} as="span" />
       </div>

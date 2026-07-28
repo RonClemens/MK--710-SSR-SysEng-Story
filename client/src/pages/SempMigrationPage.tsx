@@ -44,7 +44,7 @@ export function SempMigrationPage(data: Props) {
   return (
     <div className="page">
       <div className="page-header">
-        <h2>SEMP Migration</h2>
+        <EditableText contentKey="sempMigration.heading" defaultValue="SEMP Migration" as="h2" />
       </div>
 
       <div className="safety-callout">
@@ -53,7 +53,7 @@ export function SempMigrationPage(data: Props) {
       </div>
 
       <section>
-        <h3>What this produces</h3>
+        <EditableText contentKey="sempMigration.whatThisProducesHeading" defaultValue="What this produces" as="h3" />
         <p className="hint">
           <EditableText
             contentKey="semp.migration.howItWorks"
@@ -74,7 +74,7 @@ export function SempMigrationPage(data: Props) {
       </section>
 
       <section>
-        <h3>Data included in the export</h3>
+        <EditableText contentKey="sempMigration.dataIncludedHeading" defaultValue="Data included in the export" as="h3" />
         <div className="detail-card">
           <ul>
             {counts.map((c) => (
@@ -90,7 +90,7 @@ export function SempMigrationPage(data: Props) {
       </section>
 
       <section>
-        <h3>Section mapping (OSD SEP Outline v4.1 structure)</h3>
+        <EditableText contentKey="sempMigration.sectionMappingHeading" defaultValue="Section mapping (OSD SEP Outline v4.1 structure)" as="h3" />
         <EditableText contentKey="semp.appendixNote" defaultValue={SEMP_APPENDIX_NOTE} as="p" className="hint" />
         <p className="hint">
           <span className="badge badge-info">Verbatim-verified</span> = this app's user-supplied SEP Outline PDF
@@ -122,7 +122,7 @@ export function SempMigrationPage(data: Props) {
       </section>
 
       <section>
-        <h3>INCOSE / ISO 15288 process mapping (feeds Section 1: Introduction)</h3>
+        <EditableText contentKey="sempMigration.incoseMappingHeading" defaultValue="INCOSE / ISO 15288 process mapping (feeds Section 1: Introduction)" as="h3" />
         <EditableText contentKey="incose.frameworkIntro" defaultValue={INCOSE_FRAMEWORK_INTRO} as="p" className="hint" />
         <div className="did-guidance-grid">
           {INCOSE_PROCESS_GROUPS.map((group) => (
@@ -137,7 +137,9 @@ export function SempMigrationPage(data: Props) {
               <ul>
                 {INCOSE_GROUP_META[group].subProcesses.map((sp, i) => (
                   <li key={sp.name}>
-                    <strong>{sp.name}</strong>
+                    <strong>
+                      <EditableText contentKey={`incose.group.${group}.subProcess.${i}.name`} defaultValue={sp.name} as="span" />
+                    </strong>
                     <br />
                     <EditableText
                       contentKey={`incose.group.${group}.subProcess.${i}.appMapping`}
@@ -153,7 +155,7 @@ export function SempMigrationPage(data: Props) {
       </section>
 
       <section>
-        <h3>2.4 Modeling Strategy: managing the DBx/MBx transition</h3>
+        <EditableText contentKey="sempMigration.modelingStrategyHeading" defaultValue="2.4 Modeling Strategy: managing the DBx/MBx transition" as="h3" />
         <p className="hint">
           The full Document-Based (DBx) vs Model-Based (MBx) comparison table is on the Subsystems, CI Inventory,
           N² Diagram, Specifications, Safety Deliverables, and Program Planning tabs — not repeated here. What

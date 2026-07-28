@@ -101,7 +101,7 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
   return (
     <div className="page">
       <div className="page-header">
-        <h2>Program Planning Deliverables</h2>
+        <EditableText contentKey="planningDeliverables.heading" defaultValue="Program Planning Deliverables" as="h2" />
         <EditableText
           contentKey="page.planningDeliverables.hint"
           defaultValue="Non-safety program and software planning CDRLs (SEMP, SDP, STP, etc.) at System, Subsystem, and HWCI/CSCI level."
@@ -127,7 +127,9 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
                 <ul>
                   {PLANNING_CDRL_CATALOG[level].map((c, i) => (
                     <li key={c.name}>
-                      <strong>{c.name}</strong>{" "}
+                      <strong>
+                        <EditableText contentKey={`planning.cdrl.${level}.${i}.name`} defaultValue={c.name} as="span" />
+                      </strong>{" "}
                       <span className={`badge ${APPLICABILITY_CLASS[c.applicability]}`}>{c.applicability}</span>
                       <br />
                       <EditableText
@@ -143,19 +145,22 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
             ))}
           </div>
 
-          <h3>Software/Program Planning Through SRR → PRR</h3>
+          <EditableText contentKey="planningDeliverables.softwarePlanningHeading" defaultValue="Software/Program Planning Through SRR → PRR" as="h3" />
           <div className="did-guidance-grid">
             {SETR_EVENTS.map((event) => (
               <div className="detail-card" key={event}>
                 <h4>
-                  {event} <span className="badge">{SETR_GUIDANCE[event].name}</span>
+                  {event}{" "}
+                  <span className="badge">
+                    <EditableText contentKey={`setr.${event}.name`} defaultValue={SETR_GUIDANCE[event].name} as="span" />
+                  </span>
                 </h4>
                 <EditableText
                   contentKey={`planning.setr.${event}.softwarePlanning`}
                   defaultValue={SETR_GUIDANCE[event].softwarePlanning}
                   as="p"
                 />
-                <p className="did-guidance-label">TDP Maturity (MIL-STD-31000)</p>
+                <EditableText contentKey="setr.tdpMaturityLabel" defaultValue="TDP Maturity (MIL-STD-31000)" as="p" className="did-guidance-label" />
                 <EditableText
                   contentKey={`setr.${event}.tdpMaturity`}
                   defaultValue={SETR_GUIDANCE[event].tdpMaturity}
@@ -165,23 +170,33 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
               </div>
             ))}
           </div>
-          <p className="hint">See the Specifications tab's "SETR Milestones" section for the full System Decomposition / System Safety Planning / System Software Planning / Spec Generation breakdown at each event, and its "Technical Data Package (TDP) Alignment" section for the full MIL-STD-31000/EIA-649 picture.</p>
+          <EditableText
+            contentKey="planningDeliverables.setrCrossRefHint"
+            defaultValue={
+              'See the Specifications tab\'s "SETR Milestones" section for the full System Decomposition / System Safety Planning / System Software Planning / Spec Generation breakdown at each event, and its "Technical Data Package (TDP) Alignment" section for the full MIL-STD-31000/EIA-649 picture.'
+            }
+            as="p"
+            className="hint"
+          />
 
-          <h3>IEEE 12207 Software Life Cycle Alignment</h3>
+          <EditableText contentKey="planningDeliverables.ieee12207Heading" defaultValue="IEEE 12207 Software Life Cycle Alignment" as="h3" />
           <EditableText contentKey="softwareLifecycle.intro" defaultValue={SOFTWARE_LIFECYCLE_INTRO} as="p" className="hint" />
           <div className="did-guidance-grid">
             {SOFTWARE_LIFECYCLE_GROUPS.map((g) => (
               <div className="detail-card" key={g.id}>
-                <h4>{g.name}</h4>
+                <EditableText contentKey={`softwareLifecycle.${g.id}.name`} defaultValue={g.name} as="h4" />
                 <EditableText contentKey={`softwareLifecycle.${g.id}.description`} defaultValue={g.description} as="p" className="hint" />
-                <p className="hint">SETR range: {g.setrRange}</p>
-                <p className="did-guidance-label">Planning CDRL(s)</p>
+                <p className="hint">
+                  <EditableText contentKey="softwareLifecycle.setrRangeLabel" defaultValue="SETR range:" as="span" />{" "}
+                  <EditableText contentKey={`softwareLifecycle.${g.id}.setrRange`} defaultValue={g.setrRange} as="span" />
+                </p>
+                <EditableText contentKey="softwareLifecycle.planningCdrlsLabel" defaultValue="Planning CDRL(s)" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`softwareLifecycle.${g.id}.planningCdrls`} defaultValue={g.planningCdrls} as="p" />
               </div>
             ))}
           </div>
 
-          <h3>Document-Based (DBx) vs Model-Based (MBx) Program Execution</h3>
+          <EditableText contentKey="planningDeliverables.dbxMbxHeading" defaultValue="Document-Based (DBx) vs Model-Based (MBx) Program Execution" as="h3" />
           <EditableText contentKey="dbxMbx.intro" defaultValue={DBX_MBX_INTRO} as="p" className="hint" />
           <div className="did-guidance-grid">
             <DbxMbxCard dimension={programPlanningDimension} />

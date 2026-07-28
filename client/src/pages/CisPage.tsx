@@ -156,7 +156,7 @@ export function CisPage({ entity, subsystems, baselines, gaps, onSelectCi }: Pro
   return (
     <div className="page">
       <div className="page-header">
-        <h2>Configuration Items</h2>
+        <EditableText contentKey="cis.heading" defaultValue="Configuration Items" as="h2" />
         <button className="button-primary" onClick={() => setEditing("new")}>
           + Add CI
         </button>
@@ -172,9 +172,9 @@ export function CisPage({ entity, subsystems, baselines, gaps, onSelectCi }: Pro
             <DbxMbxCard dimension={decompositionDimension} />
           </div>
 
-          <h3>Recovery Program: CI Tier ↔ Delta Classification</h3>
+          <EditableText contentKey="cis.recoveryProgramHeading" defaultValue="Recovery Program: CI Tier ↔ Delta Classification" as="h3" />
           <EditableText contentKey="recovery.intro" defaultValue={RECOVERY_PROGRAM_INTRO} as="p" className="hint" />
-          <p className="did-guidance-label">Applies to</p>
+          <EditableText contentKey="recovery.appliesToLabel" defaultValue="Applies to" as="p" className="did-guidance-label" />
           <p className="hint">
             {reconciliationTargetBaseline?.name ?? "—"}
             {" — the baseline with a set reconciledFromBaselineId (Baseline entity data, not hardcoded guidance text)"}
@@ -183,14 +183,21 @@ export function CisPage({ entity, subsystems, baselines, gaps, onSelectCi }: Pro
             {RECOVERY_DELTA_CLASSES.map((cls) => (
               <div className="detail-card" key={cls}>
                 <h4>
-                  {cls} <span className="badge">{RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].tier}</span>
+                  {cls}{" "}
+                  <span className="badge">
+                    <EditableText
+                      contentKey={`recovery.class.${cls}.tier`}
+                      defaultValue={RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].tier}
+                      as="span"
+                    />
+                  </span>
                 </h4>
                 <EditableText
                   contentKey={`recovery.class.${cls}.description`}
                   defaultValue={RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].description}
                   as="p"
                 />
-                <p className="did-guidance-label">Reconciliation effort</p>
+                <EditableText contentKey="recovery.reconciliationEffortLabel" defaultValue="Reconciliation effort" as="p" className="did-guidance-label" />
                 <EditableText
                   contentKey={`recovery.class.${cls}.workRequired`}
                   defaultValue={RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].workRequired}

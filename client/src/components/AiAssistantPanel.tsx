@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../api/client";
 import { IS_STATIC_MODE } from "../api/deployMode";
 import { getStoredApiKey, getStoredModel, setStoredApiKey, setStoredModel } from "../api/directAi";
+import { EditableText } from "./EditableText";
 
 const STORAGE_KEY = "pdr-workbench.ai-enabled";
 
@@ -107,6 +108,10 @@ export function AiAssistantPanel({ serverAiEnabled }: Props) {
       </button>
       {open && (
         <div className="ai-panel-body">
+          {/* CUI/security banners are intentionally NOT wrapped in EditableText -- drifting
+              security-relevant copy is a risk this feature shouldn't introduce (see README
+              "Editable site content"). Keep this text fixed even as the rest of the app's
+              copy becomes editable. */}
           {IS_STATIC_MODE ? (
             <div className="ai-banner">
               <strong>This is a static demo with no backend — your browser talks to Anthropic directly.</strong>
@@ -160,7 +165,14 @@ export function AiAssistantPanel({ serverAiEnabled }: Props) {
                   </button>
                 )}
               </div>
-              {!hasStoredKey && <p className="hint">Enter and save a key to enable the assistant below.</p>}
+              {!hasStoredKey && (
+                <EditableText
+                  contentKey="aiPanel.enterKeyHint"
+                  defaultValue="Enter and save a key to enable the assistant below."
+                  as="p"
+                  className="hint"
+                />
+              )}
             </div>
           )}
 
@@ -170,14 +182,20 @@ export function AiAssistantPanel({ serverAiEnabled }: Props) {
               checked={userEnabled}
               onChange={(e) => setUserEnabled(e.target.checked)}
             />
-            <span>Enable AI Assistant (uncheck to make zero external API calls)</span>
+            <EditableText
+              contentKey="aiPanel.enableToggleLabel"
+              defaultValue="Enable AI Assistant (uncheck to make zero external API calls)"
+              as="span"
+            />
           </label>
 
           {!IS_STATIC_MODE && !serverAiEnabled && (
-            <p className="hint">
-              The AI Assistant is disabled at the server level (AI_ASSISTANT_ENABLED=false). No API calls can be
-              made until it is re-enabled in the server's .env configuration.
-            </p>
+            <EditableText
+              contentKey="aiPanel.serverDisabledHint"
+              defaultValue="The AI Assistant is disabled at the server level (AI_ASSISTANT_ENABLED=false). No API calls can be made until it is re-enabled in the server's .env configuration."
+              as="p"
+              className="hint"
+            />
           )}
 
           {active && (
@@ -204,9 +222,12 @@ export function AiAssistantPanel({ serverAiEnabled }: Props) {
               <div className="ai-chat">
                 <div className="ai-chat-messages" ref={scrollRef}>
                   {messages.length === 0 && (
-                    <p className="hint">
-                      Ask about the current data — e.g. "Which CIs are still TBD?" or "Summarize open A/B risks."
-                    </p>
+                    <EditableText
+                      contentKey="aiPanel.emptyChatHint"
+                      defaultValue={'Ask about the current data — e.g. "Which CIs are still TBD?" or "Summarize open A/B risks."'}
+                      as="p"
+                      className="hint"
+                    />
                   )}
                   {messages.map((m, i) => (
                     <div key={i} className={`chat-message ${m.role}`}>

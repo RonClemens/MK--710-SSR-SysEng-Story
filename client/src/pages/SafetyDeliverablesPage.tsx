@@ -99,7 +99,7 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
   return (
     <div className="page">
       <div className="page-header">
-        <h2>System Safety Deliverables</h2>
+        <EditableText contentKey="safetyDeliverables.heading" defaultValue="System Safety Deliverables" as="h2" />
         <EditableText
           contentKey="page.safetyDeliverables.hint"
           defaultValue="CDRL-style safety artifacts (MIL-STD-882E / JSSSEH) at System, Subsystem, and HWCI/CSCI level."
@@ -119,7 +119,7 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
         <div className="did-guidance">
           <EditableText contentKey="safety.deliverablesIntro" defaultValue={SAFETY_DELIVERABLES_INTRO} as="p" className="hint" />
 
-          <h3>Hazard categories</h3>
+          <EditableText contentKey="safetyDeliverables.hazardCategoriesHeading" defaultValue="Hazard categories" as="h3" />
           <div className="did-guidance-grid">
             {SPEC_LEVELS.map((level) => {
               const category = hazardCategoryForLevel(level);
@@ -130,7 +130,7 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
                     {category} <span className="badge">{levelLabel(level)}</span>
                   </h4>
                   <EditableText contentKey={`safety.hazardCategory.${category}.description`} defaultValue={meta.description} as="p" />
-                  <p className="did-guidance-label">Example hazards</p>
+                  <EditableText contentKey="safety.exampleHazardsLabel" defaultValue="Example hazards" as="p" className="did-guidance-label" />
                   <ul>
                     {meta.examples.map((ex, i) => (
                       <EditableText key={i} contentKey={`safety.hazardCategory.${category}.examples.${i}`} defaultValue={ex} as="li" />
@@ -141,7 +141,7 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
             })}
           </div>
 
-          <h3>Expected CDRLs per level</h3>
+          <EditableText contentKey="safetyDeliverables.expectedCdrlsHeading" defaultValue="Expected CDRLs per level" as="h3" />
           <div className="did-guidance-grid">
             {SPEC_LEVELS.map((level) => (
               <div className="detail-card" key={level}>
@@ -149,7 +149,9 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
                 <ul>
                   {CDRL_CATALOG[level].map((c, i) => (
                     <li key={c.name}>
-                      <strong>{c.name}</strong>{" "}
+                      <strong>
+                        <EditableText contentKey={`safety.cdrl.${level}.${i}.name`} defaultValue={c.name} as="span" />
+                      </strong>{" "}
                       <span className={`badge ${APPLICABILITY_CLASS[c.applicability]}`}>{c.applicability}</span>
                       <br />
                       <EditableText contentKey={`safety.cdrl.${level}.${i}.description`} defaultValue={c.description} as="span" className="hint" />
@@ -160,7 +162,7 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
             ))}
           </div>
 
-          <h3>Document-Based (DBx) vs Model-Based (MBx) Safety Analysis</h3>
+          <EditableText contentKey="safetyDeliverables.dbxMbxHeading" defaultValue="Document-Based (DBx) vs Model-Based (MBx) Safety Analysis" as="h3" />
           <EditableText contentKey="dbxMbx.intro" defaultValue={DBX_MBX_INTRO} as="p" className="hint" />
           <div className="did-guidance-grid">
             <DbxMbxCard dimension={safetyAnalysisDimension} />

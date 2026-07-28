@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
+import { EditableText } from "../components/EditableText";
 import { attachmentsToText, textToAttachments } from "../utils/attachments";
 import type { ConfigurationItem, CotsRecord, QualifiedAlternate, VerificationEvent } from "../types";
 import type { useEntity } from "../hooks/useEntity";
@@ -120,12 +121,19 @@ export function CotsRecordsPage({ entity, cis, verificationEvents }: Props) {
   return (
     <div className="page">
       <div className="page-header">
-        <h2>COTS Item Records</h2>
+        <EditableText contentKey="cotsRecords.heading" defaultValue="COTS Item Records" as="h2" />
         <button className="button-primary" onClick={() => setEditing("new")} disabled={ciOptions.length === 0}>
           + Add Record
         </button>
       </div>
-      {ciOptions.length === 0 && <p className="hint">Mark at least one CI as type "COTS" before adding records.</p>}
+      {ciOptions.length === 0 && (
+        <EditableText
+          contentKey="cotsRecords.noCotsCiHint"
+          defaultValue='Mark at least one CI as type "COTS" before adding records.'
+          as="p"
+          className="hint"
+        />
+      )}
       {error && <p className="form-error">{error}</p>}
       {loading ? (
         <p>Loading…</p>
