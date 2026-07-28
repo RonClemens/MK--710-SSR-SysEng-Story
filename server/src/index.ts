@@ -38,6 +38,7 @@ async function start() {
   app.use("/api/projects", crudRouter("projects"));
   app.use("/api/baselines", crudRouter("baselines"));
   app.use("/api/milestones", crudRouter("milestones"));
+  app.use("/api/acquisition-milestones", crudRouter("acquisitionMilestones"));
   app.use("/api/requirements", crudRouter("requirements"));
   app.use("/api/verification-events", crudRouter("verificationEvents"));
   app.use("/api/checklist-items", crudRouter("checklistItems"));

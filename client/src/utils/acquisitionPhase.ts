@@ -1,5 +1,7 @@
 import {
   MILESTONE_EVENTS,
+  type AcquisitionMilestone,
+  type AcquisitionMilestoneEvent,
   type Milestone,
   type ProgramPlanningDeliverable,
   type SafetyDeliverable,
@@ -41,6 +43,19 @@ export function deriveCurrentPhase(
   if (current) return phaseForSetrEvent(pathway, current.event) ?? null;
   const inScope = AAF_PATHWAYS[pathway].filter((p) => p.inScope);
   return inScope[inScope.length - 1] ?? null;
+}
+
+// PKM Migration Step 8: the occurrence record (status/dates) for one AAF
+// decision gate (Milestone A/B/C) on one baseline lineage, if one exists yet
+// -- see AcquisitionMilestone's own comment in client/src/types/index.ts for
+// why this is a separate lookup from deriveCurrentMilestone() above rather
+// than folded into it.
+export function acquisitionMilestoneFor(
+  acquisitionMilestones: AcquisitionMilestone[],
+  baselineId: string,
+  event: AcquisitionMilestoneEvent,
+): AcquisitionMilestone | null {
+  return acquisitionMilestones.find((m) => m.baselineId === baselineId && m.event === event) ?? null;
 }
 
 export interface PhaseMilestoneStatus {

@@ -59,6 +59,14 @@ app is deployed for.
   `MilestoneStatus` enum) — both are structural, not domain content, even
   though their *values* reflect this program's real progress.
 
+### AcquisitionMilestone (added PKM Migration Step 8)
+- `actualDate`
+- `plannedDate`
+- Not marked: `event` (fixed `AcquisitionMilestoneEvent` enum), `status` (fixed
+  `MilestoneStatus` enum, reused from `Milestone`), `pathway` (fixed,
+  currently single-valued `AcquisitionPathwayId`), `baselineId` (reference)
+  — same treatment as `Milestone`'s own entry above.
+
 ### Requirement (added PKM Migration Step 4)
 - `statement`
 - Not marked: `satisfiedByCiIds`, `parentRequirementId` (both structural

@@ -10,19 +10,23 @@ import {
   type AcquisitionPhaseId,
 } from "../../../methodology/guidance/aafPhaseGuidance";
 import {
+  acquisitionMilestoneFor,
   cdrlsForPhase,
   deriveCurrentMilestone,
   deriveCurrentPhase,
   milestoneStatusesForPhase,
 } from "../utils/acquisitionPhase";
 import { findIncoseSubProcess } from "../../../methodology/guidance/incoseGuidance";
-import type {
-  Baseline,
-  ChecklistItem,
-  Milestone,
-  ProgramPlanningDeliverable,
-  SafetyDeliverable,
-  SpecStatus,
+import {
+  MILESTONE_STATUSES,
+  type AcquisitionMilestone,
+  type Baseline,
+  type ChecklistItem,
+  type Milestone,
+  type MilestoneStatus,
+  type ProgramPlanningDeliverable,
+  type SafetyDeliverable,
+  type SpecStatus,
 } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 import type { PhaseCdrl } from "../utils/acquisitionPhase";
@@ -32,6 +36,7 @@ type AllTabsTarget = "safetyDeliverables" | "planningDeliverables";
 interface Props {
   baselines: Baseline[];
   milestones: Milestone[];
+  acquisitionMilestones: ReturnType<typeof useEntity<AcquisitionMilestone>>;
   checklistItems: ReturnType<typeof useEntity<ChecklistItem>>;
   safetyDeliverables: ReturnType<typeof useEntity<SafetyDeliverable>>;
   planningDeliverables: ReturnType<typeof useEntity<ProgramPlanningDeliverable>>;
@@ -41,6 +46,7 @@ interface Props {
 export function PhaseWorkbenchPage({
   baselines,
   milestones,
+  acquisitionMilestones,
   checklistItems,
   safetyDeliverables,
   planningDeliverables,
@@ -80,6 +86,15 @@ export function PhaseWorkbenchPage({
   const entryGate = selectedPhase.entryMilestone ? MCA_MILESTONE_GATES[selectedPhase.entryMilestone] : null;
   const exitGate = selectedPhase.exitMilestone ? MCA_MILESTONE_GATES[selectedPhase.exitMilestone] : null;
 
+  const entryGateOccurrence =
+    entryGate && selectedBaselineId
+      ? acquisitionMilestoneFor(acquisitionMilestones.rows, selectedBaselineId, entryGate.id)
+      : null;
+  const exitGateOccurrence =
+    exitGate && selectedBaselineId
+      ? acquisitionMilestoneFor(acquisitionMilestones.rows, selectedBaselineId, exitGate.id)
+      : null;
+
   const currentMilestone = selectedBaselineId ? deriveCurrentMilestone(milestones, selectedBaselineId) : null;
   const isViewingCurrentPhase = currentPhase !== null && selectedPhaseId === currentPhase.id;
   const cdrls = selectedBaselineId
@@ -89,6 +104,28 @@ export function PhaseWorkbenchPage({
   function updateCdrlStatus(cdrl: PhaseCdrl, status: SpecStatus) {
     if (cdrl.kind === "safety") safetyDeliverables.update(cdrl.record.id, { status });
     else planningDeliverables.update(cdrl.record.id, { status });
+  }
+
+  // Creates the occurrence record on first status click if this gate has
+  // never been tracked for this baseline yet (e.g. a freshly-added baseline
+  // with no acquisitionMilestones seeded), rather than requiring a separate
+  // create step -- same "click saves immediately" ethos as the guided
+  // checklist panel's status toggles.
+  function updateGateStatus(gate: { id: AcquisitionMilestone["event"] }, status: MilestoneStatus) {
+    if (!selectedBaselineId) return;
+    const existing = acquisitionMilestoneFor(acquisitionMilestones.rows, selectedBaselineId, gate.id);
+    if (existing) {
+      acquisitionMilestones.update(existing.id, { status });
+    } else {
+      acquisitionMilestones.create({
+        event: gate.id,
+        pathway: "MCA",
+        baselineId: selectedBaselineId,
+        status,
+        actualDate: null,
+        plannedDate: null,
+      });
+    }
   }
 
   return (
@@ -177,6 +214,18 @@ export function PhaseWorkbenchPage({
                         defaultValue={entryGate.decisionSummary}
                         as="span"
                       />
+                      <div className="cdrl-badge-row">
+                        {MILESTONE_STATUSES.map((status) => (
+                          <button
+                            key={status}
+                            type="button"
+                            className={`cdrl-status-pill${entryGateOccurrence?.status === status ? " selected" : ""}`}
+                            onClick={() => updateGateStatus(entryGate, status)}
+                          >
+                            {status}
+                          </button>
+                        ))}
+                      </div>
                     </dd>
                   </>
                 )}
@@ -197,6 +246,18 @@ export function PhaseWorkbenchPage({
                         defaultValue={exitGate.decisionSummary}
                         as="span"
                       />
+                      <div className="cdrl-badge-row">
+                        {MILESTONE_STATUSES.map((status) => (
+                          <button
+                            key={status}
+                            type="button"
+                            className={`cdrl-status-pill${exitGateOccurrence?.status === status ? " selected" : ""}`}
+                            onClick={() => updateGateStatus(exitGate, status)}
+                          >
+                            {status}
+                          </button>
+                        ))}
+                      </div>
                     </dd>
                   </>
                 )}

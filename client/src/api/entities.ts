@@ -3,6 +3,7 @@ import { makeLocalCrud } from "./localStore";
 import { IS_STATIC_MODE } from "./deployMode";
 import type {
   AbCompatibilityRow,
+  AcquisitionMilestone,
   Baseline,
   ChecklistItem,
   ConfigurationItem,
@@ -30,6 +31,10 @@ export const programsApi = entity<Program>("/programs", "programs");
 export const projectsApi = entity<Project>("/projects", "projects");
 export const baselinesApi = entity<Baseline>("/baselines", "baselines");
 export const milestonesApi = entity<Milestone>("/milestones", "milestones");
+export const acquisitionMilestonesApi = entity<AcquisitionMilestone>(
+  "/acquisition-milestones",
+  "acquisitionMilestones"
+);
 export const requirementsApi = entity<Requirement>("/requirements", "requirements");
 export const verificationEventsApi = entity<VerificationEvent>("/verification-events", "verificationEvents");
 export const checklistItemsApi = entity<ChecklistItem>("/checklist-items", "checklistItems");

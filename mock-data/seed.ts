@@ -232,6 +232,82 @@ export const SEED_DATA: Database = {
       updatedAt: "2026-06-01T00:00:00.000Z",
     },
   ],
+  // PKM Migration Step 8 (additive, first slice): AAF acquisition-decision
+  // milestone (Milestone A/B/C) occurrence records, per baseline lineage —
+  // see AcquisitionMilestone's own comment in client/src/types/index.ts.
+  // Baseline A has already passed all three gates (consistent with its
+  // current phase already being Production & Deployment, derived from its
+  // in-progress TRR above); Baseline B has only passed Milestone A so far
+  // (consistent with its current phase still being Technology Maturation &
+  // Risk Reduction, derived from its in-progress SFR above).
+  acquisitionMilestones: [
+    {
+      id: "acq-milestone-a-msa",
+      event: "MS-A",
+      pathway: "MCA",
+      baselineId: "BASELINE-A",
+      status: "Complete",
+      actualDate: "2026-01-10T00:00:00.000Z",
+      plannedDate: "2026-01-10T00:00:00.000Z",
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-10T00:00:00.000Z",
+    },
+    {
+      id: "acq-milestone-a-msb",
+      event: "MS-B",
+      pathway: "MCA",
+      baselineId: "BASELINE-A",
+      status: "Complete",
+      actualDate: "2026-02-25T00:00:00.000Z",
+      plannedDate: "2026-02-25T00:00:00.000Z",
+      createdAt: "2026-01-10T00:00:00.000Z",
+      updatedAt: "2026-02-25T00:00:00.000Z",
+    },
+    {
+      id: "acq-milestone-a-msc",
+      event: "MS-C",
+      pathway: "MCA",
+      baselineId: "BASELINE-A",
+      status: "Complete",
+      actualDate: "2026-05-15T00:00:00.000Z",
+      plannedDate: "2026-05-15T00:00:00.000Z",
+      createdAt: "2026-02-25T00:00:00.000Z",
+      updatedAt: "2026-05-15T00:00:00.000Z",
+    },
+    {
+      id: "acq-milestone-b-msa",
+      event: "MS-A",
+      pathway: "MCA",
+      baselineId: "BASELINE-B",
+      status: "Complete",
+      actualDate: "2026-05-20T00:00:00.000Z",
+      plannedDate: "2026-05-20T00:00:00.000Z",
+      createdAt: "2026-05-15T00:00:00.000Z",
+      updatedAt: "2026-05-20T00:00:00.000Z",
+    },
+    {
+      id: "acq-milestone-b-msb",
+      event: "MS-B",
+      pathway: "MCA",
+      baselineId: "BASELINE-B",
+      status: "Not Started",
+      actualDate: null,
+      plannedDate: "2026-08-15T00:00:00.000Z",
+      createdAt: "2026-05-20T00:00:00.000Z",
+      updatedAt: "2026-05-20T00:00:00.000Z",
+    },
+    {
+      id: "acq-milestone-b-msc",
+      event: "MS-C",
+      pathway: "MCA",
+      baselineId: "BASELINE-B",
+      status: "Not Started",
+      actualDate: null,
+      plannedDate: "2027-01-15T00:00:00.000Z",
+      createdAt: "2026-05-20T00:00:00.000Z",
+      updatedAt: "2026-05-20T00:00:00.000Z",
+    },
+  ],
   logicalSubsystems: [
     {
       id: "sub-001",

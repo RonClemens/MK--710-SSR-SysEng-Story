@@ -3,6 +3,7 @@ import { useEntity } from "./hooks/useEntity";
 import { useNavMode } from "./hooks/useNavMode";
 import {
   abCompatibilityApi,
+  acquisitionMilestonesApi,
   baselinesApi,
   checklistItemsApi,
   cisApi,
@@ -78,6 +79,7 @@ export default function App() {
   const projects = useEntity(projectsApi);
   const baselines = useEntity(baselinesApi);
   const milestones = useEntity(milestonesApi);
+  const acquisitionMilestones = useEntity(acquisitionMilestonesApi);
   const requirements = useEntity(requirementsApi);
   const verificationEvents = useEntity(verificationEventsApi);
   const checklistItems = useEntity(checklistItemsApi);
@@ -109,6 +111,7 @@ export default function App() {
     projects.refresh();
     baselines.refresh();
     milestones.refresh();
+    acquisitionMilestones.refresh();
     requirements.refresh();
     verificationEvents.refresh();
     checklistItems.refresh();
@@ -230,6 +233,7 @@ export default function App() {
             <PhaseWorkbenchPage
               baselines={baselines.rows}
               milestones={milestones.rows}
+              acquisitionMilestones={acquisitionMilestones}
               checklistItems={checklistItems}
               safetyDeliverables={safetyDeliverables}
               planningDeliverables={planningDeliverables}
@@ -330,6 +334,7 @@ export default function App() {
                   programs={programs.rows}
                   projects={projects.rows}
                   milestones={milestones.rows}
+                  acquisitionMilestones={acquisitionMilestones.rows}
                   requirements={requirements.rows}
                   verificationEvents={verificationEvents.rows}
                   checklistItems={checklistItems.rows}

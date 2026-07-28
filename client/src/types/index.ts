@@ -124,6 +124,73 @@ export interface Milestone {
   updatedAt: string;
 }
 
+// PKM Migration Step 8 (additive, first slice): promotes the AAF
+// acquisition-decision milestones (Milestone A/B/C) from static-only
+// definitions in methodology/guidance/aafPhaseGuidance.ts
+// (MCA_MILESTONE_GATES) into real, per-baseline-lineage occurrence
+// records — the same "structured content already exists in the
+// methodology layer, promote it to queryable records" move Step 3 made
+// for the SETR Milestone entity above, applied here to the AAF pathway's
+// own decision gates, which had no occurrence data (status, dates) of
+// their own until now — the same gap SETR events had before Step 3.
+//
+// Deliberately a separate entity from Milestone, not a broadened
+// MilestoneEvent union: MS-A/B/C are acquisition-decision events (DAU/AAF
+// doctrine — resourcing and program-level authorization to proceed), not
+// SE technical reviews, and MILESTONE_EVENTS' fixed SRR-PRR ordering is
+// load-bearing for deriveCurrentMilestone()'s "first non-Complete gate in
+// canonical order" logic (see client/src/utils/acquisitionPhase.ts) —
+// folding AAF events into that array/type would require re-deriving that
+// ordering assumption for no benefit, since AAF milestones already relate
+// to SETR events structurally via AcquisitionPhaseMeta.entryMilestone/
+// exitMilestone, not by shared identity.
+//
+// AcquisitionPathway itself is NOT promoted to a data-layer entity: it's
+// already PKM-conformant as a plain, stable, external, human-meaningful ID
+// ("MCA") per Architecture Guidance §9 / PKM §4 — the pathway's name,
+// definition, and phase banding are DoD Adaptive Acquisition Framework
+// doctrine, identical for every program that uses MCA, not per-program
+// data the way a Program or Project record's name/description is.
+// Nothing about it needs a stored record; only a stable id to reference,
+// which the existing type union already provides. Flagged explicitly here
+// (rather than left to be rediscovered) as an "already conformant, no
+// entity needed" finding — the same category PKM Migration Step 0
+// recorded for CI↔LogicalSubsystem cardinality.
+//
+// AcquisitionPhase (Materiel Solution Analysis, TMRR, EMD, Production &
+// Deployment, Operations & Support) is also NOT promoted to a stored
+// entity. A baseline's "current phase" is already fully and cheaply
+// derived from its own Milestone records (see deriveCurrentPhase() in
+// client/src/utils/acquisitionPhase.ts, added with the Acquisition Phase
+// Workbench) — storing it as a field would create a second source of
+// truth that could silently drift from the Milestone records that already
+// determine it, with no new information gained. This app's existing
+// "derived, not stored" design choice for current-phase is kept as-is,
+// not revisited by this step.
+export type AcquisitionMilestoneEvent = "MS-A" | "MS-B" | "MS-C";
+
+export const ACQUISITION_MILESTONE_EVENTS: AcquisitionMilestoneEvent[] = ["MS-A", "MS-B", "MS-C"];
+
+export interface AcquisitionMilestone {
+  id: string;
+  event: AcquisitionMilestoneEvent;
+  pathway: AcquisitionPathwayId;
+  baselineId: string;
+  status: MilestoneStatus;
+  // @domain-placeholder
+  actualDate: string | null;
+  // @domain-placeholder
+  plannedDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Mirrors methodology/guidance/aafPhaseGuidance.ts's `AcquisitionPathway`
+// union exactly (same independently-maintained-mirror pattern as
+// MilestoneEvent/SetrEvent above) — kept as a distinct name in this file
+// since a data-schema type shouldn't import from /methodology directly.
+export type AcquisitionPathwayId = "MCA";
+
 export type LogicalSubsystemSource =
   | "Validated"
   | "Proposed"
@@ -626,6 +693,7 @@ export interface Database {
   projects: Project[];
   baselines: Baseline[];
   milestones: Milestone[];
+  acquisitionMilestones: AcquisitionMilestone[];
   requirements: Requirement[];
   verificationEvents: VerificationEvent[];
   checklistItems: ChecklistItem[];
