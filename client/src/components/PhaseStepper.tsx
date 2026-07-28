@@ -1,4 +1,5 @@
 import { MCA_MILESTONE_GATES, type AcquisitionPhaseId, type AcquisitionPhaseMeta } from "../../../methodology/guidance/aafPhaseGuidance";
+import { useSiteContent } from "../contexts/SiteContentContext";
 
 interface Props {
   phases: AcquisitionPhaseMeta[];
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function PhaseStepper({ phases, currentPhaseId, selectedPhaseId, onSelectPhase }: Props) {
+  const { getValue } = useSiteContent();
   return (
     <nav className="phase-stepper">
       {phases.map((phase) => {
@@ -29,8 +31,10 @@ export function PhaseStepper({ phases, currentPhaseId, selectedPhaseId, onSelect
             onClick={() => onSelectPhase(phase.id)}
             aria-current={isCurrent ? "step" : undefined}
           >
-            {gate && <span className="phase-step-gate-badge">{gate.name}</span>}
-            <span className="phase-step-name">{phase.name}</span>
+            {gate && (
+              <span className="phase-step-gate-badge">{getValue(`aafMilestone.${gate.id}.name`, gate.name)}</span>
+            )}
+            <span className="phase-step-name">{getValue(`aafPhase.${phase.id}.name`, phase.name)}</span>
             {isCurrent && <span className="phase-step-current-label">Current</span>}
             {!phase.inScope && <span className="phase-step-current-label">Not modeled</span>}
           </button>

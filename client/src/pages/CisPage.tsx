@@ -183,7 +183,14 @@ export function CisPage({ entity, subsystems, baselines, gaps, onSelectCi }: Pro
             {RECOVERY_DELTA_CLASSES.map((cls) => (
               <div className="detail-card" key={cls}>
                 <h4>
-                  {cls} <span className="badge">{RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].tier}</span>
+                  {cls}{" "}
+                  <span className="badge">
+                    <EditableText
+                      contentKey={`recovery.class.${cls}.tier`}
+                      defaultValue={RECOVERY_DELTA_CLASS_TIER_MAPPING[cls].tier}
+                      as="span"
+                    />
+                  </span>
                 </h4>
                 <EditableText
                   contentKey={`recovery.class.${cls}.description`}

@@ -137,7 +137,9 @@ export function SempMigrationPage(data: Props) {
               <ul>
                 {INCOSE_GROUP_META[group].subProcesses.map((sp, i) => (
                   <li key={sp.name}>
-                    <strong>{sp.name}</strong>
+                    <strong>
+                      <EditableText contentKey={`incose.group.${group}.subProcess.${i}.name`} defaultValue={sp.name} as="span" />
+                    </strong>
                     <br />
                     <EditableText
                       contentKey={`incose.group.${group}.subProcess.${i}.appMapping`}

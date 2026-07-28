@@ -211,7 +211,7 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
         {ORDERED_SECTION_KEYS.map((key) => (
           <div className="form-field spec-section" key={key}>
             <span className="spec-section-heading">
-              {SECTION_META[key].label}{" "}
+              <EditableText contentKey={`did.section.${key}.label`} defaultValue={SECTION_META[key].label} as="span" />{" "}
               <span className={`badge ${RELEVANCE_CLASS[relevance[key]]}`}>{relevance[key]}</span>
               {key === "safety" &&
                 SAFETY_BY_LEVEL[spec.level].analyses.map((type) => (

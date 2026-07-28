@@ -158,7 +158,9 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
           <div className="did-guidance-grid">
             {SPEC_TYPES.map((type) => (
               <div className="detail-card" key={type}>
-                <h4>{type} Specification</h4>
+                <h4>
+                  {type} <EditableText contentKey="specifications.specTypeSuffix" defaultValue="Specification" as="span" />
+                </h4>
                 <EditableText contentKey={`did.specType.${type}.summary`} defaultValue={SPEC_TYPE_GUIDANCE[type].summary} as="p" />
                 <EditableText
                   contentKey={`did.specType.${type}.whenUsed`}
@@ -210,7 +212,10 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
             {SETR_EVENTS.map((event) => (
               <div className="detail-card" key={event}>
                 <h4>
-                  {event} <span className="badge">{SETR_GUIDANCE[event].name}</span>
+                  {event}{" "}
+                  <span className="badge">
+                    <EditableText contentKey={`setr.${event}.name`} defaultValue={SETR_GUIDANCE[event].name} as="span" />
+                  </span>
                 </h4>
                 <EditableText contentKey={`setr.${event}.summary`} defaultValue={SETR_GUIDANCE[event].summary} as="p" />
                 <EditableText contentKey="setr.decompositionLabel" defaultValue="System Decomposition" as="p" className="did-guidance-label" />
@@ -237,7 +242,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
           <div className="did-guidance-grid">
             {RECURRING_TECHNICAL_ACTIVITIES.map((activity) => (
               <div className="detail-card" key={activity.id}>
-                <h4>{activity.name}</h4>
+                <EditableText contentKey={`recurringTechActivities.${activity.id}.name`} defaultValue={activity.name} as="h4" />
                 <EditableText contentKey="recurringTechActivities.cadenceLabel" defaultValue="Cadence" as="p" className="did-guidance-label" />
                 <EditableText
                   contentKey={`recurringTechActivities.${activity.id}.cadence`}
@@ -272,7 +277,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
           <div className="did-guidance-grid">
             {POINTER_SPEC_PRINCIPLES.map((principle, i) => (
               <div className="detail-card" key={principle.title}>
-                <h4>{principle.title}</h4>
+                <EditableText contentKey={`pointerSpec.principles.${i}.title`} defaultValue={principle.title} as="h4" />
                 <EditableText contentKey={`pointerSpec.principles.${i}`} defaultValue={principle.text} as="p" />
               </div>
             ))}
@@ -281,9 +286,10 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
             {POINTER_SPEC_CATALOG.map((entry) => (
               <div className="detail-card" key={entry.id}>
                 <h4>
-                  {entry.designator} <span className="badge">{entry.domain}</span>
+                  <EditableText contentKey={`pointerSpec.catalog.${entry.id}.designator`} defaultValue={entry.designator} as="span" />{" "}
+                  <span className="badge">{entry.domain}</span>
                 </h4>
-                <p className="hint">{entry.title}</p>
+                <EditableText contentKey={`pointerSpec.catalog.${entry.id}.title`} defaultValue={entry.title} as="p" className="hint" />
                 <div className="safety-badge-row">
                   {entry.levels.map((level) => (
                     <span key={level} className="safety-badge">
@@ -312,7 +318,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
           <div className="did-guidance-grid">
             {TDP_MATURITY_LEVELS.map((level) => (
               <div className="detail-card" key={level}>
-                <h4>{TDP_MATURITY_META[level].name}</h4>
+                <EditableText contentKey={`tdp.maturity.${level}.name`} defaultValue={TDP_MATURITY_META[level].name} as="h4" />
                 <EditableText
                   contentKey={`tdp.maturity.${level}.description`}
                   defaultValue={TDP_MATURITY_META[level].description}
@@ -326,7 +332,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                 />
                 <p className="hint">
                   <EditableText contentKey="tdp.setrRangeLabel" defaultValue="SETR range:" as="span" />{" "}
-                  {TDP_MATURITY_META[level].setrRange}
+                  <EditableText contentKey={`tdp.maturity.${level}.setrRange`} defaultValue={TDP_MATURITY_META[level].setrRange} as="span" />
                 </p>
               </div>
             ))}
@@ -337,7 +343,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
           <div className="did-guidance-grid">
             {TDP_CONTENT_ELEMENTS.map((el) => (
               <div className="detail-card" key={el.id}>
-                <h4>{el.name}</h4>
+                <EditableText contentKey={`tdp.content.${el.id}.name`} defaultValue={el.name} as="h4" />
                 <EditableText contentKey={`tdp.content.${el.id}.description`} defaultValue={el.description} as="p" className="hint" />
                 <EditableText contentKey="tdp.inThisAppLabel" defaultValue="In this app" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`tdp.content.${el.id}.appMapping`} defaultValue={el.appMapping} as="p" />
@@ -349,7 +355,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
           <div className="did-guidance-grid">
             {CM_FUNCTIONAL_AREAS.map((area) => (
               <div className="detail-card" key={area.id}>
-                <h4>{area.name}</h4>
+                <EditableText contentKey={`cm.area.${area.id}.name`} defaultValue={area.name} as="h4" />
                 <EditableText contentKey={`cm.area.${area.id}.description`} defaultValue={area.description} as="p" className="hint" />
                 <EditableText contentKey="cm.inThisAppLabel" defaultValue="In this app" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`cm.area.${area.id}.appMapping`} defaultValue={area.appMapping} as="p" />

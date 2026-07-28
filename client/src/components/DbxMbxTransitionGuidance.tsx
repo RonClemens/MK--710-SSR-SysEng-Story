@@ -20,7 +20,7 @@ export function DbxMbxTransitionGuidance() {
       <div className="did-guidance-grid">
         {DBX_MBX_TRANSITION_DIMENSIONS.map((d) => (
           <div className="detail-card" key={d.id}>
-            <h4>{d.name}</h4>
+            <EditableText contentKey={`dbxMbx.transition.${d.id}.name`} defaultValue={d.name} as="h4" />
             <EditableText contentKey={`dbxMbx.transition.${d.id}.challenge`} defaultValue={d.challenge} as="p" />
             <EditableText
               contentKey="dbxMbx.duplicationTaxLabel"

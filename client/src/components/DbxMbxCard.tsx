@@ -12,7 +12,7 @@ interface Props {
 export function DbxMbxCard({ dimension }: Props) {
   return (
     <div className="detail-card">
-      <h4>{dimension.name}</h4>
+      <EditableText contentKey={`dbxMbx.${dimension.id}.name`} defaultValue={dimension.name} as="h4" />
       <EditableText contentKey="dbxMbx.dbxLabel" defaultValue="Document-Based (DBx)" as="p" className="did-guidance-label" />
       <EditableText
         contentKey={`dbxMbx.${dimension.id}.dbxDescription`}

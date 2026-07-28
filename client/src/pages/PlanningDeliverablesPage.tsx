@@ -127,7 +127,9 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
                 <ul>
                   {PLANNING_CDRL_CATALOG[level].map((c, i) => (
                     <li key={c.name}>
-                      <strong>{c.name}</strong>{" "}
+                      <strong>
+                        <EditableText contentKey={`planning.cdrl.${level}.${i}.name`} defaultValue={c.name} as="span" />
+                      </strong>{" "}
                       <span className={`badge ${APPLICABILITY_CLASS[c.applicability]}`}>{c.applicability}</span>
                       <br />
                       <EditableText
@@ -148,7 +150,10 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
             {SETR_EVENTS.map((event) => (
               <div className="detail-card" key={event}>
                 <h4>
-                  {event} <span className="badge">{SETR_GUIDANCE[event].name}</span>
+                  {event}{" "}
+                  <span className="badge">
+                    <EditableText contentKey={`setr.${event}.name`} defaultValue={SETR_GUIDANCE[event].name} as="span" />
+                  </span>
                 </h4>
                 <EditableText
                   contentKey={`planning.setr.${event}.softwarePlanning`}
@@ -179,11 +184,11 @@ export function PlanningDeliverablesPage({ entity, subsystems, cis }: Props) {
           <div className="did-guidance-grid">
             {SOFTWARE_LIFECYCLE_GROUPS.map((g) => (
               <div className="detail-card" key={g.id}>
-                <h4>{g.name}</h4>
+                <EditableText contentKey={`softwareLifecycle.${g.id}.name`} defaultValue={g.name} as="h4" />
                 <EditableText contentKey={`softwareLifecycle.${g.id}.description`} defaultValue={g.description} as="p" className="hint" />
                 <p className="hint">
                   <EditableText contentKey="softwareLifecycle.setrRangeLabel" defaultValue="SETR range:" as="span" />{" "}
-                  {g.setrRange}
+                  <EditableText contentKey={`softwareLifecycle.${g.id}.setrRange`} defaultValue={g.setrRange} as="span" />
                 </p>
                 <EditableText contentKey="softwareLifecycle.planningCdrlsLabel" defaultValue="Planning CDRL(s)" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`softwareLifecycle.${g.id}.planningCdrls`} defaultValue={g.planningCdrls} as="p" />

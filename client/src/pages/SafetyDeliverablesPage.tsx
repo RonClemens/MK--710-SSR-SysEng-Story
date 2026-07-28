@@ -149,7 +149,9 @@ export function SafetyDeliverablesPage({ entity, subsystems, cis }: Props) {
                 <ul>
                   {CDRL_CATALOG[level].map((c, i) => (
                     <li key={c.name}>
-                      <strong>{c.name}</strong>{" "}
+                      <strong>
+                        <EditableText contentKey={`safety.cdrl.${level}.${i}.name`} defaultValue={c.name} as="span" />
+                      </strong>{" "}
                       <span className={`badge ${APPLICABILITY_CLASS[c.applicability]}`}>{c.applicability}</span>
                       <br />
                       <EditableText contentKey={`safety.cdrl.${level}.${i}.description`} defaultValue={c.description} as="span" className="hint" />
