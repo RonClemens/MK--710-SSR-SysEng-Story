@@ -1,5 +1,5 @@
 {
-  "name": "pdr-reconciliation-workbench",
+  "name": "se-workbench",
   "private": true,
   "version": "1.0.0",
   "workspaces": [

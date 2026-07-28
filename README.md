@@ -1,10 +1,15 @@
-# PDR Reconciliation & Baseline Alignment Workbench
+# SE Workbench
 
-An editable, living workbench for a defense program's PDR reconciliation effort —
-replaces a static Word/PowerPoint working paper with a single source of truth
-for CI inventory, delta/traceability tracking, A/B baseline compatibility, COTS
-item records, and recommendations, plus an AI assistant panel grounded in the
-app's current data.
+An editable, living Systems Engineering workbench for a defense acquisition
+program — organized around a phase-driven guided navigation spanning the
+full Major Capability Acquisition lifecycle (Materiel Solution Analysis
+through Production & Deployment), not just PDR-era reconciliation, though
+that remains one of its core capabilities. Replaces a static Word/PowerPoint
+working paper with a single source of truth for CI inventory, delta/
+traceability tracking, A/B baseline compatibility, COTS item records,
+requirements and verification tracking, safety and program-planning CDRLs,
+and recommendations, plus an AI assistant panel grounded in the app's
+current data.
 
 **All data shipped in this repo (MHC/MCC/IPS "Test Set" example) is
 illustrative/demo data only — it is not real program data.**
@@ -688,6 +693,62 @@ Explicit non-goal: no direct integration with any other tool (no API push, no
 file write to a shared/mounted location) — see
 [Non-goals](#non-goals-v1).
 
+## Acquisition Phase Workbench
+
+The app's **default landing view** is no longer the flat tab bar — it's a
+"left-to-right," time/phase-driven guided navigation built around the DoD
+Adaptive Acquisition Framework's Major Capability Acquisition (MCA)
+pathway: Materiel Solution Analysis → Technology Maturation & Risk
+Reduction → Engineering & Manufacturing Development → Production &
+Deployment → Operations & Support.
+
+- **Phase taxonomy** (`methodology/guidance/aafPhaseGuidance.ts`) bands the
+  same 8 SETR events this app already tracks (SRR through PRR) under the 5
+  MCA phases, the same banding technique `tdpGuidance.ts` already uses for
+  TDP maturity levels and IEEE 12207 software life-cycle groups — this is a
+  coarser lens over existing data, not a new taxonomy competing with it.
+  Materiel Solution Analysis and Operations & Support are explicit,
+  visibly-marked **stub phases**: this app's SETR modeling only spans
+  SRR–PRR, so those two phases show an out-of-scope note rather than
+  fabricated content. The pathway type (`AcquisitionPathway`) is
+  deliberately a one-member union (`"MCA"` only) — extensible later if a
+  program needs a different AAF pathway, but no pathway-selection UI or
+  schema field exists yet, since there's only one option to choose from
+  today.
+- **Baseline selector + phase stepper**: pick a baseline (Baseline A /
+  Baseline B), and the stepper highlights that baseline's *current* phase —
+  derived client-side from its `Milestone` records (the first SETR event
+  that isn't yet `Complete`), not a stored field. Browsing a different phase
+  than the current one shows its guidance and gate context read-only.
+- **Guided checklist panel**: when viewing a baseline's current phase, a
+  domain-grouped, click-to-answer panel over that milestone's `ChecklistItem`
+  records appears — status toggles (Not Evaluated/Met/Not Met/Waived) save
+  immediately on click, and a full-record edit/create form covers everything
+  else. This is the first real consumer of `ChecklistItem`'s own
+  forward-compatibility design intent from the PKM migration (a discrete,
+  user-answerable criterion + toggleable status + evidence reference).
+- **The original flat tab bar is fully preserved**, reachable via the **All
+  Tabs** toggle in the header (or the button inside the workbench itself) —
+  nothing about the 12 existing tabs' internals changed. Which view you land
+  on is remembered per-browser via `localStorage`, the same pattern used for
+  Edit Mode.
+
+## PDKM Promises
+
+The **PDKM Promises** tab is a read-only, cross-entity browser over every
+field this app marks `@domain-placeholder` in its type files (see
+`data-schema/DOMAIN_PLACEHOLDER_FIELDS.md` for the full manifest). Every row
+is a real value from a real record currently in this app's data — a CI name,
+a hazard example, a spec section's text — framed as a *promise*: in the
+spirit of a promissory note, this app commits that each of these fields will
+be updated once a real Product/Domain Knowledge Model (PDKM) exists for the
+program a given deployment actually serves, arriving either through a
+landing zone upload (a technical or management source file ingested through
+this app's import path) or direct user data entry through each entity's own
+tab. The tab itself has no edit affordance — it exists to make that
+inventory browsable and filterable by entity type, not to replace each
+entity's own editing UI.
+
 ## Editable site content
 
 Beyond the structured entity data above, most of the app's guidance prose
@@ -696,12 +757,18 @@ descriptions, page hints, and a few SE-judgment sentences on the CI/Subsystem
 detail views) is itself editable in place, versioned separately from the
 structured entities:
 
-- Toggle **Edit Mode** in the header (persisted per-browser via
-  `localStorage`). While on, editable prose is outlined with a pencil (✎)
-  button; click it to open an editor with Save/Cancel, a **Reset to
-  original** option (removes the override, reverting to the hardcoded
-  default), and a **version history** panel listing every prior value with a
-  **Revert to this** action per entry.
+- Click the pencil **FAB** in the bottom-left corner to enter Edit Mode —
+  it prompts for a password (currently a hardcoded placeholder, `edit`; not
+  real access control, just deliberate friction against accidental edits
+  while multiple people share this environment). The FAB turns amber while
+  active; click it again to exit (no password needed to leave). The on/off
+  state persists per-browser via `localStorage`. While on, editable prose is
+  outlined with a pencil (✎) button; click it to open an editor with
+  Save/Cancel, a **Reset to original** option (removes the override,
+  reverting to the hardcoded default), and a **version history** panel
+  listing every prior value with a **Revert to this** action per entry.
+  Saved overrides are visible immediately whether or not Edit Mode is on —
+  Edit Mode only controls whether the pencil buttons themselves are shown.
 - Backed by a ninth entity, `ContentEntry` (`key`, `value`, `history[]`,
   `updatedAt`), stored the same way as the rest of the data — server-side
   JSON in normal mode, `localStorage` in the static/Pages build — and

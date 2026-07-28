@@ -3,6 +3,14 @@ import { getDb, replaceDb } from "../db.js";
 import type { Database } from "../types.js";
 
 const REQUIRED_KEYS: (keyof Database)[] = [
+  "programs",
+  "projects",
+  "baselines",
+  "milestones",
+  "requirements",
+  "verificationEvents",
+  "checklistItems",
+  "gaps",
   "logicalSubsystems",
   "cis",
   "deltaMatrix",
@@ -19,7 +27,7 @@ const REQUIRED_KEYS: (keyof Database)[] = [
 export const dataRouter = Router();
 
 dataRouter.get("/export", (_req, res) => {
-  res.setHeader("Content-Disposition", "attachment; filename=pdr-workbench-export.json");
+  res.setHeader("Content-Disposition", "attachment; filename=se-workbench-export.json");
   res.json(getDb());
 });
 

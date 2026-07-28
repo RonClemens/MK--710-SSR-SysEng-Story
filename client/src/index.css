@@ -69,6 +69,11 @@ button {
 
 .app-main {
   flex: 1;
+  /* Flex items default to min-width: auto, which refuses to shrink below
+     the intrinsic width of their content (e.g. a fixed-width grid column) --
+     without this, narrow-viewport content pushes wider than the space left
+     by the AI panel rail and renders underneath it instead of wrapping. */
+  min-width: 0;
   padding: 1.5rem;
   overflow-y: auto;
 }
@@ -228,12 +233,31 @@ button {
   flex-wrap: wrap;
 }
 
-.edit-mode-toggle {
+.edit-mode-fab {
+  position: fixed;
+  left: 1.25rem;
+  bottom: 1.25rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: white;
+  border: none;
+  font-size: 1.4rem;
+  box-shadow: 0 4px 14px rgba(20, 27, 71, 0.4);
+  z-index: 50;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  color: var(--ice-light);
+  justify-content: center;
+}
+
+.edit-mode-fab:hover {
+  background: var(--navy-dark);
+}
+
+.edit-mode-fab.active {
+  background: var(--amber);
+  box-shadow: 0 4px 14px rgba(181, 101, 29, 0.45);
 }
 
 .data-table-wrap {
@@ -737,8 +761,18 @@ button {
 }
 
 .ai-panel.open .ai-panel-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
   padding: 0.6rem 0.9rem;
-  text-align: left;
+  text-align: right;
+}
+
+.ai-panel-close-icon {
+  font-size: 1.3rem;
+  line-height: 1;
 }
 
 @media (max-width: 720px) {
@@ -747,6 +781,19 @@ button {
     inset: 0;
     width: 100%;
     z-index: 100;
+  }
+
+  /* A fixed 160px label column is too cramped next to real sentence-length
+     values (e.g. Phase Workbench entry/exit gate text) on a narrow Android
+     portrait screen -- stack label above value instead of squeezing both
+     into one row. */
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 0.15rem 0;
+  }
+
+  .detail-grid dd {
+    margin-bottom: 0.6rem;
   }
 }
 
@@ -857,6 +904,158 @@ button {
   resize: none;
 }
 
+.pill-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.pill-filter {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.8rem;
+}
+
+.pill-filter:hover {
+  border-color: var(--ice);
+  color: var(--navy);
+}
+
+.pill-filter.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
+}
+
+.search-control {
+  min-width: 260px;
+  max-width: 420px;
+  margin: 0.75rem 0 1rem;
+}
+
+.search-control input[type="text"] {
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.promises-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.promise-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.promise-group-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--ice-light);
+  border: none;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.promise-group-chevron {
+  display: inline-block;
+  transition: transform 0.15s ease;
+  color: var(--navy);
+  font-size: 0.7rem;
+}
+
+.promise-group-chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.promise-group-title {
+  flex: 1;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.promise-group-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.promise-group-body {
+  padding: 0.75rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.promise-element {
+  border-top: 1px solid var(--border);
+  padding-top: 0.7rem;
+}
+
+.promise-element:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.promise-element-name {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.promise-element-entity {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--amber);
+}
+
+.promise-element-label {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.promise-element-fields {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.promise-field-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.promise-field-row dt {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.promise-field-row dd {
+  margin: 0;
+  color: var(--text);
+}
+
 .architecture-footer {
   position: fixed;
   bottom: 0;
@@ -875,4 +1074,172 @@ button {
 
 .architecture-footer a:hover {
   text-decoration: underline;
+}
+
+/* Acquisition Phase Workbench */
+
+.phase-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 1rem;
+  margin: 1rem 0;
+}
+
+.phase-step {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  min-width: 160px;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.phase-step:hover {
+  border-color: var(--ice);
+}
+
+.phase-step.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
+}
+
+.phase-step.active .phase-step-gate-badge {
+  background: var(--ice-light);
+  color: var(--navy-dark);
+}
+
+.phase-step.current {
+  border-bottom: 3px solid var(--amber);
+}
+
+.phase-step.out-of-scope {
+  opacity: 0.55;
+}
+
+.phase-step-name {
+  font-weight: 600;
+}
+
+.phase-step-gate-badge {
+  display: inline-block;
+  background: var(--ice);
+  color: var(--navy-dark);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.phase-step-current-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--amber);
+}
+
+.phase-step.active .phase-step-current-label {
+  color: var(--ice-light);
+}
+
+.phase-detail-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.phase-detail-panel h3 {
+  margin: 0 0 0.3rem;
+  color: var(--navy);
+}
+
+.guided-checklist-panel {
+  margin-top: 1.5rem;
+}
+
+.checklist-item-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--ice);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.checklist-item-card p {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.checklist-status-row,
+.cdrl-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.checklist-status-pill {
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.checklist-status-pill:hover {
+  border-color: var(--ice);
+}
+
+.checklist-status-pill.met.selected {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
+}
+
+.checklist-status-pill.not-met.selected {
+  background: #fbe9dd;
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.checklist-status-pill.waived.selected {
+  background: var(--ice-light);
+  border-color: var(--ice);
+  color: var(--navy);
+}
+
+.checklist-status-pill.not-evaluated.selected {
+  background: var(--ice-light);
+  border-color: var(--border);
+  color: var(--navy-dark);
+}
+
+.cdrl-status-pill {
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.cdrl-status-pill:hover {
+  border-color: var(--ice);
+}
+
+.cdrl-status-pill.selected {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
 }

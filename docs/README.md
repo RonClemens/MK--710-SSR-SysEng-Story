@@ -11,3 +11,7 @@ This app's own contributions to that exchange live at:
 - `migration-plans/se-workbench/PKM_MIGRATION_PLAN.md`
 - `feedback/se-workbench/PKM_ENTITY_MODEL_CONFORMANCE.md`
 - `feedback/se-workbench/PKM_MIGRATION_PLAN_FEEDBACK.md`
+
+## `reference/`
+
+Internal reference material for contributors — original summaries of external standards, not reproductions of the source documents themselves. See `reference/INCOSE_SE_HANDBOOK_5TH_ED_SUMMARY.md` for a section-by-section map of the INCOSE SE Handbook (5th ed.), useful when checking a PKM entity or field against established SE terminology. The source Handbook PDF itself is licensed for personal use only and must never be added to this or any repo.

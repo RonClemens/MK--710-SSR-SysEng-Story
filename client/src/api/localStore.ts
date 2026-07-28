@@ -13,23 +13,59 @@ function normalize(db: Partial<Database>): Database {
     ...ci,
     subsystemIds: ci.subsystemIds ?? [],
     baseline: ci.baseline ?? "Baseline A",
+    projectId: ci.projectId ?? null,
+    baselineId: ci.baselineId ?? null,
+    gapId: ci.gapId ?? null,
     attachments: ci.attachments ?? [],
   }));
   const logicalSubsystems = (db.logicalSubsystems ?? []).map((s) => ({
     ...s,
     baseline: s.baseline ?? "Baseline A",
+    projectId: s.projectId ?? null,
+    baselineId: s.baselineId ?? null,
   }));
-  const cotsRecords = (db.cotsRecords ?? []).map((r) => ({ ...r, attachments: r.attachments ?? [] }));
-  const specifications = (db.specifications ?? []).map((s) => ({ ...s, attachments: s.attachments ?? [] }));
-  const safetyDeliverables = (db.safetyDeliverables ?? []).map((s) => ({ ...s, attachments: s.attachments ?? [] }));
+  const deltaMatrix = (db.deltaMatrix ?? []).map((r) => ({
+    ...r,
+    requirementId: r.requirementId ?? null,
+    gapId: r.gapId ?? null,
+  }));
+  const cotsRecords = (db.cotsRecords ?? []).map((r) => ({
+    ...r,
+    verificationEventId: r.verificationEventId ?? null,
+    attachments: r.attachments ?? [],
+  }));
+  const specifications = (db.specifications ?? []).map((s) => ({
+    ...s,
+    projectId: s.projectId ?? null,
+    baselineId: s.baselineId ?? null,
+    attachments: s.attachments ?? [],
+  }));
+  const safetyDeliverables = (db.safetyDeliverables ?? []).map((s) => ({
+    ...s,
+    projectId: s.projectId ?? null,
+    baselineId: s.baselineId ?? null,
+    milestoneId: s.milestoneId ?? null,
+    attachments: s.attachments ?? [],
+  }));
   const programPlanningDeliverables = (db.programPlanningDeliverables ?? []).map((p) => ({
     ...p,
+    projectId: p.projectId ?? null,
+    baselineId: p.baselineId ?? null,
+    milestoneId: p.milestoneId ?? null,
     attachments: p.attachments ?? [],
   }));
   return {
+    programs: db.programs ?? [],
+    projects: db.projects ?? [],
+    baselines: db.baselines ?? [],
+    milestones: db.milestones ?? [],
+    requirements: db.requirements ?? [],
+    verificationEvents: db.verificationEvents ?? [],
+    checklistItems: db.checklistItems ?? [],
+    gaps: db.gaps ?? [],
     logicalSubsystems,
     cis,
-    deltaMatrix: db.deltaMatrix ?? [],
+    deltaMatrix,
     abCompatibility: db.abCompatibility ?? [],
     cotsRecords,
     recommendations: db.recommendations ?? [],
@@ -53,7 +89,15 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.interfaces === undefined ||
     db.specifications === undefined ||
     db.safetyDeliverables === undefined ||
-    db.programPlanningDeliverables === undefined;
+    db.programPlanningDeliverables === undefined ||
+    db.programs === undefined ||
+    db.projects === undefined ||
+    db.baselines === undefined ||
+    db.milestones === undefined ||
+    db.requirements === undefined ||
+    db.verificationEvents === undefined ||
+    db.checklistItems === undefined ||
+    db.gaps === undefined;
   return {
     db: {
       ...db,
@@ -62,6 +106,14 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       specifications: db.specifications ?? SEED_DATA.specifications,
       safetyDeliverables: db.safetyDeliverables ?? SEED_DATA.safetyDeliverables,
       programPlanningDeliverables: db.programPlanningDeliverables ?? SEED_DATA.programPlanningDeliverables,
+      programs: db.programs ?? SEED_DATA.programs,
+      projects: db.projects ?? SEED_DATA.projects,
+      baselines: db.baselines ?? SEED_DATA.baselines,
+      milestones: db.milestones ?? SEED_DATA.milestones,
+      requirements: db.requirements ?? SEED_DATA.requirements,
+      verificationEvents: db.verificationEvents ?? SEED_DATA.verificationEvents,
+      checklistItems: db.checklistItems ?? SEED_DATA.checklistItems,
+      gaps: db.gaps ?? SEED_DATA.gaps,
     },
     changed,
   };

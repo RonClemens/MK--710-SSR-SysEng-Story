@@ -1,16 +1,25 @@
 import { useEffect, useState } from "react";
 import { useEntity } from "./hooks/useEntity";
+import { useNavMode } from "./hooks/useNavMode";
 import {
   abCompatibilityApi,
+  baselinesApi,
+  checklistItemsApi,
   cisApi,
   cotsRecordsApi,
   deltaMatrixApi,
+  gapsApi,
   interfacesApi,
   logicalSubsystemsApi,
+  milestonesApi,
   programPlanningDeliverablesApi,
+  programsApi,
+  projectsApi,
   recommendationsApi,
+  requirementsApi,
   safetyDeliverablesApi,
   specificationsApi,
+  verificationEventsApi,
 } from "./api/entities";
 import { api } from "./api/client";
 import { SubsystemsPage } from "./pages/SubsystemsPage";
@@ -26,12 +35,14 @@ import { SpecificationDetailPage } from "./pages/SpecificationDetailPage";
 import { SafetyDeliverablesPage } from "./pages/SafetyDeliverablesPage";
 import { PlanningDeliverablesPage } from "./pages/PlanningDeliverablesPage";
 import { SempMigrationPage } from "./pages/SempMigrationPage";
+import { PromisesPage } from "./pages/PromisesPage";
+import { PhaseWorkbenchPage } from "./pages/PhaseWorkbenchPage";
 import { CiDetailPage } from "./pages/CiDetailPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { EditableText } from "./components/EditableText";
+import { EditModeFab } from "./components/EditModeFab";
 import { ExportImport } from "./components/ExportImport";
 import { ArchitectureFooter } from "./components/ArchitectureFooter";
-import { useSiteContent } from "./contexts/SiteContentContext";
 
 type Tab =
   | "subsystems"
@@ -44,7 +55,8 @@ type Tab =
   | "safetyDeliverables"
   | "planningDeliverables"
   | "recommendations"
-  | "sempMigration";
+  | "sempMigration"
+  | "promises";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "subsystems", label: "Subsystems" },
@@ -58,9 +70,18 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "planningDeliverables", label: "Program Planning" },
   { key: "recommendations", label: "Recommendations" },
   { key: "sempMigration", label: "SEMP Migration" },
+  { key: "promises", label: "PDKM Promises" },
 ];
 
 export default function App() {
+  const programs = useEntity(programsApi);
+  const projects = useEntity(projectsApi);
+  const baselines = useEntity(baselinesApi);
+  const milestones = useEntity(milestonesApi);
+  const requirements = useEntity(requirementsApi);
+  const verificationEvents = useEntity(verificationEventsApi);
+  const checklistItems = useEntity(checklistItemsApi);
+  const gaps = useEntity(gapsApi);
   const logicalSubsystems = useEntity(logicalSubsystemsApi);
   const cis = useEntity(cisApi);
   const deltaMatrix = useEntity(deltaMatrixApi);
@@ -77,13 +98,21 @@ export default function App() {
   const [selectedSubsystemId, setSelectedSubsystemId] = useState<string | null>(null);
   const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
   const [serverAiEnabled, setServerAiEnabled] = useState(false);
-  const { editMode, setEditMode } = useSiteContent();
+  const [navMode, setNavMode] = useNavMode();
 
   useEffect(() => {
     api.config().then((cfg) => setServerAiEnabled(cfg.aiEnabled));
   }, []);
 
   function refreshAll() {
+    programs.refresh();
+    projects.refresh();
+    baselines.refresh();
+    milestones.refresh();
+    requirements.refresh();
+    verificationEvents.refresh();
+    checklistItems.refresh();
+    gaps.refresh();
     logicalSubsystems.refresh();
     cis.refresh();
     deltaMatrix.refresh();
@@ -130,19 +159,26 @@ export default function App() {
     <div className="app-shell">
       <header className="app-header">
         <div>
-          <h1>PDR Reconciliation & Baseline Alignment Workbench</h1>
+          <h1>SE Workbench</h1>
           <EditableText
             contentKey="app.subtitle"
             defaultValue="Illustrative/demo data only — not a real program's CI names or requirements."
             as="p"
             className="subtitle"
           />
+          {projects.rows[0] && (
+            <p className="hint" title="PKM Migration Step 1: Program / Project scope">
+              {programs.rows[0]?.name ?? "—"} → {projects.rows[0].name}
+            </p>
+          )}
         </div>
         <div className="header-actions">
-          <label className="edit-mode-toggle">
-            <input type="checkbox" checked={editMode} onChange={(e) => setEditMode(e.target.checked)} />
-            Edit Mode
-          </label>
+          <button
+            className="button-secondary"
+            onClick={() => setNavMode(navMode === "wizard" ? "allTabs" : "wizard")}
+          >
+            {navMode === "wizard" ? "All Tabs" : "Guided View"}
+          </button>
           <ExportImport onImported={refreshAll} />
         </div>
       </header>
@@ -190,6 +226,18 @@ export default function App() {
               onSelectSubsystem={selectSubsystem}
               onSelectCi={selectCi}
             />
+          ) : navMode === "wizard" ? (
+            <PhaseWorkbenchPage
+              baselines={baselines.rows}
+              milestones={milestones.rows}
+              checklistItems={checklistItems}
+              safetyDeliverables={safetyDeliverables}
+              planningDeliverables={planningDeliverables}
+              onSwitchToAllTabs={(targetTab) => {
+                if (targetTab) setTab(targetTab);
+                setNavMode("allTabs");
+              }}
+            />
           ) : (
             <>
               <nav className="tab-bar">
@@ -215,10 +263,27 @@ export default function App() {
                   onSelectCi={selectCi}
                 />
               )}
-              {tab === "cis" && <CisPage entity={cis} subsystems={logicalSubsystems.rows} onSelectCi={selectCi} />}
-              {tab === "delta" && <DeltaMatrixPage entity={deltaMatrix} cis={cis.rows} />}
+              {tab === "cis" && (
+                <CisPage
+                  entity={cis}
+                  subsystems={logicalSubsystems.rows}
+                  baselines={baselines.rows}
+                  gaps={gaps.rows}
+                  onSelectCi={selectCi}
+                />
+              )}
+              {tab === "delta" && (
+                <DeltaMatrixPage
+                  entity={deltaMatrix}
+                  cis={cis.rows}
+                  requirements={requirements.rows}
+                  gaps={gaps.rows}
+                />
+              )}
               {tab === "ab" && <AbCompatibilityPage entity={abCompatibility} cis={cis.rows} />}
-              {tab === "cots" && <CotsRecordsPage entity={cotsRecords} cis={cis.rows} />}
+              {tab === "cots" && (
+                <CotsRecordsPage entity={cotsRecords} cis={cis.rows} verificationEvents={verificationEvents.rows} />
+              )}
               {tab === "specifications" && (
                 <SpecificationsPage
                   entity={specifications}
@@ -242,10 +307,33 @@ export default function App() {
                 />
               )}
               {tab === "recommendations" && (
-                <RecommendationsPage entity={recommendations} cis={cis.rows} />
+                <RecommendationsPage entity={recommendations} cis={cis.rows} gaps={gaps.rows} />
               )}
               {tab === "sempMigration" && (
                 <SempMigrationPage
+                  baselines={baselines.rows}
+                  milestones={milestones.rows}
+                  logicalSubsystems={logicalSubsystems.rows}
+                  cis={cis.rows}
+                  deltaMatrix={deltaMatrix.rows}
+                  abCompatibility={abCompatibility.rows}
+                  cotsRecords={cotsRecords.rows}
+                  recommendations={recommendations.rows}
+                  interfaces={interfaces.rows}
+                  specifications={specifications.rows}
+                  safetyDeliverables={safetyDeliverables.rows}
+                  planningDeliverables={planningDeliverables.rows}
+                />
+              )}
+              {tab === "promises" && (
+                <PromisesPage
+                  programs={programs.rows}
+                  projects={projects.rows}
+                  milestones={milestones.rows}
+                  requirements={requirements.rows}
+                  verificationEvents={verificationEvents.rows}
+                  checklistItems={checklistItems.rows}
+                  gaps={gaps.rows}
                   logicalSubsystems={logicalSubsystems.rows}
                   cis={cis.rows}
                   deltaMatrix={deltaMatrix.rows}
@@ -263,6 +351,7 @@ export default function App() {
         </main>
         <AiAssistantPanel serverAiEnabled={serverAiEnabled} />
       </div>
+      <EditModeFab />
       <ArchitectureFooter />
     </div>
   );

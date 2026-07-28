@@ -3,12 +3,13 @@ import { DataTable, type ColumnDef } from "../components/DataTable";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
 import { attachmentsToText, textToAttachments } from "../utils/attachments";
-import type { ConfigurationItem, CotsRecord, QualifiedAlternate } from "../types";
+import type { ConfigurationItem, CotsRecord, QualifiedAlternate, VerificationEvent } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
 interface Props {
   entity: ReturnType<typeof useEntity<CotsRecord>>;
   cis: ConfigurationItem[];
+  verificationEvents: VerificationEvent[];
 }
 
 // qualifiedAlternates is edited as free text, one "part number | lifecycle status" per line.
@@ -31,7 +32,7 @@ type CotsFormValues = Omit<CotsRecord, "qualifiedAlternates" | "attachments"> & 
   attachments: string;
 };
 
-export function CotsRecordsPage({ entity, cis }: Props) {
+export function CotsRecordsPage({ entity, cis, verificationEvents }: Props) {
   const { rows, loading, error, create, update, remove } = entity;
   const [editing, setEditing] = useState<CotsRecord | "new" | null>(null);
 
@@ -39,6 +40,7 @@ export function CotsRecordsPage({ entity, cis }: Props) {
   const ciOptions = cotsCis.map((c) => c.id);
   const ciLabels = Object.fromEntries(cis.map((c) => [c.id, c.name]));
   const ciName = (id: string) => ciLabels[id] ?? "(unknown CI)";
+  const verificationEventsById = Object.fromEntries(verificationEvents.map((v) => [v.id, v]));
 
   const fields: FieldDef<CotsFormValues>[] = [
     { key: "ciId", label: "CI (COTS only)", type: "select", options: ciOptions, optionLabels: ciLabels },
@@ -69,6 +71,7 @@ export function CotsRecordsPage({ entity, cis }: Props) {
     interfaceRequirement: "",
     formFitConstraints: "",
     verificationMethod: "inspection of vendor data sheet",
+    verificationEventId: null,
     rationale: "",
     partsListEntry: "",
     qualifiedAlternates: "",
@@ -82,6 +85,19 @@ export function CotsRecordsPage({ entity, cis }: Props) {
     { key: "ciId", label: "CI", sortValue: (r) => ciName(r.ciId), render: (r) => ciName(r.ciId) },
     { key: "partsListEntry", label: "Parts list entry" },
     { key: "verificationMethod", label: "Verification method" },
+    {
+      key: "verificationEventId",
+      label: "Verification event (structural)",
+      render: (r) => {
+        const ve = r.verificationEventId ? verificationEventsById[r.verificationEventId] : null;
+        if (!ve) return "(unlinked)";
+        return (
+          <span title={ve.evidenceSummary}>
+            {ve.method} — {ve.result}
+          </span>
+        );
+      },
+    },
     {
       key: "qualifiedAlternates",
       label: "Qualified alternates",

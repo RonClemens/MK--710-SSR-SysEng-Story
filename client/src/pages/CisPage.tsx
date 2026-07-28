@@ -6,13 +6,22 @@ import { EntityForm, type FieldDef } from "../components/EntityForm";
 import { DbxMbxCard } from "../components/DbxMbxCard";
 import { DBX_MBX_DIMENSIONS, DBX_MBX_INTRO } from "../../../methodology/guidance/dbxMbxGuidance";
 import {
+  findReconciliationTargetBaseline,
   RECOVERY_DELTA_CLASSES,
   RECOVERY_DELTA_CLASS_SCOPE_NOTE,
   RECOVERY_DELTA_CLASS_TIER_MAPPING,
   RECOVERY_PROGRAM_INTRO,
 } from "../../../methodology/guidance/recoveryProgramGuidance";
 import { attachmentsToText, textToAttachments } from "../utils/attachments";
-import { CI_TIERS, CI_TYPES, SPEC_BASELINES, type ConfigurationItem, type LogicalSubsystem } from "../types";
+import {
+  CI_TIERS,
+  CI_TYPES,
+  SPEC_BASELINES,
+  type Baseline,
+  type ConfigurationItem,
+  type Gap,
+  type LogicalSubsystem,
+} from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
 const decompositionDimension = DBX_MBX_DIMENSIONS.find((d) => d.id === "decomposition")!;
@@ -35,13 +44,17 @@ const emptyRow: Partial<CiFormValues> = {
 interface Props {
   entity: ReturnType<typeof useEntity<ConfigurationItem>>;
   subsystems: LogicalSubsystem[];
+  baselines: Baseline[];
+  gaps: Gap[];
   onSelectCi: (id: string) => void;
 }
 
-export function CisPage({ entity, subsystems, onSelectCi }: Props) {
+export function CisPage({ entity, subsystems, baselines, gaps, onSelectCi }: Props) {
   const { rows, loading, error, create, update, remove } = entity;
   const [editing, setEditing] = useState<ConfigurationItem | "new" | null>(null);
   const [showGuidance, setShowGuidance] = useState(false);
+  const reconciliationTargetBaseline = findReconciliationTargetBaseline(baselines);
+  const gapsById = Object.fromEntries(gaps.map((g) => [g.id, g]));
 
   const subsystemLabels = Object.fromEntries(subsystems.map((s) => [s.id, s.name]));
   const subsystemNames = (ids: string[]) => ids.map((id) => subsystemLabels[id] ?? "(unknown)").join(", ");
@@ -110,6 +123,21 @@ export function CisPage({ entity, subsystems, onSelectCi }: Props) {
       filterOptions: ["Yes", "No"],
       filterValue: (r) => (r.overDecompositionFlag ? "Yes" : "No"),
     },
+    {
+      key: "gapId",
+      label: "Gap (structural)",
+      render: (r) => {
+        const gap = r.gapId ? gapsById[r.gapId] : null;
+        if (!gap) return "(unlinked)";
+        return (
+          <span title={gap.description}>
+            <span className="truncate">{gap.description}</span>
+            <br />
+            <span className="hint">{gap.disposition}</span>
+          </span>
+        );
+      },
+    },
     { key: "status", label: "Status", sortValue: (r) => r.status },
     {
       key: "attachments",
@@ -144,8 +172,13 @@ export function CisPage({ entity, subsystems, onSelectCi }: Props) {
             <DbxMbxCard dimension={decompositionDimension} />
           </div>
 
-          <h3>Recovery Program: CI Tier ↔ Delta Classification (Baseline B)</h3>
+          <h3>Recovery Program: CI Tier ↔ Delta Classification</h3>
           <EditableText contentKey="recovery.intro" defaultValue={RECOVERY_PROGRAM_INTRO} as="p" className="hint" />
+          <p className="did-guidance-label">Applies to</p>
+          <p className="hint">
+            {reconciliationTargetBaseline?.name ?? "—"}
+            {" — the baseline with a set reconciledFromBaselineId (Baseline entity data, not hardcoded guidance text)"}
+          </p>
           <div className="did-guidance-grid">
             {RECOVERY_DELTA_CLASSES.map((cls) => (
               <div className="detail-card" key={cls}>

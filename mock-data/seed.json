@@ -1,5 +1,226 @@
 {
   "_comment": "ILLUSTRATIVE SAMPLE DATA ONLY. This is placeholder/demo data (MHC/MCC/IPS Test Set example) used to build and demonstrate the app. It is not real program data. Do not treat any names, requirements text, or part numbers here as authoritative.",
+  "programs": [
+    {
+      "id": "program-001",
+      "name": "Test Equipment Sustainment Program",
+      "description": "Illustrative program record (PKM Migration Step 1) \u2014 coordinates the recovery/reconciliation project below. Not a real program name.",
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": "project-001",
+      "name": "Baseline A/B Reconciliation Project",
+      "description": "Illustrative project record (PKM Migration Step 1) \u2014 the temporary effort this workbench supports, delivering a reconciled Baseline B design. Not a real project name.",
+      "programId": "program-001",
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    }
+  ],
+  "baselines": [
+    {
+      "id": "BASELINE-A",
+      "name": "Baseline A",
+      "baselineType": "Product",
+      "projectId": "project-001",
+      "establishedAtMilestoneId": "milestone-a-cdr",
+      "reconciledFromBaselineId": null,
+      "reconciledIntoBaselineId": "BASELINE-B",
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "BASELINE-B",
+      "name": "Baseline B",
+      "baselineType": "Allocated",
+      "projectId": "project-001",
+      "establishedAtMilestoneId": "milestone-b-srr",
+      "reconciledFromBaselineId": "BASELINE-A",
+      "reconciledIntoBaselineId": null,
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-20T00:00:00.000Z"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone-a-srr",
+      "event": "SRR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A",
+      "status": "Complete",
+      "actualDate": "2026-01-20T00:00:00.000Z",
+      "plannedDate": "2026-01-20T00:00:00.000Z",
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-20T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-a-sfr",
+      "event": "SFR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A",
+      "status": "Complete",
+      "actualDate": "2026-02-17T00:00:00.000Z",
+      "plannedDate": "2026-02-17T00:00:00.000Z",
+      "createdAt": "2026-01-20T00:00:00.000Z",
+      "updatedAt": "2026-02-17T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-a-ssr",
+      "event": "SSR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A",
+      "status": "Complete",
+      "actualDate": "2026-03-10T00:00:00.000Z",
+      "plannedDate": "2026-03-10T00:00:00.000Z",
+      "createdAt": "2026-02-17T00:00:00.000Z",
+      "updatedAt": "2026-03-10T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-a-pdr",
+      "event": "PDR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A",
+      "status": "Complete",
+      "actualDate": "2026-04-07T00:00:00.000Z",
+      "plannedDate": "2026-04-07T00:00:00.000Z",
+      "createdAt": "2026-03-10T00:00:00.000Z",
+      "updatedAt": "2026-04-07T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-a-cdr",
+      "event": "CDR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A",
+      "status": "Complete",
+      "actualDate": "2026-05-01T00:00:00.000Z",
+      "plannedDate": "2026-05-01T00:00:00.000Z",
+      "createdAt": "2026-04-07T00:00:00.000Z",
+      "updatedAt": "2026-05-01T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-a-trr",
+      "event": "TRR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A",
+      "status": "In Progress",
+      "actualDate": null,
+      "plannedDate": "2026-08-05T00:00:00.000Z",
+      "createdAt": "2026-05-01T00:00:00.000Z",
+      "updatedAt": "2026-06-15T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-a-svr",
+      "event": "SVR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A",
+      "status": "Not Started",
+      "actualDate": null,
+      "plannedDate": "2026-10-01T00:00:00.000Z",
+      "createdAt": "2026-05-01T00:00:00.000Z",
+      "updatedAt": "2026-05-01T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-a-prr",
+      "event": "PRR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A",
+      "status": "Not Started",
+      "actualDate": null,
+      "plannedDate": "2026-12-01T00:00:00.000Z",
+      "createdAt": "2026-05-01T00:00:00.000Z",
+      "updatedAt": "2026-05-01T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-b-srr",
+      "event": "SRR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B",
+      "status": "Complete",
+      "actualDate": "2026-06-01T00:00:00.000Z",
+      "plannedDate": "2026-06-01T00:00:00.000Z",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-b-sfr",
+      "event": "SFR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B",
+      "status": "In Progress",
+      "actualDate": null,
+      "plannedDate": "2026-07-30T00:00:00.000Z",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-20T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-b-ssr",
+      "event": "SSR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B",
+      "status": "Not Started",
+      "actualDate": null,
+      "plannedDate": "2026-09-01T00:00:00.000Z",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-b-pdr",
+      "event": "PDR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B",
+      "status": "Not Started",
+      "actualDate": null,
+      "plannedDate": "2026-10-15T00:00:00.000Z",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-b-cdr",
+      "event": "CDR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B",
+      "status": "Not Started",
+      "actualDate": null,
+      "plannedDate": "2026-12-01T00:00:00.000Z",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-b-trr",
+      "event": "TRR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B",
+      "status": "Not Started",
+      "actualDate": null,
+      "plannedDate": "2027-02-01T00:00:00.000Z",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-b-svr",
+      "event": "SVR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B",
+      "status": "Not Started",
+      "actualDate": null,
+      "plannedDate": "2027-03-15T00:00:00.000Z",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "milestone-b-prr",
+      "event": "PRR",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B",
+      "status": "Not Started",
+      "actualDate": null,
+      "plannedDate": "2027-04-15T00:00:00.000Z",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-01T00:00:00.000Z"
+    }
+  ],
   "logicalSubsystems": [
     {
       "id": "sub-001",
@@ -8,7 +229,9 @@
       "source": "Validated",
       "baseline": "Baseline A",
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "sub-002",
@@ -17,7 +240,9 @@
       "source": "Validated",
       "baseline": "Baseline A",
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "sub-003",
@@ -26,25 +251,31 @@
       "source": "Proposed",
       "baseline": "Baseline A",
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "sub-004",
       "name": "Rack 3 Assembly (legacy grouping)",
-      "description": "Pulled directly from the existing physical/rack-organized SSDD as a placeholder grouping. Captures which enclosure a CI physically sits in, not a functional boundary — not yet independently validated as a true logical subsystem.",
-      "source": "Inherited from SSDD structure — unverified",
+      "description": "Pulled directly from the existing physical/rack-organized SSDD as a placeholder grouping. Captures which enclosure a CI physically sits in, not a functional boundary \u2014 not yet independently validated as a true logical subsystem.",
+      "source": "Inherited from SSDD structure \u2014 unverified",
       "baseline": "Baseline A",
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "sub-b-001",
       "name": "UUT Stimulus/Response",
-      "description": "Baseline B's own functional decomposition for stimulus/response generation and capture — independently validated at SFR, not inherited from Baseline A's subsystem of the same name.",
+      "description": "Baseline B's own functional decomposition for stimulus/response generation and capture \u2014 independently validated at SFR, not inherited from Baseline A's subsystem of the same name.",
       "source": "Validated",
       "baseline": "Baseline B",
       "createdAt": "2026-06-01T00:00:00.000Z",
-      "updatedAt": "2026-06-20T00:00:00.000Z"
+      "updatedAt": "2026-06-20T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "sub-b-002",
@@ -53,16 +284,20 @@
       "source": "Validated",
       "baseline": "Baseline B",
       "createdAt": "2026-06-01T00:00:00.000Z",
-      "updatedAt": "2026-06-20T00:00:00.000Z"
+      "updatedAt": "2026-06-20T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "sub-b-003",
       "name": "Power Conditioning & Distribution",
-      "description": "Candidate Baseline B power conditioning function, largely mirroring Baseline A's IPS-derived allocation. Still Proposed pending SFR closure — the one subsystem that didn't clear SFR alongside the other two.",
+      "description": "Candidate Baseline B power conditioning function, largely mirroring Baseline A's IPS-derived allocation. Still Proposed pending SFR closure \u2014 the one subsystem that didn't clear SFR alongside the other two.",
       "source": "Proposed",
       "baseline": "Baseline B",
       "createdAt": "2026-06-01T00:00:00.000Z",
-      "updatedAt": "2026-06-20T00:00:00.000Z"
+      "updatedAt": "2026-06-20T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     }
   ],
   "cis": [
@@ -87,8 +322,11 @@
           "url": "https://example.com/docs/ICD-TS-014"
         }
       ],
+      "gapId": null,
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "ci-002",
@@ -105,8 +343,11 @@
       "status": "In reconciliation",
       "notes": "UUT-facing controller module within the Test Set.",
       "attachments": [],
+      "gapId": null,
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "ci-003",
@@ -122,8 +363,11 @@
       "status": "Flagged for consolidation",
       "notes": "Vendor COTS card, no unique program requirements beyond the Test Set's allocation.",
       "attachments": [],
+      "gapId": "gap-001",
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "ci-004",
@@ -139,8 +383,11 @@
       "status": "Flagged for consolidation",
       "notes": "Commercial power supply module.",
       "attachments": [],
+      "gapId": "gap-002",
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "ci-005",
@@ -156,6 +403,117 @@
       "status": "Slated for replacement",
       "notes": "Not UUT-facing; scheduled to be retired in a future increment.",
       "attachments": [],
+      "gapId": null,
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
+    }
+  ],
+  "gaps": [
+    {
+      "id": "gap-001",
+      "baselineId": "BASELINE-A",
+      "foundInEntityType": "ConfigurationItem",
+      "foundInEntityId": "ci-003",
+      "description": "MCC (ci-003) tracked as standalone CI despite being a COTS sub-assembly with no independent verification path; should be consolidated into the Test Set CI.",
+      "disposition": "Accept as-is",
+      "blocksMilestoneId": "milestone-a-trr",
+      "blocksChecklistItemId": null,
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "gap-002",
+      "baselineId": "BASELINE-A",
+      "foundInEntityType": "ConfigurationItem",
+      "foundInEntityId": "ci-004",
+      "description": "IPS (ci-004) tracked as standalone CI despite being a commercial power supply module; candidate for reclassification as a COTS item record under the Test Set CI.",
+      "disposition": "Accept as-is",
+      "blocksMilestoneId": "milestone-a-trr",
+      "blocksChecklistItemId": null,
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "gap-003",
+      "baselineId": "BASELINE-A",
+      "foundInEntityType": "DeltaMatrixRow",
+      "foundInEntityId": "delta-001",
+      "description": "As-built Test Set (ci-001) decomposes stimulus/response function across MHC + MCC + IPS sub-modules, finer-grained than the SFR-agreed single-CI allocation.",
+      "disposition": "ECP required",
+      "blocksMilestoneId": "milestone-a-trr",
+      "blocksChecklistItemId": null,
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req-001",
+      "baselineId": "BASELINE-A",
+      "statement": "Test Set shall provide UUT stimulus/response interface per SFR-4.2.1.",
+      "satisfiedByCiIds": [
+        "ci-002",
+        "ci-003",
+        "ci-004"
+      ],
+      "parentRequirementId": null,
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "req-002",
+      "baselineId": "BASELINE-A",
+      "statement": "No independent SFR allocation exists for MCC; it is implicitly part of Test Set allocation.",
+      "satisfiedByCiIds": [
+        "ci-003"
+      ],
+      "parentRequirementId": "req-001",
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "req-003",
+      "baselineId": "BASELINE-A",
+      "statement": "Shall provide module-level control signaling sufficient to support Test Set stimulus/response timing per SFR-4.2.1 (capability-based; no vendor-specific behavior required).",
+      "satisfiedByCiIds": [
+        "ci-003"
+      ],
+      "parentRequirementId": "req-001",
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "req-004",
+      "baselineId": "BASELINE-A",
+      "statement": "Shall provide regulated 28VDC output at up to 15A to support UUT test fixture power needs (capability-based).",
+      "satisfiedByCiIds": [
+        "ci-004"
+      ],
+      "parentRequirementId": null,
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    }
+  ],
+  "verificationEvents": [
+    {
+      "id": "ve-001",
+      "requirementId": "req-003",
+      "method": "Inspection",
+      "result": "Pass",
+      "evidenceSummary": "Inspection of vendor data sheet (Acme Corp MCC-200, Rev C) confirms capability is met.",
+      "eventDate": "2026-01-06",
+      "createdAt": "2026-01-06T00:00:00.000Z",
+      "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "ve-002",
+      "requirementId": "req-004",
+      "method": "Inspection",
+      "result": "Pass",
+      "evidenceSummary": "Inspection of vendor data sheet (Volt Dynamics IPS-28-15, Rev A) confirms capability is met.",
+      "eventDate": "2026-01-06",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     }
@@ -170,6 +528,8 @@
       "deltaSource": "Design reality vs. model",
       "rationale": "Sub-modules were introduced during detailed design for vendor sourcing reasons, not reflected back into the requirements model.",
       "disposition": "ECP required",
+      "requirementId": "req-001",
+      "gapId": "gap-003",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     },
@@ -182,6 +542,8 @@
       "deltaSource": "Model unvalidated vs. design",
       "rationale": "CI record was created early for CM tracking convenience and never reconciled against actual requirements allocation.",
       "disposition": "Accept as-is",
+      "requirementId": "req-002",
+      "gapId": "gap-001",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     }
@@ -218,6 +580,7 @@
       "interfaceRequirement": "Per ICD-TS-014, Section 3 (referenced, not restated).",
       "formFitConstraints": "Must fit existing Test Set card cage slot 3; conduction-cooled per chassis spec.",
       "verificationMethod": "inspection of vendor data sheet",
+      "verificationEventId": "ve-001",
       "rationale": "Capability is bounded by the Test Set's overall stimulus/response requirement; no need for a standalone CI-level requirement set.",
       "partsListEntry": "Acme Corp MCC-200, Rev C",
       "qualifiedAlternates": [
@@ -243,6 +606,7 @@
       "interfaceRequirement": "Per ICD-TS-014, Section 5 (referenced, not restated).",
       "formFitConstraints": "1U rack-mount form factor; existing chassis cutout.",
       "verificationMethod": "inspection of vendor data sheet",
+      "verificationEventId": "ve-002",
       "rationale": "Commercial power supply meeting a bounded capability; verification by vendor data sheet is sufficient per program COTS policy.",
       "partsListEntry": "Volt Dynamics IPS-28-15, Rev A",
       "qualifiedAlternates": [],
@@ -258,8 +622,9 @@
       "text": "Consolidate MCC and IPS as COTS item records under the Test Set CI rather than standalone CIs; retire their independent CI records after CCB approval.",
       "category": "CI structure",
       "status": "open",
-      "owner": "",
+      "owner": "CM Lead",
       "relatedCiId": "ci-001",
+      "resolvesGapId": "gap-001",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     },
@@ -268,8 +633,9 @@
       "text": "Submit ECP to reconcile SFR-4.2.1 allocation with as-built Test Set sub-module decomposition.",
       "category": "delta matrix",
       "status": "open",
-      "owner": "",
+      "owner": "Lead Systems Engineer",
       "relatedCiId": "ci-001",
+      "resolvesGapId": "gap-003",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     },
@@ -278,8 +644,9 @@
       "text": "Stand up an adapter layer (or plan a UUT script rewrite) to bridge MHC's serial diagnostic protocol to Baseline B's Ethernet-based messaging before Baseline B System TRR.",
       "category": "A-B alignment",
       "status": "in progress",
-      "owner": "",
+      "owner": "Software Lead",
       "relatedCiId": "ci-002",
+      "resolvesGapId": null,
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-06-15T00:00:00.000Z"
     }
@@ -307,7 +674,7 @@
   "specifications": [
     {
       "id": "spec-001",
-      "title": "System Requirements Specification — Baseline A",
+      "title": "System Requirements Specification \u2014 Baseline A",
       "level": "System",
       "domain": "Hardware",
       "specType": "Development",
@@ -320,14 +687,14 @@
         "applicableDocuments": "Capability Development Document (CDD); program ConOps; SFR-agreed requirements baseline.",
         "functionalPerformance": "Shall provide automated stimulus/response testing of the UUT across the defined operational envelope; shall report diagnostic status within program-specified latency bounds.",
         "interfaces": "External interfaces to the UUT and to organic support equipment; internal decomposition is intentionally left to subsystem/CI-level specs, not restated here.",
-        "environmental": "Per program environmental design reference mission profile (temperature, vibration, EMI) — inherited by all subsystem/CI specs unless a tailored exception is documented at that level.",
-        "designConstraints": "None prescribed at this level by design — system spec intentionally avoids design-solution language to preserve subsystem/CI trade space.",
+        "environmental": "Per program environmental design reference mission profile (temperature, vibration, EMI) \u2014 inherited by all subsystem/CI specs unless a tailored exception is documented at that level.",
+        "designConstraints": "None prescribed at this level by design \u2014 system spec intentionally avoids design-solution language to preserve subsystem/CI trade space.",
         "safety": "System shall fail to a safe state on loss of UUT communication.",
         "security": "N/A for this illustrative dataset.",
         "humanFactors": "Test operator workload shall not exceed program-defined thresholds during nominal test sequences.",
         "logistics": "Deferred to CI-level specs; not meaningfully allocable at system level.",
         "verificationProvisions": "System-level requirements verified via integrated DT&E; subsystem/CI-level verification methods are specified in those respective specs.",
-        "notes": "Illustrative/demo content only — not real program data."
+        "notes": "Illustrative/demo content only \u2014 not real program data."
       },
       "attachments": [
         {
@@ -336,11 +703,13 @@
         }
       ],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-06-01T00:00:00.000Z"
+      "updatedAt": "2026-06-01T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "spec-002",
-      "title": "Test Set (MHC/MCC/IPS Assembly) — CI Development Specification",
+      "title": "Test Set (MHC/MCC/IPS Assembly) \u2014 CI Development Specification",
       "level": "CI",
       "domain": "Hardware",
       "specType": "Development",
@@ -352,7 +721,7 @@
         "scope": "Development specification for the Test Set CI, covering the MHC/MCC/IPS assembly as currently decomposed pending the CI-structure consolidation recommendation.",
         "applicableDocuments": "System Requirements Specification (spec-001); ICD-TS-014.",
         "functionalPerformance": "Shall generate and capture UUT stimulus/response signals per SFR-4.2.1; shall format diagnostic messages for transport to test scripts.",
-        "interfaces": "Per ICD-TS-014; internal sub-module interfaces tracked in the CI x CI N² diagram (see MHC ↔ MCC).",
+        "interfaces": "Per ICD-TS-014; internal sub-module interfaces tracked in the CI x CI N\u00b2 diagram (see MHC \u2194 MCC).",
         "environmental": "Conduction-cooled per chassis spec; see Delta Matrix for as-built vs. SFR-agreed allocation discrepancy on sub-module decomposition.",
         "designConstraints": "Must fit existing Test Set card cage; COTS sub-assemblies (MCC, IPS) tracked as separate COTS item records pending consolidation.",
         "safety": "No hazardous voltages exposed at UUT interface under single-fault conditions.",
@@ -360,15 +729,17 @@
         "humanFactors": "N/A beyond system-level allocation.",
         "logistics": "MCC and IPS obsolescence monitored via their COTS item records, not restated here.",
         "verificationProvisions": "Stimulus/response timing verified by test; COTS sub-assembly capability verified by inspection of vendor data sheet (see COTS Records).",
-        "notes": "This CI is flagged for over-decomposition consolidation — see CI Inventory and rec-001. Keep this spec's scope tight to avoid re-litigating requirements already captured in COTS item records once consolidation happens."
+        "notes": "This CI is flagged for over-decomposition consolidation \u2014 see CI Inventory and rec-001. Keep this spec's scope tight to avoid re-litigating requirements already captured in COTS item records once consolidation happens."
       },
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-06-10T00:00:00.000Z"
+      "updatedAt": "2026-06-10T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "spec-003",
-      "title": "System Requirements Specification — Baseline B",
+      "title": "System Requirements Specification \u2014 Baseline B",
       "level": "System",
       "domain": "Hardware",
       "specType": "Development",
@@ -377,10 +748,10 @@
       "linkedSubsystemId": null,
       "linkedCiId": null,
       "sections": {
-        "scope": "Top-level requirements for Baseline B, confirmed complete and bounded at SRR. Functional decomposition (SFR) has since validated two of three candidate subsystems — see sub-b-001/sub-b-002/sub-b-003.",
+        "scope": "Top-level requirements for Baseline B, confirmed complete and bounded at SRR. Functional decomposition (SFR) has since validated two of three candidate subsystems \u2014 see sub-b-001/sub-b-002/sub-b-003.",
         "applicableDocuments": "Baseline B CDD; SEMP (plan-001); Software Development Plan (plan-003).",
-        "functionalPerformance": "TBD — see A/B Compatibility Matrix for the specific UUT-relevant interfaces already being tracked ahead of full requirements definition.",
-        "interfaces": "Baseline B intends to standardize on Ethernet-based diagnostic messaging where Baseline A uses a proprietary serial protocol (see ab-001) — this is the leading edge of what this spec will need to formalize.",
+        "functionalPerformance": "TBD \u2014 see A/B Compatibility Matrix for the specific UUT-relevant interfaces already being tracked ahead of full requirements definition.",
+        "interfaces": "Baseline B intends to standardize on Ethernet-based diagnostic messaging where Baseline A uses a proprietary serial protocol (see ab-001) \u2014 this is the leading edge of what this spec will need to formalize.",
         "environmental": "TBD.",
         "designConstraints": "TBD.",
         "safety": "TBD.",
@@ -388,15 +759,17 @@
         "humanFactors": "TBD.",
         "logistics": "TBD.",
         "verificationProvisions": "TBD.",
-        "notes": "Illustrative/demo content only. SRR closed this spec's requirements baseline; it should mature roughly in step with Baseline A's transition from Development to Production specs — track that relationship via the A/B Compatibility Matrix, not by duplicating content here."
+        "notes": "Illustrative/demo content only. SRR closed this spec's requirements baseline; it should mature roughly in step with Baseline A's transition from Development to Production specs \u2014 track that relationship via the A/B Compatibility Matrix, not by duplicating content here."
       },
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-06-20T00:00:00.000Z"
+      "updatedAt": "2026-06-20T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "spec-004",
-      "title": "UUT Stimulus/Response — Subsystem Development Specification (Baseline B)",
+      "title": "UUT Stimulus/Response \u2014 Subsystem Development Specification (Baseline B)",
       "level": "Subsystem",
       "domain": "Hardware",
       "specType": "Development",
@@ -406,25 +779,27 @@
       "linkedCiId": null,
       "sections": {
         "scope": "Development specification for Baseline B's UUT Stimulus/Response subsystem, allocating system-level stimulus/response requirements to this now-validated functional boundary (see Subsystems tab, sub-b-001).",
-        "applicableDocuments": "System Requirements Specification — Baseline B (spec-003); SEMP (plan-001).",
+        "applicableDocuments": "System Requirements Specification \u2014 Baseline B (spec-003); SEMP (plan-001).",
         "functionalPerformance": "Shall generate and capture UUT stimulus/response signals per the Baseline B requirements baseline; specific signal timing/tolerance TBD pending detailed design.",
-        "interfaces": "External interface to the UUT carries over from Baseline A's ICD-TS-014 pending confirmation this remains unchanged for Baseline B; internal CI-level interfaces not yet defined — physical decomposition hasn't started.",
+        "interfaces": "External interface to the UUT carries over from Baseline A's ICD-TS-014 pending confirmation this remains unchanged for Baseline B; internal CI-level interfaces not yet defined \u2014 physical decomposition hasn't started.",
         "environmental": "TBD pending Baseline B environmental design reference mission profile confirmation.",
         "designConstraints": "None prescribed at this level by design, consistent with keeping subsystem specs free of design-solution language.",
-        "safety": "Functional Hazard Analysis in progress (see Safety Deliverables) — no safety requirements finalized here until that closes.",
+        "safety": "Functional Hazard Analysis in progress (see Safety Deliverables) \u2014 no safety requirements finalized here until that closes.",
         "security": "N/A for this illustrative dataset.",
         "humanFactors": "Deferred to system-level allocation.",
-        "logistics": "N/A at this level — deferred to CI-level specs once physical decomposition begins post-SSR.",
-        "verificationProvisions": "TBD — verification approach depends on CI-level decomposition, not yet started.",
+        "logistics": "N/A at this level \u2014 deferred to CI-level specs once physical decomposition begins post-SSR.",
+        "verificationProvisions": "TBD \u2014 verification approach depends on CI-level decomposition, not yet started.",
         "notes": "Illustrative/demo content only. This subsystem cleared SFR; this spec reflects the resulting allocation, still Draft pending SSR review."
       },
       "attachments": [],
       "createdAt": "2026-06-20T00:00:00.000Z",
-      "updatedAt": "2026-06-20T00:00:00.000Z"
+      "updatedAt": "2026-06-20T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "spec-005",
-      "title": "Diagnostic Messaging (Ethernet-based) — Subsystem Development Specification (Baseline B)",
+      "title": "Diagnostic Messaging (Ethernet-based) \u2014 Subsystem Development Specification (Baseline B)",
       "level": "Subsystem",
       "domain": "Software",
       "specType": "Development",
@@ -434,27 +809,29 @@
       "linkedCiId": null,
       "sections": {
         "scope": "Development specification for Baseline B's redesigned Ethernet-based Diagnostic Messaging subsystem (see Subsystems tab, sub-b-002), replacing Baseline A's proprietary serial protocol (see ab-001).",
-        "applicableDocuments": "System Requirements Specification — Baseline B (spec-003); Software Development Plan (plan-003); Software Test Plan (plan-004).",
+        "applicableDocuments": "System Requirements Specification \u2014 Baseline B (spec-003); Software Development Plan (plan-003); Software Test Plan (plan-004).",
         "functionalPerformance": "Shall transport diagnostic status/health messages over Ethernet per the Baseline B requirements baseline; message schema and latency bounds TBD pending detailed design.",
         "interfaces": "Ethernet-based transport per the Baseline B interface intent noted in ab-001; specific protocol/port allocation TBD.",
         "environmental": "Inherits system-level environmental allocation; no tailored exception identified yet.",
-        "designConstraints": "Must interoperate with legacy serial-protocol UUT scripts during the Baseline A→B transition (see rec-003) until an adapter layer or script rewrite is in place.",
-        "safety": "Functional Hazard Analysis in progress (see Safety Deliverables) — flags network congestion delaying a safety-relevant fault report as a candidate hazard; not yet a finalized safety requirement.",
-        "security": "Ethernet transport introduces a network attack surface Baseline A's point-to-point serial link didn't have — security requirements TBD, flagged for follow-up rather than deferred silently.",
+        "designConstraints": "Must interoperate with legacy serial-protocol UUT scripts during the Baseline A\u2192B transition (see rec-003) until an adapter layer or script rewrite is in place.",
+        "safety": "Functional Hazard Analysis in progress (see Safety Deliverables) \u2014 flags network congestion delaying a safety-relevant fault report as a candidate hazard; not yet a finalized safety requirement.",
+        "security": "Ethernet transport introduces a network attack surface Baseline A's point-to-point serial link didn't have \u2014 security requirements TBD, flagged for follow-up rather than deferred silently.",
         "humanFactors": "N/A beyond system-level allocation.",
         "logistics": "N/A at this level.",
-        "verificationProvisions": "TBD — depends on CI-level decomposition, not yet started.",
-        "notes": "Illustrative/demo content only. This is the subsystem most likely to slip SSR if its FHA doesn't close — track via the Safety Deliverables tab, not just this spec's status."
+        "verificationProvisions": "TBD \u2014 depends on CI-level decomposition, not yet started.",
+        "notes": "Illustrative/demo content only. This is the subsystem most likely to slip SSR if its FHA doesn't close \u2014 track via the Safety Deliverables tab, not just this spec's status."
       },
       "attachments": [],
       "createdAt": "2026-06-20T00:00:00.000Z",
-      "updatedAt": "2026-06-20T00:00:00.000Z"
+      "updatedAt": "2026-06-20T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     }
   ],
   "safetyDeliverables": [
     {
       "id": "safety-001",
-      "title": "System Safety Program Plan — Baseline A",
+      "title": "System Safety Program Plan \u2014 Baseline A",
       "level": "System",
       "cdrlType": "System Safety Program Plan (SSPP)",
       "applicability": "Both",
@@ -463,8 +840,9 @@
       "linkedSubsystemId": null,
       "linkedCiId": null,
       "hazardExample": "Loss of the Unit Under Test (UUT) due to an uncontrolled stimulus applied by the test set.",
-      "cdrlDescription": "Governs the safety program's process, organization, and hazard-tracking approach across both baselines — established early and updated, not re-issued per baseline.",
+      "cdrlDescription": "Governs the safety program's process, organization, and hazard-tracking approach across both baselines \u2014 established early and updated, not re-issued per baseline.",
       "deliveryMilestone": "SRR",
+      "milestoneId": "milestone-a-srr",
       "attachments": [
         {
           "label": "System Safety Program Plan (full document)",
@@ -472,11 +850,13 @@
         }
       ],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-002",
-      "title": "Preliminary Hazard Analysis Report — Baseline A",
+      "title": "Preliminary Hazard Analysis Report \u2014 Baseline A",
       "level": "System",
       "cdrlType": "Preliminary Hazard Analysis / System Requirements Hazard Analysis Report",
       "applicability": "Development",
@@ -485,15 +865,18 @@
       "linkedSubsystemId": null,
       "linkedCiId": null,
       "hazardExample": "Operator exposure to hazardous voltage during normal test-set operation.",
-      "cdrlDescription": "Identifies candidate system-level hazards and allocates the resulting safety requirements before detailed design is fixed — feeds the System-level Development spec's Safety Requirements section (see spec-001).",
+      "cdrlDescription": "Identifies candidate system-level hazards and allocates the resulting safety requirements before detailed design is fixed \u2014 feeds the System-level Development spec's Safety Requirements section (see spec-001).",
       "deliveryMilestone": "PDR",
+      "milestoneId": "milestone-a-pdr",
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-003",
-      "title": "Functional Hazard Analysis Report — Diagnostic Messaging",
+      "title": "Functional Hazard Analysis Report \u2014 Diagnostic Messaging",
       "level": "Subsystem",
       "cdrlType": "Functional Hazard Analysis Report",
       "applicability": "Development",
@@ -504,13 +887,16 @@
       "hazardExample": "Diagnostic messaging function silently drops a fault report instead of escalating it.",
       "cdrlDescription": "Performed against the validated Diagnostic Messaging functional decomposition before subsystem design is fixed.",
       "deliveryMilestone": "CDR",
+      "milestoneId": "milestone-a-cdr",
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-004",
-      "title": "Functional Hazard Analysis Report — Rack 3 Assembly (legacy grouping)",
+      "title": "Functional Hazard Analysis Report \u2014 Rack 3 Assembly (legacy grouping)",
       "level": "Subsystem",
       "cdrlType": "Functional Hazard Analysis Report",
       "applicability": "Development",
@@ -518,16 +904,19 @@
       "status": "Draft",
       "linkedSubsystemId": "sub-004",
       "linkedCiId": null,
-      "hazardExample": "TBD — this subsystem's functional boundary is inherited from the SSDD's physical rack grouping and hasn't been independently validated, so candidate hazards can't yet be scoped with confidence.",
-      "cdrlDescription": "Provisional: any FHA findings scoped to this subsystem inherit its unverified functional boundary (see Subsystem Detail) — do not treat as closed until the subsystem itself is validated.",
+      "hazardExample": "TBD \u2014 this subsystem's functional boundary is inherited from the SSDD's physical rack grouping and hasn't been independently validated, so candidate hazards can't yet be scoped with confidence.",
+      "cdrlDescription": "Provisional: any FHA findings scoped to this subsystem inherit its unverified functional boundary (see Subsystem Detail) \u2014 do not treat as closed until the subsystem itself is validated.",
       "deliveryMilestone": "TBD pending subsystem validation",
+      "milestoneId": null,
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-005",
-      "title": "System Hazard Analysis Report — MCC",
+      "title": "System Hazard Analysis Report \u2014 MCC",
       "level": "CI",
       "cdrlType": "System Hazard Analysis Report",
       "applicability": "Production",
@@ -536,15 +925,18 @@
       "linkedSubsystemId": null,
       "linkedCiId": "ci-003",
       "hazardExample": "Buffer overflow in the diagnostic messaging CSCI corrupts an unrelated memory region.",
-      "cdrlDescription": "Verifies the MCC's integrated design doesn't introduce new hazards at its interfaces with MHC and IPS — this CI is flagged for over-decomposition, so check for causal-factor overlap with related CI-level hazard findings before closing (see CI Detail).",
+      "cdrlDescription": "Verifies the MCC's integrated design doesn't introduce new hazards at its interfaces with MHC and IPS \u2014 this CI is flagged for over-decomposition, so check for causal-factor overlap with related CI-level hazard findings before closing (see CI Detail).",
       "deliveryMilestone": "TRR",
+      "milestoneId": "milestone-a-trr",
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-006",
-      "title": "Operating & Support Hazard Analysis — MHC",
+      "title": "Operating & Support Hazard Analysis \u2014 MHC",
       "level": "CI",
       "cdrlType": "Operating & Support Hazard Analysis Report",
       "applicability": "Production",
@@ -553,15 +945,18 @@
       "linkedSubsystemId": null,
       "linkedCiId": "ci-002",
       "hazardExample": "Connector mis-mate between the MHC and an adjacent CI energizes a pin neither CI's design assumes is live.",
-      "cdrlDescription": "Identifies hazards from operational and maintenance procedures around the MHC — depends on stable maintenance procedures, which aren't finalized until Production.",
+      "cdrlDescription": "Identifies hazards from operational and maintenance procedures around the MHC \u2014 depends on stable maintenance procedures, which aren't finalized until Production.",
       "deliveryMilestone": "Post-TRR, prior to fielding",
+      "milestoneId": null,
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "safety-007",
-      "title": "Preliminary Hazard Analysis Report — Baseline B",
+      "title": "Preliminary Hazard Analysis Report \u2014 Baseline B",
       "level": "System",
       "cdrlType": "Preliminary Hazard Analysis / System Requirements Hazard Analysis Report",
       "applicability": "Development",
@@ -572,13 +967,16 @@
       "hazardExample": "Loss of test-set control over the UUT during an automated Baseline B test sequence, before the redesigned Ethernet messaging path is fully validated.",
       "cdrlDescription": "Identified candidate system-level hazards and allocated resulting safety requirements at SRR, against the Baseline B requirements baseline (spec-003).",
       "deliveryMilestone": "SRR",
+      "milestoneId": "milestone-b-srr",
       "attachments": [],
       "createdAt": "2026-06-01T00:00:00.000Z",
-      "updatedAt": "2026-06-01T00:00:00.000Z"
+      "updatedAt": "2026-06-01T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "safety-008",
-      "title": "Functional Hazard Analysis Report — UUT Stimulus/Response (Baseline B)",
+      "title": "Functional Hazard Analysis Report \u2014 UUT Stimulus/Response (Baseline B)",
       "level": "Subsystem",
       "cdrlType": "Functional Hazard Analysis Report",
       "applicability": "Development",
@@ -587,15 +985,18 @@
       "linkedSubsystemId": "sub-b-001",
       "linkedCiId": null,
       "hazardExample": "Stimulus generation function applies an out-of-tolerance signal to the UUT interface during a Baseline B automated test sequence.",
-      "cdrlDescription": "Performed against the now-validated UUT Stimulus/Response functional boundary (see Subsystems tab, sub-b-001) — one of the two subsystems that cleared SFR.",
+      "cdrlDescription": "Performed against the now-validated UUT Stimulus/Response functional boundary (see Subsystems tab, sub-b-001) \u2014 one of the two subsystems that cleared SFR.",
       "deliveryMilestone": "SFR",
+      "milestoneId": "milestone-b-sfr",
       "attachments": [],
       "createdAt": "2026-06-20T00:00:00.000Z",
-      "updatedAt": "2026-06-20T00:00:00.000Z"
+      "updatedAt": "2026-06-20T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "safety-009",
-      "title": "Functional Hazard Analysis Report — Diagnostic Messaging (Baseline B)",
+      "title": "Functional Hazard Analysis Report \u2014 Diagnostic Messaging (Baseline B)",
       "level": "Subsystem",
       "cdrlType": "Functional Hazard Analysis Report",
       "applicability": "Development",
@@ -603,12 +1004,15 @@
       "status": "Draft",
       "linkedSubsystemId": "sub-b-002",
       "linkedCiId": null,
-      "hazardExample": "Ethernet-based diagnostic messaging introduces a new potential hazard: network congestion delaying a safety-relevant fault report beyond the required latency bound — a failure mode Baseline A's point-to-point serial protocol didn't have.",
-      "cdrlDescription": "Performed against the redesigned Ethernet-based Diagnostic Messaging subsystem (sub-b-002) — still Draft since this is the subsystem most likely to slip SSR.",
+      "hazardExample": "Ethernet-based diagnostic messaging introduces a new potential hazard: network congestion delaying a safety-relevant fault report beyond the required latency bound \u2014 a failure mode Baseline A's point-to-point serial protocol didn't have.",
+      "cdrlDescription": "Performed against the redesigned Ethernet-based Diagnostic Messaging subsystem (sub-b-002) \u2014 still Draft since this is the subsystem most likely to slip SSR.",
       "deliveryMilestone": "SFR",
+      "milestoneId": "milestone-b-sfr",
       "attachments": [],
       "createdAt": "2026-06-20T00:00:00.000Z",
-      "updatedAt": "2026-06-20T00:00:00.000Z"
+      "updatedAt": "2026-06-20T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     }
   ],
   "programPlanningDeliverables": [
@@ -622,8 +1026,9 @@
       "status": "Approved",
       "linkedSubsystemId": null,
       "linkedCiId": null,
-      "cdrlDescription": "Governs the overall SE process (reviews, baselines, decomposition approach) across both baselines — established at/before SRR, updated rather than re-issued per baseline.",
+      "cdrlDescription": "Governs the overall SE process (reviews, baselines, decomposition approach) across both baselines \u2014 established at/before SRR, updated rather than re-issued per baseline.",
       "deliveryMilestone": "SRR",
+      "milestoneId": "milestone-a-srr",
       "attachments": [
         {
           "label": "Systems Engineering Management Plan (full document)",
@@ -631,7 +1036,9 @@
         }
       ],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "plan-002",
@@ -643,15 +1050,18 @@
       "status": "Approved",
       "linkedSubsystemId": null,
       "linkedCiId": null,
-      "cdrlDescription": "Governs CM process for both baselines — the same discipline the Delta/Traceability Matrix and CI over-decomposition tracking ultimately feed into.",
+      "cdrlDescription": "Governs CM process for both baselines \u2014 the same discipline the Delta/Traceability Matrix and CI over-decomposition tracking ultimately feed into.",
       "deliveryMilestone": "SRR",
+      "milestoneId": "milestone-a-srr",
       "attachments": [],
       "createdAt": "2026-01-06T00:00:00.000Z",
-      "updatedAt": "2026-01-06T00:00:00.000Z"
+      "updatedAt": "2026-01-06T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "plan-003",
-      "title": "Software Development Plan — Baseline B",
+      "title": "Software Development Plan \u2014 Baseline B",
       "level": "System",
       "cdrlType": "Software Development Plan (SDP)",
       "applicability": "Development",
@@ -661,13 +1071,16 @@
       "linkedCiId": null,
       "cdrlDescription": "Drafted at SRR establishing candidate CSCI boundaries; updated at SFR to allocate software functions against the now-validated Diagnostic Messaging and UUT Stimulus/Response subsystems.",
       "deliveryMilestone": "SFR",
+      "milestoneId": "milestone-b-sfr",
       "attachments": [],
       "createdAt": "2026-06-01T00:00:00.000Z",
-      "updatedAt": "2026-06-20T00:00:00.000Z"
+      "updatedAt": "2026-06-20T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "plan-004",
-      "title": "Software Test Plan — Diagnostic Messaging (Baseline B)",
+      "title": "Software Test Plan \u2014 Diagnostic Messaging (Baseline B)",
       "level": "Subsystem",
       "cdrlType": "Software Test Plan (STP)",
       "applicability": "Development",
@@ -675,15 +1088,18 @@
       "status": "Draft",
       "linkedSubsystemId": "sub-b-002",
       "linkedCiId": null,
-      "cdrlDescription": "Establishes the test approach for the Ethernet-based diagnostic messaging redesign now that this subsystem's functional boundary cleared SFR — still Draft since the subsystem's own FHA hasn't closed yet.",
+      "cdrlDescription": "Establishes the test approach for the Ethernet-based diagnostic messaging redesign now that this subsystem's functional boundary cleared SFR \u2014 still Draft since the subsystem's own FHA hasn't closed yet.",
       "deliveryMilestone": "SFR",
+      "milestoneId": "milestone-b-sfr",
       "attachments": [],
       "createdAt": "2026-06-15T00:00:00.000Z",
-      "updatedAt": "2026-06-20T00:00:00.000Z"
+      "updatedAt": "2026-06-20T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-B"
     },
     {
       "id": "plan-005",
-      "title": "Software Design Description — Test Set CI (Baseline A)",
+      "title": "Software Design Description \u2014 Test Set CI (Baseline A)",
       "level": "CI",
       "cdrlType": "Software Design Description (SDD)",
       "applicability": "Development",
@@ -691,15 +1107,18 @@
       "status": "In Review",
       "linkedSubsystemId": null,
       "linkedCiId": "ci-001",
-      "cdrlDescription": "Documents the Test Set CI's internal software design, drafted at CDR — still In Review in step with the CI's own Development spec (spec-002), which is itself held up pending the over-decomposition consolidation recommendation (rec-001).",
+      "cdrlDescription": "Documents the Test Set CI's internal software design, drafted at CDR \u2014 still In Review in step with the CI's own Development spec (spec-002), which is itself held up pending the over-decomposition consolidation recommendation (rec-001).",
       "deliveryMilestone": "CDR",
+      "milestoneId": "milestone-a-cdr",
       "attachments": [],
       "createdAt": "2026-05-01T00:00:00.000Z",
-      "updatedAt": "2026-06-10T00:00:00.000Z"
+      "updatedAt": "2026-06-10T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
     },
     {
       "id": "plan-006",
-      "title": "Version Description Document — Test Set CI (Baseline A)",
+      "title": "Version Description Document \u2014 Test Set CI (Baseline A)",
       "level": "CI",
       "cdrlType": "Version Description Document (VDD)",
       "applicability": "Production",
@@ -707,11 +1126,93 @@
       "status": "Draft",
       "linkedSubsystemId": null,
       "linkedCiId": "ci-001",
-      "cdrlDescription": "Will record the as-built/as-qualified software baseline once TRR-era testing closes — still Draft, consistent with Baseline A approaching but not yet at System TRR.",
+      "cdrlDescription": "Will record the as-built/as-qualified software baseline once TRR-era testing closes \u2014 still Draft, consistent with Baseline A approaching but not yet at System TRR.",
       "deliveryMilestone": "TRR",
+      "milestoneId": "milestone-a-trr",
       "attachments": [],
       "createdAt": "2026-06-15T00:00:00.000Z",
+      "updatedAt": "2026-06-15T00:00:00.000Z",
+      "projectId": "project-001",
+      "baselineId": "BASELINE-A"
+    }
+  ],
+  "checklistItems": [
+    {
+      "id": "check-001",
+      "milestoneId": "milestone-a-trr",
+      "domain": "System Safety",
+      "criterion": "CI-level System Hazard Analysis for MCC (ci-003) must be complete before TRR closes.",
+      "status": "Not Met",
+      "evidenceType": "SafetyDeliverable",
+      "evidenceId": "safety-005",
+      "createdAt": "2026-06-15T00:00:00.000Z",
       "updatedAt": "2026-06-15T00:00:00.000Z"
+    },
+    {
+      "id": "check-002",
+      "milestoneId": "milestone-a-trr",
+      "domain": "Verification & Validation",
+      "criterion": "Requirement req-001 (Test Set stimulus/response) must have a passing verification event on record.",
+      "status": "Not Met",
+      "evidenceType": "Requirement",
+      "evidenceId": "req-001",
+      "createdAt": "2026-06-15T00:00:00.000Z",
+      "updatedAt": "2026-06-15T00:00:00.000Z"
+    },
+    {
+      "id": "check-003",
+      "milestoneId": "milestone-b-sfr",
+      "domain": "System Safety",
+      "criterion": "Functional Hazard Analysis for the Diagnostic Messaging subsystem (sub-b-002) must be validated before SFR closes.",
+      "status": "Not Met",
+      "evidenceType": "SafetyDeliverable",
+      "evidenceId": "safety-009",
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "updatedAt": "2026-06-20T00:00:00.000Z"
+    },
+    {
+      "id": "check-004",
+      "milestoneId": "milestone-b-sfr",
+      "domain": "Verification & Validation",
+      "criterion": "COTS power supply (cots-002 / ci-004) capability must have a documented, passing verification method.",
+      "status": "Met",
+      "evidenceType": "VerificationEvent",
+      "evidenceId": "ve-002",
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "updatedAt": "2026-06-20T00:00:00.000Z"
+    },
+    {
+      "id": "check-005",
+      "milestoneId": "milestone-b-sfr",
+      "domain": "Decomposition & Architecture",
+      "criterion": "Power Conditioning & Distribution subsystem (sub-b-003) must move from Proposed to Validated before SFR closes.",
+      "status": "Not Evaluated",
+      "evidenceType": null,
+      "evidenceId": null,
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "updatedAt": "2026-06-20T00:00:00.000Z"
+    },
+    {
+      "id": "check-006",
+      "milestoneId": "milestone-b-sfr",
+      "domain": "Software Planning",
+      "criterion": "Software Development Plan (plan-003) must be updated to allocate software functions against the validated subsystem boundaries.",
+      "status": "Met",
+      "evidenceType": "ProgramPlanningDeliverable",
+      "evidenceId": "plan-003",
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "updatedAt": "2026-06-20T00:00:00.000Z"
+    },
+    {
+      "id": "check-007",
+      "milestoneId": "milestone-b-sfr",
+      "domain": "Specification Generation",
+      "criterion": "Subsystem-level Development specifications must exist in at least Draft form for each validated Baseline B subsystem (spec-004, spec-005).",
+      "status": "Met",
+      "evidenceType": "Specification",
+      "evidenceId": "spec-004",
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "updatedAt": "2026-06-20T00:00:00.000Z"
     }
   ],
   "content": []

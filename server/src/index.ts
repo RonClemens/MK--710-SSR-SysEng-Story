@@ -34,6 +34,14 @@ async function start() {
     res.json({ aiEnabled, aiProvider: process.env.AI_PROVIDER || "public" });
   });
 
+  app.use("/api/programs", crudRouter("programs"));
+  app.use("/api/projects", crudRouter("projects"));
+  app.use("/api/baselines", crudRouter("baselines"));
+  app.use("/api/milestones", crudRouter("milestones"));
+  app.use("/api/requirements", crudRouter("requirements"));
+  app.use("/api/verification-events", crudRouter("verificationEvents"));
+  app.use("/api/checklist-items", crudRouter("checklistItems"));
+  app.use("/api/gaps", crudRouter("gaps"));
   app.use("/api/subsystems", crudRouter("logicalSubsystems"));
   app.use("/api/cis", crudRouter("cis"));
   app.use("/api/delta-matrix", crudRouter("deltaMatrix"));
@@ -57,7 +65,7 @@ async function start() {
 
   const PORT = Number(process.env.PORT) || 3001;
   app.listen(PORT, () => {
-    console.log(`PDR Workbench server listening on http://localhost:${PORT}`);
+    console.log(`SE Workbench server listening on http://localhost:${PORT}`);
   });
 }
 
