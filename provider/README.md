@@ -1,6 +1,6 @@
 # /provider
 
-Per [Architecture Guidance](/vendor/architecture-guidance-v1.3.0.md) §3, every app should code against one AI
+Per [Architecture Guidance](/vendor/architecture-guidance-v1.4.0.md) §3, every app should code against one AI
 provider interface, never against Anthropic's or Bedrock's SDK directly in application logic. This directory
 documents this app's contract and where it's actually implemented; it does not duplicate the runtime code.
 

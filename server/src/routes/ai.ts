@@ -6,7 +6,7 @@ import { getAiClient } from "../ai/index.js";
 import { buildSystemPrompt } from "../ai/context.js";
 import type { ChatMessage } from "../ai/types.js";
 
-// Loaded from /methodology/prompts (Architecture Guidance v1.3.0 §5) — see
+// Loaded from /methodology/prompts (Architecture Guidance v1.4.0 §5) — see
 // client/src/api/aiContext.ts for the browser-side counterpart of this same file.
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PDR_SUMMARY_PROMPT = readFileSync(

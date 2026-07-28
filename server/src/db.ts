@@ -8,7 +8,7 @@ const REPO_ROOT = join(__dirname, "..", "..");
 const DATA_DIR = join(__dirname, "..", "data");
 const DB_PATH = join(DATA_DIR, "db.json");
 
-// dataSource resolution (Architecture Guidance v1.3.0 §4): root config.json can point at a
+// dataSource resolution (Architecture Guidance v1.4.0 §4): root config.json can point at a
 // real program data file for a CUI deployment, without hand-editing anything under
 // /mock-data or /methodology. Falls back to the public mock-data seed when config.json is
 // absent or doesn't set dataSource — see /mock-data/README.md and root config.json.

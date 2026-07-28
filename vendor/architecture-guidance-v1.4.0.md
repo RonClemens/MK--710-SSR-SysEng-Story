@@ -1,18 +1,19 @@
 Applies to: MK 710 program / PDR Reconciliation & Baseline Alignment Workbench
-Vendored version: v1.3.0
-Imported: 2026-07-25
+Vendored version: v1.4.0
+Imported: 2026-07-28
 Reviewer: this program's Lead Systems Engineer
 
 ---
 
 # Reusable SE Webapp Architecture Guidance
 
-**Version:** 1.3.0
-**Last updated:** 2026-07-25
+**Version:** 1.4.0
+**Last updated:** 2026-07-27
 **Status:** Draft
 
 **Changelog:**
-- **v1.3.0** — Added §10, forward-compatibility conventions for an eventual Unified Data Model (UDM) spanning multiple apps. Non-blocking; sets conventions only.
+- **v1.4.0** — Added §10, the `@domain-placeholder` convention: a field/type-level marker for program-specific illustrative content, plus a required manifest and a recommended "Promises" UI pattern. Generalized from SE Workbench's own implementation, refined through Workbench's response to the original proposal (JSDoc-comment form, whole-type and shared-subtype tagging patterns, mock-data scope settled as out-of-scope). Renumbered former §10 ("Why This Matters Long-Term") to §11. Added a §7 migration-checklist line for retroactive tagging.
+- **v1.3.0** — Added §10 (now §11), forward-compatibility conventions for an eventual Unified Data Model (UDM) spanning multiple apps. Non-blocking; sets conventions only.
 - **v1.2.0** — Clarified §4: `config.json` doesn't have to own every setting (e.g., provider selection can stay on existing env vars); it exists to give settings without an existing home, like `dataSource`, a documented place to live. Prompted by SE Workbench implementation review of v1.1.0.
 - **v1.1.0** — Added public-only/static deployment exception (§3.1), clarified provider interface as a functional contract rather than a literal method signature (§3), added cross-runtime prompt-sharing guidance (§5), added "editable override ≠ real separation" anti-pattern (§1.1), added recommended migration sequencing (§7), noted §8.1 footer snippet needs adapting for multi-file/SPA frameworks. Informed by first real-world gap analysis (SE Workbench app).
 - **v1.0.0** — Initial release.
@@ -159,6 +160,7 @@ For each app currently in development, evaluate:
 - [ ] Does the app call Anthropic's API directly in UI/logic code? → wrap behind `provider-interface.js`
 - [ ] Are prompts inline strings? → extract to `/methodology/prompts`, parameterize
 - [ ] Is there a synthetic mirror dataset for public-side testing? → build one if not
+- [ ] Are program-specific illustrative values in `/data-schema` tagged with `@domain-placeholder` (§10)? → tag retroactively; this is additive, comment-only, and low-risk, so it can be done early rather than waiting for the content-split step
 - [ ] Could this app's methodology logic be reused for a different program today, with just a config/data swap? If not, that's the gap to close next.
 
 **Suggested order:** workbench app first (it's the platform), then retrofit PDR readiness app and Dispatch against the same pattern, since they'll benefit most from the provider abstraction and prompt library already existing.
@@ -195,7 +197,7 @@ This guidance document is itself methodology-layer content — public-safe, prog
 
 3. **Log gaps, don't silently patch.** If a CUI-side project finds the guidance doesn't fit a real situation (a checklist item, a directory convention that doesn't map cleanly), do not alter the vendored file. Record the gap in `/patches/architecture-guidance-notes.md` with enough detail to reproduce the issue, and route it back upstream through the same public-repo update process described in §6 for code. The next public version should resolve it for every program, not just this one.
 
-4. **Compliance requests reference the version, not "the doc."** When requesting a CUI team update to comply with this architecture, cite the specific vendored version (e.g., "bring `/vendor` up to architecture-guidance-v1.3.0") so compliance is checkable and auditable, consistent with the version-pinning discipline in §6.
+4. **Compliance requests reference the version, not "the doc."** When requesting a CUI team update to comply with this architecture, cite the specific vendored version (e.g., "bring `/vendor` up to architecture-guidance-v1.4.0") so compliance is checkable and auditable, consistent with the version-pinning discipline in §6.
 
 5. **Update the app's displayed version tag alongside the vendored doc.** Every app implementing this architecture should surface its current guidance version in-app (see §8.1 below). When `/vendor/architecture-guidance-vX.Y.Z.md` is bumped, update that app's `ARCHITECTURE_VERSION`/`ARCHITECTURE_DATE` config in the same commit. A compliance check is not complete until the visible tag matches the vendored file — this is the fastest way to catch drift across multiple apps without inspecting each repo.
 
@@ -210,8 +212,8 @@ Every webapp built against this architecture (public or CUI-side) should include
 ```html
 <!-- Add near top of <script>, alongside other config -->
 <script>
-  const ARCHITECTURE_VERSION = "1.3.0";
-  const ARCHITECTURE_DATE = "2026-07-25";
+  const ARCHITECTURE_VERSION = "1.4.0";
+  const ARCHITECTURE_DATE = "2026-07-27";
 </script>
 
 <!-- Add near end of <body> -->
@@ -247,6 +249,78 @@ No app should delay its current migration work waiting on the UDM. Treat these a
 
 ---
 
-## 10. Why This Matters Long-Term
+## 10. The `@domain-placeholder` Convention
+
+This section makes §1's own test — *"would this line of code be the same regardless of program?"* — mechanically checkable at the field level, instead of relying on a reviewer remembering to apply it. It also closes the exact loophole §1.1 names: a field can be runtime-editable and still fail separation if its baked-in default is program-specific content. The marker below applies to that default, same as §1.1 already requires — just made greppable.
+
+It also extends §9's UDM forward-compatibility conventions: §9 already asks for stable IDs and explicit references so a future PDKM can attach cleanly. `@domain-placeholder` is the missing piece that marks *exactly where*, field by field, a PDKM's real values are meant to land once one exists.
+
+### 10.1 The marker
+
+Tag every field whose current value is program-specific illustrative content — as distinct from structural fields (IDs, foreign-key references, fixed enums, timestamps, booleans) — with a JSDoc-style `@domain-placeholder` tag directly above the field:
+
+```ts
+interface ConfigurationItem {
+  id: string;                          // structural — not tagged
+  subsystemIds: string[];              // structural — not tagged
+  baselineId: string;                  // structural — not tagged
+
+  /** @domain-placeholder */
+  name: string;                        // illustrative program content — tagged
+
+  /** @domain-placeholder */
+  description: string;                 // illustrative program content — tagged
+}
+```
+
+Use the JSDoc block-comment form specifically, not a plain line comment — it's the form IDE hover and `tsdoc`-aware tooling already read natively, which matters if this ever grows a lint rule (§10.4).
+
+The test for what gets tagged is §1's test, applied at field granularity: **if this field's current value is a synthetic stand-in for something a real program will eventually supply, tag it.** Structural fields are never tagged — the shape is exactly what's meant to be reused; only the illustrative *values* sitting in that shape are.
+
+**Free-text fields that are structural taxonomy, not program content, are also not tagged.** A field like `domain: string` holding a reusable SE category name (e.g., "System Safety," "Verification & Validation") is structural despite being an untyped string — contrast with a status field whose actual values are genuinely program-specific findings. When this distinction isn't obvious from the field name alone, note it inline (a one-line comment is enough) rather than leaving a future reviewer to guess.
+
+### 10.2 Beyond single fields
+
+Two shapes come up often enough to call out explicitly:
+
+**Whole-type tagging.** A fixed-key, variable-value structure — e.g. a `Record<SectionKey, string>` where the keys are reusable DID/CDRL structure but every value is program-specific requirement text — has no single field to annotate. Tag the type alias itself:
+
+```ts
+/** @domain-placeholder -- every section's text is program-specific requirement
+ * content, not generic structure. The keys themselves are the reusable
+ * DID-derived structure and stay as-is. */
+export type SpecSections = Record<SpecSectionKey, string>;
+```
+
+**Shared sub-types.** If a type is reused across multiple parent entities (e.g., an `Attachment` type nested inside several different record types' `attachments` arrays), tag it once, on the shared type itself — it applies transitively everywhere that type is used. Don't re-tag it per parent entity.
+
+### 10.3 The manifest
+
+Every app maintains a companion manifest at `/data-schema/DOMAIN_PLACEHOLDER_FIELDS.md`, listing every tagged field or type, per entity, in one reviewable place. This gives:
+- A fast audit of how much of an app's current data is placeholder, without reading every type file.
+- Confirmation at CUI-vendoring time (§8) that nothing tagged has silently become load-bearing default content.
+- An onboarding reference instead of the boundary being inferred from scratch.
+
+Markdown is the required format for now, for consistency with the rest of this document family. A structured (JSON/YAML) manifest is a reasonable future step once a second app wants to build a shared, generic "Promises" UI (§10.5) rather than a hand-built one per app — not a blocker today.
+
+### 10.4 Tooling enforcement (future direction, not required now)
+
+A future lint rule could flag any string field in `/data-schema` that has neither a `@domain-placeholder` tag nor an explicit structural-taxonomy justification. This is not being built now, and any future version needs an allowlist mechanism for structural free-text fields (§10.1) — a naive "untyped string ⇒ flag it" rule will false-positive on exactly that category.
+
+### 10.5 The "Promises" view (recommended, not mandated)
+
+Pair the marker convention with a read-only, filterable in-app view surfacing every current record's `@domain-placeholder` values in one place, framed as a promissory note: each value is synthetic and will be replaced once a real PDKM exists for the program a given deployment serves, arriving via landing-zone upload or direct user entry (§4). Every app doesn't need identical UI, but every app should have *some* visible way to answer "what in this deployment is still synthetic."
+
+### 10.6 Mock data is out of scope
+
+Mock/seed data files are **not** tagged. The marker's job is to tell a real deployment which schema fields need real content — it is not to make demo data illegible while it waits for that deployment. Rewriting illustrative seed values into placeholder strings would defeat the purpose of having a readable demo in the first place. This is settled, not an open question.
+
+### 10.7 Migration note
+
+Retroactively tagging an existing app's fields is additive and comment-only — no structural change, no behavior change. It can be done early in an app's migration sequence (§7) rather than waiting for the content-split step.
+
+---
+
+## 11. Why This Matters Long-Term
 
 Right now each app (PDR readiness, Dispatch, translator) independently reinvents: an AI provider call, a prompt, a data shape, a UI. Once `/methodology` + `/provider` are standardized, a new tool for a new program becomes: define a data schema, write a few checklist/prompt files, reuse everything else. That's the actual scaling unlock — not just CUI-compliance, but turning one-off tools into a genuine internal SE toolkit product line.

@@ -1,14 +1,15 @@
 # Changelog
 
-Tracks this app's compliance with the [Reusable SE Webapp Architecture Guidance](vendor/architecture-guidance-v1.3.0.md),
-per its §6 versioning/vendoring discipline. This app is the reference implementation the guidance's v1.1.0 and
-v1.2.0 revisions were informed by (see that doc's own changelog).
+Tracks this app's compliance with the [Reusable SE Webapp Architecture Guidance](vendor/architecture-guidance-v1.4.0.md),
+per its §6 versioning/vendoring discipline. This app is the reference implementation the guidance's v1.1.0, v1.2.0,
+and v1.4.0 §10 revisions were informed by (see that doc's own changelog).
 
 ## Architecture guidance vendoring
 
 | Vendored version | Imported | Reviewer |
 |---|---|---|
 | v1.3.0 | 2026-07-25 | this program's Lead Systems Engineer |
+| v1.4.0 | 2026-07-28 | this program's Lead Systems Engineer |
 
 ## App-side migration history (Architecture Guidance §7)
 
@@ -28,6 +29,14 @@ v1.2.0 revisions were informed by (see that doc's own changelog).
   (`AI_PROVIDER`, `AWS_REGION`, etc.) per the guidance's §4 scope note — not migrated into `config.json`.
 - **2026-07-25 — Phase 4: Versioning/vendoring scaffolding.** This file, `/vendor/architecture-guidance-v1.3.0.md`,
   and the in-app `ARCHITECTURE_VERSION`/`ARCHITECTURE_DATE` footer (see `client/src/config/architectureVersion.ts`).
+- **2026-07-28 — Vendoring bump to v1.4.0 (§10, `@domain-placeholder` convention).** This app implemented the
+  `@domain-placeholder` marker convention, its `/data-schema/DOMAIN_PLACEHOLDER_FIELDS.md` manifest, and the PDKM
+  Promises tab ahead of the canonical Architecture Guidance formally documenting §10 — the guidance's v1.4.0 §10
+  text was itself generalized from this app's implementation and its response to the original convention proposal
+  (see `udm-exchange` repo, `feedback/se-workbench/PROPOSAL_DOMAIN_PLACEHOLDER_CONVENTION_RESPONSE.md`). This is a
+  paperwork-only vendoring update: re-vendored `/vendor/architecture-guidance-v1.4.0.md`, bumped
+  `ARCHITECTURE_VERSION`/`ARCHITECTURE_DATE` to `1.4.0`/`2026-07-27`, and updated every in-repo doc/comment citing
+  the vendored version. No code behavior changed — the app already conformed to the content this bump formalizes.
 - **Not yet done — Phase 5: Methodology-vs-program-data content split.** The ~10 files under
   `/methodology/guidance/` were relocated as-is in Phase 1; several (most notably
   `recoveryProgramGuidance.ts`, parts of `dbxMbxGuidance.ts` and `setrGuidance.ts`) still interleave genuinely
