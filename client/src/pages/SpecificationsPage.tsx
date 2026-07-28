@@ -107,7 +107,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
   return (
     <div className="page">
       <div className="page-header">
-        <h2>Requirement Specifications</h2>
+        <EditableText contentKey="specifications.heading" defaultValue="Requirement Specifications" as="h2" />
         <EditableText
           contentKey="page.specifications.hint"
           defaultValue="DID-style templates for HRS/SRS at System, Subsystem, and HWCI/CSCI level."
@@ -139,13 +139,13 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                   defaultValue={LEVEL_GUIDANCE[level].competency.note}
                   as="p"
                 />
-                <p className="did-guidance-label did-pro">Pros</p>
+                <EditableText contentKey="did.prosLabel" defaultValue="Pros" as="p" className="did-guidance-label did-pro" />
                 <ul>
                   {LEVEL_GUIDANCE[level].pros.map((p, i) => (
                     <EditableText key={i} contentKey={`did.level.${level}.pros.${i}`} defaultValue={p} as="li" />
                   ))}
                 </ul>
-                <p className="did-guidance-label did-con">Cons</p>
+                <EditableText contentKey="did.consLabel" defaultValue="Cons" as="p" className="did-guidance-label did-con" />
                 <ul>
                   {LEVEL_GUIDANCE[level].cons.map((c, i) => (
                     <EditableText key={i} contentKey={`did.level.${level}.cons.${i}`} defaultValue={c} as="li" />
@@ -176,7 +176,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
             className="hint"
           />
 
-          <h3>System Safety Decomposition (MIL-STD-882E / JSSSEH)</h3>
+          <EditableText contentKey="specifications.safetyDecompositionHeading" defaultValue="System Safety Decomposition (MIL-STD-882E / JSSSEH)" as="h3" />
           <EditableText contentKey="safety.frameworkIntro" defaultValue={SAFETY_FRAMEWORK_INTRO} as="p" className="hint" />
           <div className="did-guidance-grid">
             {SPEC_LEVELS.map((level) => (
@@ -204,7 +204,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
             ))}
           </div>
 
-          <h3>SETR Milestones: SRR → SFR → SSR</h3>
+          <EditableText contentKey="specifications.setrMilestonesHeading" defaultValue="SETR Milestones: SRR → SFR → SSR" as="h3" />
           <EditableText contentKey="setr.frameworkIntro" defaultValue={SETR_FRAMEWORK_INTRO} as="p" className="hint" />
           <div className="did-guidance-grid">
             {SETR_EVENTS.map((event) => (
@@ -213,21 +213,21 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                   {event} <span className="badge">{SETR_GUIDANCE[event].name}</span>
                 </h4>
                 <EditableText contentKey={`setr.${event}.summary`} defaultValue={SETR_GUIDANCE[event].summary} as="p" />
-                <p className="did-guidance-label">System Decomposition</p>
+                <EditableText contentKey="setr.decompositionLabel" defaultValue="System Decomposition" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`setr.${event}.decomposition`} defaultValue={SETR_GUIDANCE[event].decomposition} as="p" />
-                <p className="did-guidance-label">System Safety Planning</p>
+                <EditableText contentKey="setr.safetyPlanningLabel" defaultValue="System Safety Planning" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`setr.${event}.safetyPlanning`} defaultValue={SETR_GUIDANCE[event].safetyPlanning} as="p" />
-                <p className="did-guidance-label">System Software Planning</p>
+                <EditableText contentKey="setr.softwarePlanningLabel" defaultValue="System Software Planning" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`setr.${event}.softwarePlanning`} defaultValue={SETR_GUIDANCE[event].softwarePlanning} as="p" />
-                <p className="did-guidance-label">Spec Generation</p>
+                <EditableText contentKey="setr.specGenerationLabel" defaultValue="Spec Generation" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`setr.${event}.specGeneration`} defaultValue={SETR_GUIDANCE[event].specGeneration} as="p" />
-                <p className="did-guidance-label">TDP Maturity (MIL-STD-31000)</p>
+                <EditableText contentKey="setr.tdpMaturityLabel" defaultValue="TDP Maturity (MIL-STD-31000)" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`setr.${event}.tdpMaturity`} defaultValue={SETR_GUIDANCE[event].tdpMaturity} as="p" />
               </div>
             ))}
           </div>
 
-          <h3>Recurring Technical Activities: Beyond the Milestone Gates</h3>
+          <EditableText contentKey="specifications.recurringActivitiesHeading" defaultValue="Recurring Technical Activities: Beyond the Milestone Gates" as="h3" />
           <EditableText
             contentKey="recurringTechActivities.intro"
             defaultValue={RECURRING_TECHNICAL_ACTIVITIES_INTRO}
@@ -238,20 +238,25 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
             {RECURRING_TECHNICAL_ACTIVITIES.map((activity) => (
               <div className="detail-card" key={activity.id}>
                 <h4>{activity.name}</h4>
-                <p className="did-guidance-label">Cadence</p>
+                <EditableText contentKey="recurringTechActivities.cadenceLabel" defaultValue="Cadence" as="p" className="did-guidance-label" />
                 <EditableText
                   contentKey={`recurringTechActivities.${activity.id}.cadence`}
                   defaultValue={activity.cadence}
                   as="p"
                   className="hint"
                 />
-                <p className="did-guidance-label">Purpose</p>
+                <EditableText contentKey="recurringTechActivities.purposeLabel" defaultValue="Purpose" as="p" className="did-guidance-label" />
                 <EditableText
                   contentKey={`recurringTechActivities.${activity.id}.purpose`}
                   defaultValue={activity.purpose}
                   as="p"
                 />
-                <p className="did-guidance-label">Distinction from a SETR milestone gate</p>
+                <EditableText
+                  contentKey="recurringTechActivities.distinctionLabel"
+                  defaultValue="Distinction from a SETR milestone gate"
+                  as="p"
+                  className="did-guidance-label"
+                />
                 <EditableText
                   contentKey={`recurringTechActivities.${activity.id}.distinctionFromSetr`}
                   defaultValue={activity.distinctionFromSetr}
@@ -262,7 +267,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
             ))}
           </div>
 
-          <h3>Pointer Specifications: Citing Higher-Level Standards</h3>
+          <EditableText contentKey="specifications.pointerSpecHeading" defaultValue="Pointer Specifications: Citing Higher-Level Standards" as="h3" />
           <EditableText contentKey="pointerSpec.frameworkIntro" defaultValue={POINTER_SPEC_INTRO} as="p" className="hint" />
           <div className="did-guidance-grid">
             {POINTER_SPEC_PRINCIPLES.map((principle, i) => (
@@ -286,13 +291,13 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                     </span>
                   ))}
                 </div>
-                <p className="did-guidance-label">Why it matters</p>
+                <EditableText contentKey="pointerSpec.whyItMattersLabel" defaultValue="Why it matters" as="p" className="did-guidance-label" />
                 <EditableText
                   contentKey={`pointerSpec.catalog.${entry.id}.whyItMatters`}
                   defaultValue={entry.whyItMatters}
                   as="p"
                 />
-                <p className="did-guidance-label">Recommended approach</p>
+                <EditableText contentKey="pointerSpec.recommendedApproachLabel" defaultValue="Recommended approach" as="p" className="did-guidance-label" />
                 <EditableText
                   contentKey={`pointerSpec.catalog.${entry.id}.recommendedApproach`}
                   defaultValue={entry.recommendedApproach}
@@ -302,7 +307,7 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
             ))}
           </div>
 
-          <h3>Technical Data Package (TDP) Alignment — MIL-STD-31000 / EIA-649</h3>
+          <EditableText contentKey="specifications.tdpAlignmentHeading" defaultValue="Technical Data Package (TDP) Alignment — MIL-STD-31000 / EIA-649" as="h3" />
           <EditableText contentKey="tdp.frameworkIntro" defaultValue={TDP_FRAMEWORK_INTRO} as="p" className="hint" />
           <div className="did-guidance-grid">
             {TDP_MATURITY_LEVELS.map((level) => (
@@ -313,43 +318,46 @@ export function SpecificationsPage({ entity, subsystems, cis, onSelectSpecificat
                   defaultValue={TDP_MATURITY_META[level].description}
                   as="p"
                 />
-                <p className="did-guidance-label">Spec-Type Correlation</p>
+                <EditableText contentKey="tdp.specTypeCorrelationLabel" defaultValue="Spec-Type Correlation" as="p" className="did-guidance-label" />
                 <EditableText
                   contentKey={`tdp.maturity.${level}.specTypeCorrelation`}
                   defaultValue={TDP_MATURITY_META[level].specTypeCorrelation}
                   as="p"
                 />
-                <p className="hint">SETR range: {TDP_MATURITY_META[level].setrRange}</p>
+                <p className="hint">
+                  <EditableText contentKey="tdp.setrRangeLabel" defaultValue="SETR range:" as="span" />{" "}
+                  {TDP_MATURITY_META[level].setrRange}
+                </p>
               </div>
             ))}
           </div>
           <EditableText contentKey="tdp.fcaPcaNote" defaultValue={FCA_PCA_NOTE} as="p" className="hint" />
 
-          <h4>TDP Content Elements</h4>
+          <EditableText contentKey="specifications.tdpContentElementsHeading" defaultValue="TDP Content Elements" as="h4" />
           <div className="did-guidance-grid">
             {TDP_CONTENT_ELEMENTS.map((el) => (
               <div className="detail-card" key={el.id}>
                 <h4>{el.name}</h4>
                 <EditableText contentKey={`tdp.content.${el.id}.description`} defaultValue={el.description} as="p" className="hint" />
-                <p className="did-guidance-label">In this app</p>
+                <EditableText contentKey="tdp.inThisAppLabel" defaultValue="In this app" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`tdp.content.${el.id}.appMapping`} defaultValue={el.appMapping} as="p" />
               </div>
             ))}
           </div>
 
-          <h4>EIA-649 Configuration Management Functional Areas</h4>
+          <EditableText contentKey="specifications.cmFunctionalAreasHeading" defaultValue="EIA-649 Configuration Management Functional Areas" as="h4" />
           <div className="did-guidance-grid">
             {CM_FUNCTIONAL_AREAS.map((area) => (
               <div className="detail-card" key={area.id}>
                 <h4>{area.name}</h4>
                 <EditableText contentKey={`cm.area.${area.id}.description`} defaultValue={area.description} as="p" className="hint" />
-                <p className="did-guidance-label">In this app</p>
+                <EditableText contentKey="cm.inThisAppLabel" defaultValue="In this app" as="p" className="did-guidance-label" />
                 <EditableText contentKey={`cm.area.${area.id}.appMapping`} defaultValue={area.appMapping} as="p" />
               </div>
             ))}
           </div>
 
-          <h3>Document-Based (DBx) vs Model-Based (MBx) Specification</h3>
+          <EditableText contentKey="specifications.dbxMbxHeading" defaultValue="Document-Based (DBx) vs Model-Based (MBx) Specification" as="h3" />
           <EditableText contentKey="dbxMbx.intro" defaultValue={DBX_MBX_INTRO} as="p" className="hint" />
           <div className="did-guidance-grid">
             <DbxMbxCard dimension={specWritingDimension} />

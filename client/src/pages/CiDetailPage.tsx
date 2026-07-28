@@ -58,15 +58,15 @@ export function CiDetailPage({
         {ci.overDecompositionFlag && <span className="badge badge-warning">Over-decomposition flagged</span>}
       </div>
       <dl className="detail-grid">
-        <dt>Type</dt>
+        <dt><EditableText contentKey="ciDetail.typeLabel" defaultValue="Type" as="span" /></dt>
         <dd>{ci.type}</dd>
-        <dt>Status</dt>
+        <dt><EditableText contentKey="ciDetail.statusLabel" defaultValue="Status" as="span" /></dt>
         <dd>{ci.status || "—"}</dd>
-        <dt>Notes</dt>
+        <dt><EditableText contentKey="ciDetail.notesLabel" defaultValue="Notes" as="span" /></dt>
         <dd>{ci.notes || "—"}</dd>
         {ci.overDecompositionFlag && (
           <>
-            <dt>Consolidation notes</dt>
+            <dt><EditableText contentKey="ciDetail.consolidationNotesLabel" defaultValue="Consolidation notes" as="span" /></dt>
             <dd>{ci.consolidationNotes || "—"}</dd>
           </>
         )}
@@ -85,9 +85,17 @@ export function CiDetailPage({
       )}
 
       <section>
-        <h3>Logical Subsystems Served{linkedSubsystems.length >= 2 ? ` (${linkedSubsystems.length})` : ""}</h3>
+        <h3>
+          <EditableText contentKey="ciDetail.subsystemsServedLabel" defaultValue="Logical Subsystems Served" as="span" />
+          {linkedSubsystems.length >= 2 ? ` (${linkedSubsystems.length})` : ""}
+        </h3>
         {linkedSubsystems.length === 0 ? (
-          <p className="hint">Not yet linked to a logical subsystem.</p>
+          <EditableText
+            contentKey="ciDetail.noSubsystemLinkedHint"
+            defaultValue="Not yet linked to a logical subsystem."
+            as="p"
+            className="hint"
+          />
         ) : (
           <>
             {linkedSubsystems.length >= 2 && (
@@ -120,9 +128,14 @@ export function CiDetailPage({
       </section>
 
       <section>
-        <h3>Delta / Traceability Matrix</h3>
+        <EditableText contentKey="ciDetail.deltaMatrixLabel" defaultValue="Delta / Traceability Matrix" as="h3" />
         {deltaRows.length === 0 ? (
-          <p className="hint">No delta matrix rows for this CI.</p>
+          <EditableText
+            contentKey="ciDetail.noDeltaRowsHint"
+            defaultValue="No delta matrix rows for this CI."
+            as="p"
+            className="hint"
+          />
         ) : (
           deltaRows.map((row) => (
             <div className="detail-card" key={row.id}>
@@ -138,9 +151,14 @@ export function CiDetailPage({
       </section>
 
       <section>
-        <h3>A/B Compatibility</h3>
+        <EditableText contentKey="ciDetail.abCompatibilityLabel" defaultValue="A/B Compatibility" as="h3" />
         {abRows.length === 0 ? (
-          <p className="hint">No A/B compatibility rows for this CI.</p>
+          <EditableText
+            contentKey="ciDetail.noAbRowsHint"
+            defaultValue="No A/B compatibility rows for this CI."
+            as="p"
+            className="hint"
+          />
         ) : (
           abRows.map((row) => (
             <div className="detail-card" key={row.id}>
@@ -155,9 +173,14 @@ export function CiDetailPage({
       </section>
 
       <section>
-        <h3>COTS Record</h3>
+        <EditableText contentKey="ciDetail.cotsRecordLabel" defaultValue="COTS Record" as="h3" />
         {cotsRecords.length === 0 ? (
-          <p className="hint">No COTS record for this CI.</p>
+          <EditableText
+            contentKey="ciDetail.noCotsRecordHint"
+            defaultValue="No COTS record for this CI."
+            as="p"
+            className="hint"
+          />
         ) : (
           cotsRecords.map((row) => (
             <div className="detail-card" key={row.id}>
@@ -175,9 +198,14 @@ export function CiDetailPage({
       </section>
 
       <section>
-        <h3>Requirement Specifications</h3>
+        <EditableText contentKey="ciDetail.specificationsLabel" defaultValue="Requirement Specifications" as="h3" />
         {specifications.length === 0 ? (
-          <p className="hint">No specifications linked to this CI yet.</p>
+          <EditableText
+            contentKey="ciDetail.noSpecificationsHint"
+            defaultValue="No specifications linked to this CI yet."
+            as="p"
+            className="hint"
+          />
         ) : (
           specifications.map((spec) => (
             <div className="detail-card" key={spec.id}>
@@ -195,9 +223,14 @@ export function CiDetailPage({
       </section>
 
       <section>
-        <h3>Safety Deliverables</h3>
+        <EditableText contentKey="ciDetail.safetyDeliverablesLabel" defaultValue="Safety Deliverables" as="h3" />
         {safetyDeliverables.length === 0 ? (
-          <p className="hint">No safety deliverables linked to this CI yet.</p>
+          <EditableText
+            contentKey="ciDetail.noSafetyDeliverablesHint"
+            defaultValue="No safety deliverables linked to this CI yet."
+            as="p"
+            className="hint"
+          />
         ) : (
           safetyDeliverables.map((sd) => (
             <div className="detail-card" key={sd.id}>
@@ -214,9 +247,14 @@ export function CiDetailPage({
       </section>
 
       <section>
-        <h3>Program Planning Deliverables</h3>
+        <EditableText contentKey="ciDetail.planningDeliverablesLabel" defaultValue="Program Planning Deliverables" as="h3" />
         {planningDeliverables.length === 0 ? (
-          <p className="hint">No planning deliverables linked to this CI yet.</p>
+          <EditableText
+            contentKey="ciDetail.noPlanningDeliverablesHint"
+            defaultValue="No planning deliverables linked to this CI yet."
+            as="p"
+            className="hint"
+          />
         ) : (
           planningDeliverables.map((pd) => (
             <div className="detail-card" key={pd.id}>
@@ -233,9 +271,14 @@ export function CiDetailPage({
       </section>
 
       <section>
-        <h3>Related Recommendations</h3>
+        <EditableText contentKey="ciDetail.recommendationsLabel" defaultValue="Related Recommendations" as="h3" />
         {recommendations.length === 0 ? (
-          <p className="hint">No recommendations reference this CI.</p>
+          <EditableText
+            contentKey="ciDetail.noRecommendationsHint"
+            defaultValue="No recommendations reference this CI."
+            as="p"
+            className="hint"
+          />
         ) : (
           <ul>
             {recommendations.map((r) => (

@@ -15,14 +15,19 @@ import {
 export function DbxMbxTransitionGuidance() {
   return (
     <>
-      <h4>Caught between DBx and MBx: the transition period</h4>
+      <EditableText contentKey="dbxMbx.transitionHeading" defaultValue="Caught between DBx and MBx: the transition period" as="h4" />
       <EditableText contentKey="dbxMbx.transitionIntro" defaultValue={DBX_MBX_TRANSITION_INTRO} as="p" className="hint" />
       <div className="did-guidance-grid">
         {DBX_MBX_TRANSITION_DIMENSIONS.map((d) => (
           <div className="detail-card" key={d.id}>
             <h4>{d.name}</h4>
             <EditableText contentKey={`dbxMbx.transition.${d.id}.challenge`} defaultValue={d.challenge} as="p" />
-            <p className="did-guidance-label">Extra work required while straddling</p>
+            <EditableText
+              contentKey="dbxMbx.duplicationTaxLabel"
+              defaultValue="Extra work required while straddling"
+              as="p"
+              className="did-guidance-label"
+            />
             <EditableText
               contentKey={`dbxMbx.transition.${d.id}.duplicationTax`}
               defaultValue={d.duplicationTax}
@@ -33,7 +38,7 @@ export function DbxMbxTransitionGuidance() {
         ))}
       </div>
 
-      <h4>This program's complicating factor</h4>
+      <EditableText contentKey="dbxMbx.complicatingFactorHeading" defaultValue="This program's complicating factor" as="h4" />
       <EditableText
         contentKey="dbxMbx.baselineMaturityAsymmetry"
         defaultValue={DBX_MBX_BASELINE_MATURITY_ASYMMETRY}
@@ -51,7 +56,12 @@ export function DbxMbxTransitionGuidance() {
       </ul>
       <EditableText contentKey="dbxMbx.sowToolingMismatch" defaultValue={DBX_MBX_SOW_TOOLING_MISMATCH} as="p" />
 
-      <p className="did-guidance-label">Managing the transition without it becoming permanent</p>
+      <EditableText
+        contentKey="dbxMbx.managingTransitionLabel"
+        defaultValue="Managing the transition without it becoming permanent"
+        as="p"
+        className="did-guidance-label"
+      />
       <ul>
         {DBX_MBX_TRANSITION_MITIGATIONS.map((m, i) => (
           <EditableText key={m.id} contentKey={`dbxMbx.transition.mitigation.${i}`} defaultValue={m.text} as="li" />

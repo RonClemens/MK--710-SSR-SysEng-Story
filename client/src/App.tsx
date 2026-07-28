@@ -159,7 +159,7 @@ export default function App() {
     <div className="app-shell">
       <header className="app-header">
         <div>
-          <h1>SE Workbench</h1>
+          <EditableText contentKey="app.title" defaultValue="SE Workbench" as="h1" />
           <EditableText
             contentKey="app.subtitle"
             defaultValue="Illustrative/demo data only — not a real program's CI names or requirements."

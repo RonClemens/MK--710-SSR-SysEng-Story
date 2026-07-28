@@ -53,7 +53,7 @@ export function AbCompatibilityPage({ entity, cis }: Props) {
   return (
     <div className="page">
       <div className="page-header">
-        <h2>A/B Compatibility Matrix</h2>
+        <EditableText contentKey="abCompatibility.heading" defaultValue="A/B Compatibility Matrix" as="h2" />
         <EditableText
           contentKey="page.abCompatibility.hint"
           defaultValue="Scoped to Tier 1 (UUT-relevant) interfaces"
@@ -64,7 +64,14 @@ export function AbCompatibilityPage({ entity, cis }: Props) {
           + Add Row
         </button>
       </div>
-      {ciOptions.length === 0 && <p className="hint">Mark at least one CI as Tier 1 before adding A/B rows.</p>}
+      {ciOptions.length === 0 && (
+        <EditableText
+          contentKey="abCompatibility.noTier1CiHint"
+          defaultValue="Mark at least one CI as Tier 1 before adding A/B rows."
+          as="p"
+          className="hint"
+        />
+      )}
       {error && <p className="form-error">{error}</p>}
       {loading ? (
         <p>Loading…</p>

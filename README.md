@@ -773,10 +773,15 @@ structured entities:
   `updatedAt`), stored the same way as the rest of the data — server-side
   JSON in normal mode, `localStorage` in the static/Pages build — and
   included in Export/Import.
-- Deliberately out of scope: structural UI (labels, button/tab text) and the
-  entire AI Assistant panel, including its CUI/security banner — those stay
-  fixed regardless of Edit Mode, since drifting security-relevant copy is a
-  risk this feature shouldn't introduce.
+- Coverage is broad: every page heading, section label, hint, and empty-state
+  message is editable, not just prose paragraphs — the app's *content* (what
+  it says) is editable throughout, versioned the same way as everything else.
+- Deliberately out of scope: true UI controls (button and tab labels — the
+  editor can't nest inside an interactive element without breaking HTML),
+  table column headers and entity form field labels (schema-level, not
+  content), and the AI Assistant panel's CUI/security banner specifically —
+  that stays fixed regardless of Edit Mode, since drifting security-relevant
+  copy is a risk this feature shouldn't introduce.
 - This is a content-versioning layer, not a program-data audit trail — it
   exists so the app's own guidance text can be refined in place by whoever's
   using it, with a way to see what changed and undo it.

@@ -35,7 +35,7 @@ export function SubsystemDetailPage({
         <span className="badge">{subsystem.source}</span>
       </div>
       <dl className="detail-grid">
-        <dt>Description</dt>
+        <dt><EditableText contentKey="subsystemDetail.descriptionLabel" defaultValue="Description" as="span" /></dt>
         <dd>{subsystem.description || "—"}</dd>
       </dl>
 
@@ -50,9 +50,14 @@ export function SubsystemDetailPage({
       )}
 
       <section>
-        <h3>CIs serving this subsystem</h3>
+        <EditableText contentKey="subsystemDetail.servingCisLabel" defaultValue="CIs serving this subsystem" as="h3" />
         {servingCis.length === 0 ? (
-          <p className="hint">No CIs currently link to this subsystem.</p>
+          <EditableText
+            contentKey="subsystemDetail.noServingCisHint"
+            defaultValue="No CIs currently link to this subsystem."
+            as="p"
+            className="hint"
+          />
         ) : (
           <>
             {servingCis.length >= 2 && (
@@ -84,9 +89,14 @@ export function SubsystemDetailPage({
       </section>
 
       <section>
-        <h3>Requirement Specifications</h3>
+        <EditableText contentKey="subsystemDetail.specificationsLabel" defaultValue="Requirement Specifications" as="h3" />
         {specifications.length === 0 ? (
-          <p className="hint">No specifications linked to this subsystem yet.</p>
+          <EditableText
+            contentKey="subsystemDetail.noSpecificationsHint"
+            defaultValue="No specifications linked to this subsystem yet."
+            as="p"
+            className="hint"
+          />
         ) : (
           specifications.map((spec) => (
             <div className="detail-card" key={spec.id}>
@@ -104,9 +114,14 @@ export function SubsystemDetailPage({
       </section>
 
       <section>
-        <h3>Safety Deliverables</h3>
+        <EditableText contentKey="subsystemDetail.safetyDeliverablesLabel" defaultValue="Safety Deliverables" as="h3" />
         {safetyDeliverables.length === 0 ? (
-          <p className="hint">No safety deliverables linked to this subsystem yet.</p>
+          <EditableText
+            contentKey="subsystemDetail.noSafetyDeliverablesHint"
+            defaultValue="No safety deliverables linked to this subsystem yet."
+            as="p"
+            className="hint"
+          />
         ) : (
           safetyDeliverables.map((sd) => (
             <div className="detail-card" key={sd.id}>
@@ -123,9 +138,14 @@ export function SubsystemDetailPage({
       </section>
 
       <section>
-        <h3>Program Planning Deliverables</h3>
+        <EditableText contentKey="subsystemDetail.planningDeliverablesLabel" defaultValue="Program Planning Deliverables" as="h3" />
         {planningDeliverables.length === 0 ? (
-          <p className="hint">No planning deliverables linked to this subsystem yet.</p>
+          <EditableText
+            contentKey="subsystemDetail.noPlanningDeliverablesHint"
+            defaultValue="No planning deliverables linked to this subsystem yet."
+            as="p"
+            className="hint"
+          />
         ) : (
           planningDeliverables.map((pd) => (
             <div className="detail-card" key={pd.id}>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Modal } from "./Modal";
+import { EditableText } from "./EditableText";
 import type { InterfaceRecord, InterfaceScope } from "../types";
 
 export interface N2Element {
@@ -147,16 +148,27 @@ export function N2Grid({
         </table>
       </div>
 
-      <p className="hint">
-        ● documented interface · ○ derived only (shares a{" "}
-        {scope === "subsystem" ? "CI, not yet documented" : "subsystem, not yet documented"}) · click any
-        off-diagonal cell to add or edit
-      </p>
+      <EditableText
+        contentKey={`n2Grid.${scope}.legend`}
+        defaultValue={`● documented interface · ○ derived only (shares a ${
+          scope === "subsystem" ? "CI, not yet documented" : "subsystem, not yet documented"
+        }) · click any off-diagonal cell to add or edit`}
+        as="p"
+        className="hint"
+      />
 
       <section>
-        <h3>Documented Interfaces ({documented.length})</h3>
+        <h3>
+          <EditableText contentKey="n2Grid.documentedInterfacesLabel" defaultValue="Documented Interfaces" as="span" />{" "}
+          ({documented.length})
+        </h3>
         {documented.length === 0 ? (
-          <p className="hint">No interfaces documented yet — click a cell above to add one.</p>
+          <EditableText
+            contentKey="n2Grid.emptyState"
+            defaultValue="No interfaces documented yet — click a cell above to add one."
+            as="p"
+            className="hint"
+          />
         ) : (
           documented.map((r) => {
             const a = elements.find((e) => e.id === r.aId);

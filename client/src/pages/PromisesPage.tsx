@@ -367,7 +367,7 @@ export function PromisesPage({
   return (
     <div className="page">
       <div className="page-header">
-        <h2>PDKM Promises</h2>
+        <EditableText contentKey="promises.heading" defaultValue="PDKM Promises" as="h2" />
         <EditableText
           contentKey="page.promises.hint"
           defaultValue="Every synthetic value below is a promise — explore what changes once the real PDKM lands."
@@ -417,7 +417,12 @@ export function PromisesPage({
 
       <div className="promises-groups">
         {visibleGroups.length === 0 ? (
-          <p className="empty-row">No promised values match this filter.</p>
+          <EditableText
+            contentKey="promises.noMatchesEmptyState"
+            defaultValue="No promised values match this filter."
+            as="p"
+            className="empty-row"
+          />
         ) : (
           visibleGroups.map((g) => {
             const expanded = isExpanded(g.group);

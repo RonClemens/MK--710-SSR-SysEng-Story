@@ -94,7 +94,7 @@ export function PhaseWorkbenchPage({
   return (
     <div className="page">
       <div className="page-header">
-        <h2>Acquisition Phase Workbench</h2>
+        <EditableText contentKey="phaseWorkbench.heading" defaultValue="Acquisition Phase Workbench" as="h2" />
         <button className="button-secondary" onClick={() => onSwitchToAllTabs()}>
           All Tabs
         </button>
@@ -108,7 +108,12 @@ export function PhaseWorkbenchPage({
       />
 
       {baselines.length === 0 ? (
-        <p className="empty-row">No baselines yet.</p>
+        <EditableText
+          contentKey="phaseWorkbench.noBaselinesEmptyState"
+          defaultValue="No baselines yet."
+          as="p"
+          className="empty-row"
+        />
       ) : (
         <>
           <div className="pill-filter-row">
@@ -132,7 +137,11 @@ export function PhaseWorkbenchPage({
           />
 
           <div className="phase-detail-panel">
-            <h3>{selectedPhase.name}</h3>
+            <EditableText
+              contentKey={`aafPhase.${selectedPhase.id}.name`}
+              defaultValue={selectedPhase.name}
+              as="h3"
+            />
             <EditableText
               contentKey={`aafPhase.${selectedPhase.id}.summary`}
               defaultValue={selectedPhase.summary}
@@ -153,9 +162,16 @@ export function PhaseWorkbenchPage({
               <dl className="detail-grid">
                 {entryGate && (
                   <>
-                    <dt>Entry gate</dt>
+                    <dt>
+                      <EditableText contentKey="phaseWorkbench.entryGateLabel" defaultValue="Entry gate" as="span" />
+                    </dt>
                     <dd>
-                      {entryGate.name} —{" "}
+                      <EditableText
+                        contentKey={`aafMilestone.${entryGate.id}.name`}
+                        defaultValue={entryGate.name}
+                        as="span"
+                      />{" "}
+                      —{" "}
                       <EditableText
                         contentKey={`aafMilestone.${entryGate.id}.decisionSummary`}
                         defaultValue={entryGate.decisionSummary}
@@ -166,9 +182,16 @@ export function PhaseWorkbenchPage({
                 )}
                 {exitGate && (
                   <>
-                    <dt>Exit gate</dt>
+                    <dt>
+                      <EditableText contentKey="phaseWorkbench.exitGateLabel" defaultValue="Exit gate" as="span" />
+                    </dt>
                     <dd>
-                      {exitGate.name} —{" "}
+                      <EditableText
+                        contentKey={`aafMilestone.${exitGate.id}.name`}
+                        defaultValue={exitGate.name}
+                        as="span"
+                      />{" "}
+                      —{" "}
                       <EditableText
                         contentKey={`aafMilestone.${exitGate.id}.decisionSummary`}
                         defaultValue={exitGate.decisionSummary}
@@ -182,11 +205,25 @@ export function PhaseWorkbenchPage({
 
             {milestoneStatuses.length > 0 && (
               <>
-                <p className="did-guidance-label">SETR events in this phase</p>
+                <EditableText
+                  contentKey="phaseWorkbench.setrEventsLabel"
+                  defaultValue="SETR events in this phase"
+                  as="p"
+                  className="did-guidance-label"
+                />
                 <ul>
                   {milestoneStatuses.map(({ event, milestone }) => (
                     <li key={event}>
-                      {event}: {milestone ? milestone.status : "Not yet scheduled"}
+                      {event}:{" "}
+                      {milestone ? (
+                        milestone.status
+                      ) : (
+                        <EditableText
+                          contentKey="phaseWorkbench.notYetScheduledLabel"
+                          defaultValue="Not yet scheduled"
+                          as="span"
+                        />
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -195,7 +232,12 @@ export function PhaseWorkbenchPage({
 
             {selectedPhase.incoseFraming && (
               <>
-                <p className="did-guidance-label">INCOSE Systems Engineering Handbook framing</p>
+                <EditableText
+                  contentKey="phaseWorkbench.incoseFramingLabel"
+                  defaultValue="INCOSE Systems Engineering Handbook framing"
+                  as="p"
+                  className="did-guidance-label"
+                />
                 <EditableText
                   contentKey={`aafPhase.${selectedPhase.id}.incoseFraming`}
                   defaultValue={selectedPhase.incoseFraming}
@@ -207,7 +249,12 @@ export function PhaseWorkbenchPage({
 
             {selectedPhase.emphasizedIncoseSubProcesses.length > 0 && (
               <>
-                <p className="did-guidance-label">Emphasized INCOSE technical processes</p>
+                <EditableText
+                  contentKey="phaseWorkbench.emphasizedProcessesLabel"
+                  defaultValue="Emphasized INCOSE technical processes"
+                  as="p"
+                  className="did-guidance-label"
+                />
                 <ul>
                   {selectedPhase.emphasizedIncoseSubProcesses.map((name) => {
                     const subProcess = findIncoseSubProcess(name);

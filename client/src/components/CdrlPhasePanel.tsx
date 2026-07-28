@@ -1,3 +1,4 @@
+import { EditableText } from "./EditableText";
 import type { PhaseCdrl } from "../utils/acquisitionPhase";
 import { SPEC_STATUSES, type SpecStatus } from "../types";
 
@@ -16,9 +17,17 @@ const APPLICABILITY_CLASS: Record<string, string> = {
 export function CdrlPhasePanel({ cdrls, onUpdateStatus, onViewInAllTabs }: Props) {
   return (
     <div className="cdrl-phase-panel">
-      <p className="did-guidance-label">CDRLs due in this phase{cdrls.length > 0 ? ` (${cdrls.length})` : ""}</p>
+      <p className="did-guidance-label">
+        <EditableText contentKey="cdrlPhasePanel.label" defaultValue="CDRLs due in this phase" as="span" />
+        {cdrls.length > 0 ? ` (${cdrls.length})` : ""}
+      </p>
       {cdrls.length === 0 ? (
-        <p className="empty-row">No Safety or Program Planning deliverables reference a milestone in this phase yet.</p>
+        <EditableText
+          contentKey="cdrlPhasePanel.emptyState"
+          defaultValue="No Safety or Program Planning deliverables reference a milestone in this phase yet."
+          as="p"
+          className="empty-row"
+        />
       ) : (
         cdrls.map((c) => (
           <div className="checklist-item-card" key={`${c.kind}-${c.record.id}`}>

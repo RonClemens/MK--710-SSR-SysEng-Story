@@ -80,7 +80,7 @@ export function SubsystemsPage({ entity, cis, onSelectSubsystem }: Props) {
   return (
     <div className="page">
       <div className="page-header">
-        <h2>Logical Subsystems</h2>
+        <EditableText contentKey="subsystems.heading" defaultValue="Logical Subsystems" as="h2" />
         <EditableText
           contentKey="page.subsystems.hint"
           defaultValue="Functional decomposition layer — see §2.3 background on the missing SSDD functional layer"

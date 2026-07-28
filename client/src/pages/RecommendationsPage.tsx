@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DataTable, type ColumnDef } from "../components/DataTable";
 import { Modal } from "../components/Modal";
 import { EntityForm, type FieldDef } from "../components/EntityForm";
+import { EditableText } from "../components/EditableText";
 import {
   RECOMMENDATION_CATEGORIES,
   RECOMMENDATION_OWNER_ROLES,
@@ -84,7 +85,7 @@ export function RecommendationsPage({ entity, cis, gaps }: Props) {
   return (
     <div className="page">
       <div className="page-header">
-        <h2>Recommendations / Action Items</h2>
+        <EditableText contentKey="recommendations.heading" defaultValue="Recommendations / Action Items" as="h2" />
         <button className="button-primary" onClick={() => setEditing("new")}>
           + Add Recommendation
         </button>

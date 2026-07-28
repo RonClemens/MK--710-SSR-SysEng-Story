@@ -71,7 +71,7 @@ export function NSquaredPage({ subsystems: allSubsystems, cis: allCis, interface
   return (
     <div className="page">
       <div className="page-header">
-        <h2>N² Diagrams</h2>
+        <EditableText contentKey="nSquared.heading" defaultValue="N² Diagrams" as="h2" />
         <EditableText
           contentKey="page.n2.hint"
           defaultValue="Click any off-diagonal cell to document a real interface. Derived-only cells (shared CI or shared subsystem) are a starting hint, not a substitute for a documented interface."
@@ -114,9 +114,14 @@ export function NSquaredPage({ subsystems: allSubsystems, cis: allCis, interface
       {error && <p className="form-error">{error}</p>}
 
       <section>
-        <h3>Subsystem × Subsystem</h3>
+        <EditableText contentKey="nSquared.subsystemGridHeading" defaultValue="Subsystem × Subsystem" as="h3" />
         {subsystems.length < 2 ? (
-          <p className="hint">Add at least two logical subsystems to generate this diagram.</p>
+          <EditableText
+            contentKey="nSquared.tooFewSubsystemsHint"
+            defaultValue="Add at least two logical subsystems to generate this diagram."
+            as="p"
+            className="hint"
+          />
         ) : (
           <N2Grid
             scope="subsystem"
@@ -132,7 +137,7 @@ export function NSquaredPage({ subsystems: allSubsystems, cis: allCis, interface
       </section>
 
       <section ref={ciSectionRef}>
-        <h3>CI × CI</h3>
+        <EditableText contentKey="nSquared.ciGridHeading" defaultValue="CI × CI" as="h3" />
         {ciFocus && (
           <p className="hint">
             Showing the {ciFocus.ciIds.length} CIs behind <strong>{ciFocus.label}</strong> — {ciInterfaceCount}{" "}
@@ -144,9 +149,19 @@ export function NSquaredPage({ subsystems: allSubsystems, cis: allCis, interface
           </p>
         )}
         {cis.length < 2 ? (
-          <p className="hint">Add at least two CIs to generate this diagram.</p>
+          <EditableText
+            contentKey="nSquared.tooFewCisHint"
+            defaultValue="Add at least two CIs to generate this diagram."
+            as="p"
+            className="hint"
+          />
         ) : ciElements.length < 2 ? (
-          <p className="hint">Fewer than two CIs serve this subsystem pair.</p>
+          <EditableText
+            contentKey="nSquared.tooFewCisForPairHint"
+            defaultValue="Fewer than two CIs serve this subsystem pair."
+            as="p"
+            className="hint"
+          />
         ) : (
           <N2Grid
             scope="ci"
