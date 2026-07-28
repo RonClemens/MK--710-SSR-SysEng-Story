@@ -1,10 +1,15 @@
-# PDR Reconciliation & Baseline Alignment Workbench
+# SE Workbench
 
-An editable, living workbench for a defense program's PDR reconciliation effort —
-replaces a static Word/PowerPoint working paper with a single source of truth
-for CI inventory, delta/traceability tracking, A/B baseline compatibility, COTS
-item records, and recommendations, plus an AI assistant panel grounded in the
-app's current data.
+An editable, living Systems Engineering workbench for a defense acquisition
+program — organized around a phase-driven guided navigation spanning the
+full Major Capability Acquisition lifecycle (Materiel Solution Analysis
+through Production & Deployment), not just PDR-era reconciliation, though
+that remains one of its core capabilities. Replaces a static Word/PowerPoint
+working paper with a single source of truth for CI inventory, delta/
+traceability tracking, A/B baseline compatibility, COTS item records,
+requirements and verification tracking, safety and program-planning CDRLs,
+and recommendations, plus an AI assistant panel grounded in the app's
+current data.
 
 **All data shipped in this repo (MHC/MCC/IPS "Test Set" example) is
 illustrative/demo data only — it is not real program data.**

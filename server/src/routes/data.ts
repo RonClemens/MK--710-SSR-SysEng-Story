@@ -27,7 +27,7 @@ const REQUIRED_KEYS: (keyof Database)[] = [
 export const dataRouter = Router();
 
 dataRouter.get("/export", (_req, res) => {
-  res.setHeader("Content-Disposition", "attachment; filename=pdr-workbench-export.json");
+  res.setHeader("Content-Disposition", "attachment; filename=se-workbench-export.json");
   res.json(getDb());
 });
 

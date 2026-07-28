@@ -65,7 +65,7 @@ async function start() {
 
   const PORT = Number(process.env.PORT) || 3001;
   app.listen(PORT, () => {
-    console.log(`PDR Workbench server listening on http://localhost:${PORT}`);
+    console.log(`SE Workbench server listening on http://localhost:${PORT}`);
   });
 }
 

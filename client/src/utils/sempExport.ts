@@ -108,7 +108,7 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   const lines: string[] = [];
   lines.push("# Systems Engineering Management Plan — Migration Package");
   lines.push("");
-  lines.push(`_Generated ${new Date().toISOString()} from the PDR Reconciliation & Baseline Alignment Workbench._`);
+  lines.push(`_Generated ${new Date().toISOString()} from the SE Workbench._`);
   lines.push("");
   lines.push("> " + getValue("semp.didCitation", SEMP_DID_CITATION));
   lines.push("");
