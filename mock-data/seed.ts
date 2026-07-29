@@ -595,6 +595,8 @@ export const SEED_DATA: Database = {
       statement: "Test Set shall provide UUT stimulus/response interface per SFR-4.2.1.",
       satisfiedByCiIds: ["ci-002", "ci-003", "ci-004"],
       parentRequirementId: null,
+      sourceSpecificationId: null,
+      sourceSpecSection: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -604,6 +606,8 @@ export const SEED_DATA: Database = {
       statement: "No independent SFR allocation exists for MCC; it is implicitly part of Test Set allocation.",
       satisfiedByCiIds: ["ci-003"],
       parentRequirementId: "req-001",
+      sourceSpecificationId: null,
+      sourceSpecSection: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -618,6 +622,8 @@ export const SEED_DATA: Database = {
         "Shall provide module-level control signaling sufficient to support Test Set stimulus/response timing per SFR-4.2.1 (capability-based; no vendor-specific behavior required).",
       satisfiedByCiIds: ["ci-003"],
       parentRequirementId: "req-001",
+      sourceSpecificationId: null,
+      sourceSpecSection: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -627,8 +633,40 @@ export const SEED_DATA: Database = {
       statement: "Shall provide regulated 28VDC output at up to 15A to support UUT test fixture power needs (capability-based).",
       satisfiedByCiIds: ["ci-004"],
       parentRequirementId: null,
+      sourceSpecificationId: null,
+      sourceSpecSection: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    // PKM Migration Step 10 (additive, first slice): decomposes spec-002's
+    // functionalPerformance section into individually-addressable
+    // Requirement records, closing the gap Steps 4/5 both explicitly
+    // deferred. spec-002 is this CI-level Development spec's own two "shall"
+    // statements, each now a real record rather than only free-text section
+    // content -- children of req-001 (the system-level flow-down), at
+    // ci-001 (the CI spec-002 is linked to, not the over-decomposed
+    // ci-002/003/004 split delta-001 tracks separately).
+    {
+      id: "req-005",
+      baselineId: "BASELINE-A",
+      statement: "Shall generate and capture UUT stimulus/response signals per SFR-4.2.1.",
+      satisfiedByCiIds: ["ci-001"],
+      parentRequirementId: "req-001",
+      sourceSpecificationId: "spec-002",
+      sourceSpecSection: "functionalPerformance",
+      createdAt: "2026-07-29T00:00:00.000Z",
+      updatedAt: "2026-07-29T00:00:00.000Z",
+    },
+    {
+      id: "req-006",
+      baselineId: "BASELINE-A",
+      statement: "Shall format diagnostic messages for transport to test scripts.",
+      satisfiedByCiIds: ["ci-001"],
+      parentRequirementId: "req-001",
+      sourceSpecificationId: "spec-002",
+      sourceSpecSection: "functionalPerformance",
+      createdAt: "2026-07-29T00:00:00.000Z",
+      updatedAt: "2026-07-29T00:00:00.000Z",
     },
   ],
   // PKM Migration Step 5 (additive, first slice): promotes the two existing
@@ -654,6 +692,22 @@ export const SEED_DATA: Database = {
       eventDate: "2026-01-06",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    // PKM Migration Step 10 (additive, first slice): promotes spec-002's own
+    // verificationProvisions text ("Stimulus/response timing verified by
+    // test...") into a real event record against req-005 -- the other half
+    // of that same section's text ("...COTS sub-assembly capability
+    // verified by inspection of vendor data sheet") was already covered by
+    // ve-001 above (Step 5), so only this half was still a gap.
+    {
+      id: "ve-003",
+      requirementId: "req-005",
+      method: "Test",
+      result: "Pass",
+      evidenceSummary: "Stimulus/response timing verified by test per the SFR-4.2.1 acceptance test procedure.",
+      eventDate: "2026-07-15",
+      createdAt: "2026-07-29T00:00:00.000Z",
+      updatedAt: "2026-07-29T00:00:00.000Z",
     },
   ],
   deltaMatrix: [
@@ -1399,6 +1453,22 @@ export const SEED_DATA: Database = {
       evidenceId: "spec-004",
       createdAt: "2026-06-20T00:00:00.000Z",
       updatedAt: "2026-06-20T00:00:00.000Z",
+    },
+    // PKM Migration Step 10 (additive, first slice): a criterion that
+    // couldn't be individually evaluated before this step -- req-005 didn't
+    // exist as its own record, only as free-text inside spec-002's
+    // functionalPerformance section -- now can be, thanks to the
+    // decomposition above.
+    {
+      id: "check-008",
+      milestoneId: "milestone-a-trr",
+      domain: "Verification & Validation",
+      criterion: "Requirement req-005 (Test Set stimulus/response signal generation, spec-002) must have a passing verification event on record.",
+      status: "Met",
+      evidenceType: "Requirement",
+      evidenceId: "req-005",
+      createdAt: "2026-07-29T00:00:00.000Z",
+      updatedAt: "2026-07-29T00:00:00.000Z",
     },
   ],
   content: [],

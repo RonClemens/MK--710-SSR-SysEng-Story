@@ -285,6 +285,17 @@ export interface Requirement {
   // part of req-001, per its own statement) -- not yet used for anything
   // beyond a plain reference; no cycle/depth enforcement.
   parentRequirementId: string | null;
+  // PKM Migration Step 10 (additive): traces a Requirement back to the
+  // Specification section it was decomposed from, closing the gap Steps 4
+  // and 5 both explicitly deferred ("the higher-effort part of this phase
+  // ... a separate, later sub-phase"). Both null for requirements that
+  // didn't originate from a Specification section (e.g. req-001/002, which
+  // predate this step and came from DeltaMatrixRow instead -- see this
+  // entity's own header comment). Explicit reference fields, not
+  // denormalized text, per PKM §4 -- same convention as every other
+  // cross-entity link in this file.
+  sourceSpecificationId: string | null;
+  sourceSpecSection: SpecSectionKey | null;
   createdAt: string;
   updatedAt: string;
 }

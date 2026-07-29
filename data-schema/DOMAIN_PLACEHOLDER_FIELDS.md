@@ -65,10 +65,11 @@ app is deployed for.
   Step 9) has since been fully retired; see this app's PKM Migration Status
   Report v1.5.0 §7 for the removal record.
 
-### Requirement (added PKM Migration Step 4)
+### Requirement (added PKM Migration Step 4; extended Step 10)
 - `statement`
-- Not marked: `satisfiedByCiIds`, `parentRequirementId` (both structural
-  references), `baselineId` (reference).
+- Not marked: `satisfiedByCiIds`, `parentRequirementId`, `sourceSpecificationId`
+  (added Step 10, reference), `sourceSpecSection` (added Step 10, fixed
+  `SpecSectionKey` enum) — all structural references, `baselineId` (reference).
 
 ### LogicalSubsystem
 - `name`

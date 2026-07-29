@@ -569,6 +569,8 @@
         "ci-004"
       ],
       "parentRequirementId": null,
+      "sourceSpecificationId": null,
+      "sourceSpecSection": null,
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     },
@@ -580,6 +582,8 @@
         "ci-003"
       ],
       "parentRequirementId": "req-001",
+      "sourceSpecificationId": null,
+      "sourceSpecSection": null,
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     },
@@ -591,6 +595,8 @@
         "ci-003"
       ],
       "parentRequirementId": "req-001",
+      "sourceSpecificationId": null,
+      "sourceSpecSection": null,
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     },
@@ -602,8 +608,36 @@
         "ci-004"
       ],
       "parentRequirementId": null,
+      "sourceSpecificationId": null,
+      "sourceSpecSection": null,
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "req-005",
+      "baselineId": "BASELINE-A",
+      "statement": "Shall generate and capture UUT stimulus/response signals per SFR-4.2.1.",
+      "satisfiedByCiIds": [
+        "ci-001"
+      ],
+      "parentRequirementId": "req-001",
+      "sourceSpecificationId": "spec-002",
+      "sourceSpecSection": "functionalPerformance",
+      "createdAt": "2026-07-29T00:00:00.000Z",
+      "updatedAt": "2026-07-29T00:00:00.000Z"
+    },
+    {
+      "id": "req-006",
+      "baselineId": "BASELINE-A",
+      "statement": "Shall format diagnostic messages for transport to test scripts.",
+      "satisfiedByCiIds": [
+        "ci-001"
+      ],
+      "parentRequirementId": "req-001",
+      "sourceSpecificationId": "spec-002",
+      "sourceSpecSection": "functionalPerformance",
+      "createdAt": "2026-07-29T00:00:00.000Z",
+      "updatedAt": "2026-07-29T00:00:00.000Z"
     }
   ],
   "verificationEvents": [
@@ -626,6 +660,16 @@
       "eventDate": "2026-01-06",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "ve-003",
+      "requirementId": "req-005",
+      "method": "Test",
+      "result": "Pass",
+      "evidenceSummary": "Stimulus/response timing verified by test per the SFR-4.2.1 acceptance test procedure.",
+      "eventDate": "2026-07-15",
+      "createdAt": "2026-07-29T00:00:00.000Z",
+      "updatedAt": "2026-07-29T00:00:00.000Z"
     }
   ],
   "deltaMatrix": [
@@ -1323,6 +1367,17 @@
       "evidenceId": "spec-004",
       "createdAt": "2026-06-20T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
+    },
+    {
+      "id": "check-008",
+      "milestoneId": "milestone-a-trr",
+      "domain": "Verification & Validation",
+      "criterion": "Requirement req-005 (Test Set stimulus/response signal generation, spec-002) must have a passing verification event on record.",
+      "status": "Met",
+      "evidenceType": "Requirement",
+      "evidenceId": "req-005",
+      "createdAt": "2026-07-29T00:00:00.000Z",
+      "updatedAt": "2026-07-29T00:00:00.000Z"
     }
   ],
   "content": []
