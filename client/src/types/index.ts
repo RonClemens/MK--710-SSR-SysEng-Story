@@ -85,9 +85,10 @@ export interface Baseline {
 
 // PKM Migration Step 9 (per PKM Migration Plan v0.3.0 §8) broadened this
 // entity to also cover AAF acquisition-decision gates, consolidating this
-// app's own prior "Step 8" (the now-deprecated AcquisitionMilestone entity
-// below) per the canonical model's own correction: one Milestone entity with
-// a `milestoneType` discriminator, not two parallel entities.
+// app's own prior "Step 8" (a standalone AcquisitionMilestone entity, since
+// fully retired -- see this app's PKM Migration Status Report v1.5.0 §7 for
+// the removal) per the canonical model's own correction: one Milestone
+// entity with a `milestoneType` discriminator, not two parallel entities.
 // `SetrMilestoneEvent` mirrors ../../../methodology/guidance/setrGuidance.ts's
 // `SetrEvent` values exactly (same independently-maintained-mirror pattern
 // this file already has with server/src/types.ts); `AcquisitionGateEvent`
@@ -130,9 +131,10 @@ export type MilestoneStatus = "Not Started" | "In Progress" | "Complete";
 // this one entity also covers AAF acquisition-decision gates (Milestone
 // A/B/C), per PKM Migration Plan v0.3.0 §8. `milestoneType: "SETR"` is
 // backfilled on every pre-existing record (the only value that ever existed
-// for this entity); `"AcquisitionGate"` records are the 1:1 migration of
-// the former standalone AcquisitionMilestone rows (see that type's own
-// comment below for the coexist-then-deprecate window). `pathway` is
+// for this entity); `"AcquisitionGate"` records were a 1:1 migration of the
+// former standalone AcquisitionMilestone entity's rows, which coexisted
+// briefly then was fully retired once the UI cutover was verified (see
+// this app's PKM Migration Status Report v1.5.0 §7). `pathway` is
 // populated only for AcquisitionGate records (e.g. `"MCA"`); null for SETR
 // records, which have no pathway concept.
 //
@@ -186,34 +188,13 @@ export interface Milestone {
 // truth that could silently drift from the Milestone records that already
 // determine it, with no new information gained. This app's existing
 // "derived, not stored" design choice for current-phase is kept as-is,
-// not revisited by this step or by Step 9 above.
+// not revisited by Step 9 or since.
 //
-// Deprecated by PKM Migration Step 9 above — superseded by Milestone
-// records with `milestoneType: "AcquisitionGate"`. Kept in place, not
-// removed, per the migration plan's own coexist-then-deprecate window
-// (PKM Migration Plan v0.3.0 §8): the type, its seed data, its CRUD API
-// route, and its client entity wiring all still exist and still work —
-// only the UI (Phase Workbench gate display, PDKM Promises tab) has cut
-// over to reading the consolidated Milestone records instead. Remove
-// entirely once nothing references this table directly; not yet the case,
-// since it's still independently fetchable via its own API/entity.
-export type AcquisitionMilestoneEvent = "MS-A" | "MS-B" | "MS-C";
-
-export const ACQUISITION_MILESTONE_EVENTS: AcquisitionMilestoneEvent[] = ["MS-A", "MS-B", "MS-C"];
-
-export interface AcquisitionMilestone {
-  id: string;
-  event: AcquisitionMilestoneEvent;
-  pathway: AcquisitionPathwayId;
-  baselineId: string;
-  status: MilestoneStatus;
-  // @domain-placeholder
-  actualDate: string | null;
-  // @domain-placeholder
-  plannedDate: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+// This app previously had a standalone AcquisitionMilestone entity here
+// (Step 8), consolidated into Milestone by Step 9 above, then fully
+// retired once the coexist-then-deprecate window closed (UI cutover
+// verified, nothing left referencing it) — see this app's PKM Migration
+// Status Report v1.5.0 §7 for the removal record.
 
 // Mirrors methodology/guidance/aafPhaseGuidance.ts's `AcquisitionPathway`
 // union exactly (same independently-maintained-mirror pattern as
@@ -723,7 +704,6 @@ export interface Database {
   projects: Project[];
   baselines: Baseline[];
   milestones: Milestone[];
-  acquisitionMilestones: AcquisitionMilestone[];
   requirements: Requirement[];
   verificationEvents: VerificationEvent[];
   checklistItems: ChecklistItem[];

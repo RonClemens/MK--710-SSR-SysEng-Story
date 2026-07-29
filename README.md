@@ -741,11 +741,11 @@ Deployment → Operations & Support.
   under one type. The generic definition of what each gate *means* stays in
   `methodology/guidance/aafPhaseGuidance.ts` permanently; only the
   per-baseline occurrence (did this baseline actually pass Milestone B, and
-  when) is queryable data. The standalone `AcquisitionMilestone` entity is
-  deprecated but still present (coexist-then-deprecate window) — see
-  `client/src/types/index.ts`'s comments on both types for the full
-  reasoning, including why AAF gates are a `milestoneType` on `Milestone`
-  rather than a broadened `MilestoneEvent`.
+  when) is queryable data. The standalone `AcquisitionMilestone` entity has
+  since been fully retired — its coexist-then-deprecate window closed once
+  the UI cutover above was verified — see `client/src/types/index.ts`'s
+  comments for the full reasoning, including why AAF gates are a
+  `milestoneType` on `Milestone` rather than a broadened `MilestoneEvent`.
 - **Guided checklist panel**: when viewing a baseline's current phase, a
   domain-grouped, click-to-answer panel over that milestone's `ChecklistItem`
   records appears — status toggles (Not Evaluated/Met/Not Met/Waived) save

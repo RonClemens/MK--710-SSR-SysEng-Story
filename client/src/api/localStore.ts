@@ -59,7 +59,6 @@ function normalize(db: Partial<Database>): Database {
     projects: db.projects ?? [],
     baselines: db.baselines ?? [],
     milestones: db.milestones ?? [],
-    acquisitionMilestones: db.acquisitionMilestones ?? [],
     requirements: db.requirements ?? [],
     verificationEvents: db.verificationEvents ?? [],
     checklistItems: db.checklistItems ?? [],
@@ -95,7 +94,6 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.projects === undefined ||
     db.baselines === undefined ||
     db.milestones === undefined ||
-    db.acquisitionMilestones === undefined ||
     db.requirements === undefined ||
     db.verificationEvents === undefined ||
     db.checklistItems === undefined ||
@@ -112,7 +110,6 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       projects: db.projects ?? SEED_DATA.projects,
       baselines: db.baselines ?? SEED_DATA.baselines,
       milestones: db.milestones ?? SEED_DATA.milestones,
-      acquisitionMilestones: db.acquisitionMilestones ?? SEED_DATA.acquisitionMilestones,
       requirements: db.requirements ?? SEED_DATA.requirements,
       verificationEvents: db.verificationEvents ?? SEED_DATA.verificationEvents,
       checklistItems: db.checklistItems ?? SEED_DATA.checklistItems,

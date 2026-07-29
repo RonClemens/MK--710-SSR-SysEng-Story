@@ -60,14 +60,10 @@ app is deployed for.
   `pathway` (fixed, currently single-valued `AcquisitionPathwayId` or null)
   — all structural, not domain content, even though their *values* reflect
   this program's real progress. One entity now covers both SETR technical
-  reviews and AAF acquisition-decision gates (`milestoneType`), consolidating
-  the entry formerly listed separately below for `AcquisitionMilestone`.
-
-### AcquisitionMilestone — deprecated, superseded by Milestone (PKM Migration Step 9)
-Superseded by: `Milestone` records with `milestoneType: "AcquisitionGate"` (see above). The
-type/table itself is still present per the coexist-then-deprecate window (PKM Migration Plan
-v0.3.0 §8) but no longer has its own manifest entry — its two placeholder fields (`actualDate`,
-`plannedDate`) are identical to and now tracked under `Milestone`'s entry above.
+  reviews and AAF acquisition-decision gates (`milestoneType`) — the
+  standalone `AcquisitionMilestone` entity this consolidated (PKM Migration
+  Step 9) has since been fully retired; see this app's PKM Migration Status
+  Report v1.5.0 §7 for the removal record.
 
 ### Requirement (added PKM Migration Step 4)
 - `statement`

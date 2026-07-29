@@ -7,7 +7,6 @@ const REQUIRED_KEYS: (keyof Database)[] = [
   "projects",
   "baselines",
   "milestones",
-  "acquisitionMilestones",
   "requirements",
   "verificationEvents",
   "checklistItems",
