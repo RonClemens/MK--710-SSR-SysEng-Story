@@ -714,31 +714,38 @@ Deployment → Operations & Support.
   deliberately a one-member union (`"MCA"` only) — extensible later if a
   program needs a different AAF pathway, but no pathway-selection UI or
   schema field exists yet, since there's only one option to choose from
-  today. **PKM Migration Step 8** confirmed this stays a plain union, not a
-  data-layer entity: it's already PKM-conformant as a stable, external,
-  human-meaningful id, and its name/definition are DoD AAF doctrine
-  identical for every program, not per-program data.
+  today. **PKM Migration Step 9** (per PKM Migration Plan v0.3.0 §8)
+  confirmed this stays a plain union, not a data-layer entity: it's already
+  PKM-conformant as a stable, external, human-meaningful id, and its
+  name/definition are DoD AAF doctrine identical for every program, not
+  per-program data.
 - **Baseline selector + phase stepper**: pick a baseline (Baseline A /
   Baseline B), and the stepper highlights that baseline's *current* phase —
   derived client-side from its `Milestone` records (the first SETR event
   that isn't yet `Complete`), not a stored field. Browsing a different phase
   than the current one shows its guidance and gate context read-only. This
   "derived, not stored" choice for current-phase was likewise confirmed,
-  not revisited, by Step 8 below.
-- **Milestone A/B/C occurrence tracking (PKM Migration Step 8, additive).**
-  The entry/exit gate shown for each phase (Milestone A/B/C) now has a real,
-  per-baseline `AcquisitionMilestone` occurrence record behind it — status
-  and dates, click-to-set the same way Safety/Program Planning CDRL status
-  already works in the panel below it — rather than only the static
-  gate name/decision-summary text these gates showed before. This mirrors
-  the exact promotion PKM Migration Step 3 made for SETR Milestones
-  (SRR–PRR): the generic definition of what each gate *means* stays in
+  not revisited, by Step 9 below.
+- **Milestone A/B/C occurrence tracking (PKM Migration Step 9, additive;
+  consolidated into `Milestone` per PKM Migration Plan v0.3.0 §8).** The
+  entry/exit gate shown for each phase (Milestone A/B/C) has a real,
+  per-baseline occurrence record behind it — status and dates, click-to-set
+  the same way Safety/Program Planning CDRL status already works in the
+  panel below it — rather than only the static gate name/decision-summary
+  text these gates originally showed. This was first built as its own
+  standalone `AcquisitionMilestone` entity (Step 8), then folded into the
+  `Milestone` entity itself via a `milestoneType: "SETR" | "AcquisitionGate"`
+  discriminator once the canonical PKM model settled on one entity rather
+  than two parallel ones — the same "promote existing structured content to
+  queryable records" move Step 3 made for SETR Milestones, just consolidated
+  under one type. The generic definition of what each gate *means* stays in
   `methodology/guidance/aafPhaseGuidance.ts` permanently; only the
   per-baseline occurrence (did this baseline actually pass Milestone B, and
-  when) is new, queryable data. See `client/src/types/index.ts`'s
-  `AcquisitionMilestone` comment for the full reasoning, including why this
-  is a separate entity from `Milestone` rather than folding MS-A/B/C into
-  `MilestoneEvent`.
+  when) is queryable data. The standalone `AcquisitionMilestone` entity is
+  deprecated but still present (coexist-then-deprecate window) — see
+  `client/src/types/index.ts`'s comments on both types for the full
+  reasoning, including why AAF gates are a `milestoneType` on `Milestone`
+  rather than a broadened `MilestoneEvent`.
 - **Guided checklist panel**: when viewing a baseline's current phase, a
   domain-grouped, click-to-answer panel over that milestone's `ChecklistItem`
   records appears — status toggles (Not Evaluated/Met/Not Met/Waived) save

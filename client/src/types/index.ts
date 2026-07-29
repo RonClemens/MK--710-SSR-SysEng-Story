@@ -83,19 +83,34 @@ export interface Baseline {
   updatedAt: string;
 }
 
-export type MilestoneEvent = "SRR" | "SFR" | "SSR" | "PDR" | "CDR" | "TRR" | "SVR" | "PRR";
+// PKM Migration Step 9 (per PKM Migration Plan v0.3.0 §8) broadened this
+// entity to also cover AAF acquisition-decision gates, consolidating this
+// app's own prior "Step 8" (the now-deprecated AcquisitionMilestone entity
+// below) per the canonical model's own correction: one Milestone entity with
+// a `milestoneType` discriminator, not two parallel entities.
+// `SetrMilestoneEvent` mirrors ../../../methodology/guidance/setrGuidance.ts's
+// `SetrEvent` values exactly (same independently-maintained-mirror pattern
+// this file already has with server/src/types.ts); `AcquisitionGateEvent`
+// mirrors aafPhaseGuidance.ts's `AcquisitionMilestoneId` the same way.
+export type SetrMilestoneEvent = "SRR" | "SFR" | "SSR" | "PDR" | "CDR" | "TRR" | "SVR" | "PRR";
 
-export const MILESTONE_EVENTS: MilestoneEvent[] = ["SRR", "SFR", "SSR", "PDR", "CDR", "TRR", "SVR", "PRR"];
+// Deliberately scoped to SETR events only, unchanged by Step 9 --
+// deriveCurrentMilestone()'s "first non-Complete gate in canonical order"
+// logic (client/src/utils/acquisitionPhase.ts) depends on this array
+// containing exactly the SRR-PRR sequence and nothing else; it filters to
+// `milestoneType: "SETR"` records before consulting this ordering.
+export const MILESTONE_EVENTS: SetrMilestoneEvent[] = ["SRR", "SFR", "SSR", "PDR", "CDR", "TRR", "SVR", "PRR"];
+
+export type AcquisitionGateEvent = "MS-A" | "MS-B" | "MS-C";
+
+export type MilestoneEvent = SetrMilestoneEvent | AcquisitionGateEvent;
+
+export type MilestoneType = "SETR" | "AcquisitionGate";
 
 export type MilestoneStatus = "Not Started" | "In Progress" | "Complete";
 
 // PKM Migration Step 3 (additive): promotes SETR gate occurrences from the
 // `deliveryMilestone` free-text fields below to real, referenceable records.
-// `MilestoneEvent` mirrors ../../../methodology/guidance/setrGuidance.ts's
-// `SetrEvent` values exactly and must be kept in sync with it by hand — the
-// same independently-maintained-mirror pattern this file already has with
-// server/src/types.ts (see this file's own header comment), extended here
-// to a second file for the same reason: no shared package to import through.
 //
 // Explicit methodology/data split, per the migration plan's own instruction
 // for this step: `SETR_GUIDANCE` in the methodology layer stays the
@@ -110,11 +125,34 @@ export type MilestoneStatus = "Not Started" | "In Progress" | "Complete";
 // shared record; this app simplifies to exactly one baseline per Milestone
 // record, consistent with how Baseline's own per-lineage simplification
 // above already treats Baseline A and B as fully independent timelines.
+//
+// PKM Migration Step 9 (additive): adds `milestoneType` and `pathway` so
+// this one entity also covers AAF acquisition-decision gates (Milestone
+// A/B/C), per PKM Migration Plan v0.3.0 §8. `milestoneType: "SETR"` is
+// backfilled on every pre-existing record (the only value that ever existed
+// for this entity); `"AcquisitionGate"` records are the 1:1 migration of
+// the former standalone AcquisitionMilestone rows (see that type's own
+// comment below for the coexist-then-deprecate window). `pathway` is
+// populated only for AcquisitionGate records (e.g. `"MCA"`); null for SETR
+// records, which have no pathway concept.
+//
+// `establishesBaselineId` semantics differ by type per PKM v0.3.1 §3 (a
+// SETR milestone may establish the Baseline it belongs to; an
+// AcquisitionGate milestone gates progress within one already established
+// and never does) — but this app already models that relationship in the
+// *reverse* direction on Baseline itself (`Baseline.establishedAtMilestoneId`,
+// added Step 2) rather than a forward field here, so no new field is added
+// for it. That reverse reference is only ever populated with a
+// `milestoneType: "SETR"` record's id in practice.
 export interface Milestone {
   id: string;
+  milestoneType: MilestoneType;
   event: MilestoneEvent;
   projectId: string;
   baselineId: string;
+  // Populated only for `milestoneType: "AcquisitionGate"` records; null for
+  // "SETR" records, which have no pathway concept.
+  pathway: AcquisitionPathwayId | null;
   status: MilestoneStatus;
   // @domain-placeholder
   actualDate: string | null;
@@ -124,38 +162,20 @@ export interface Milestone {
   updatedAt: string;
 }
 
-// PKM Migration Step 8 (additive, first slice): promotes the AAF
-// acquisition-decision milestones (Milestone A/B/C) from static-only
-// definitions in methodology/guidance/aafPhaseGuidance.ts
-// (MCA_MILESTONE_GATES) into real, per-baseline-lineage occurrence
-// records — the same "structured content already exists in the
-// methodology layer, promote it to queryable records" move Step 3 made
-// for the SETR Milestone entity above, applied here to the AAF pathway's
-// own decision gates, which had no occurrence data (status, dates) of
-// their own until now — the same gap SETR events had before Step 3.
-//
-// Deliberately a separate entity from Milestone, not a broadened
-// MilestoneEvent union: MS-A/B/C are acquisition-decision events (DAU/AAF
-// doctrine — resourcing and program-level authorization to proceed), not
-// SE technical reviews, and MILESTONE_EVENTS' fixed SRR-PRR ordering is
-// load-bearing for deriveCurrentMilestone()'s "first non-Complete gate in
-// canonical order" logic (see client/src/utils/acquisitionPhase.ts) —
-// folding AAF events into that array/type would require re-deriving that
-// ordering assumption for no benefit, since AAF milestones already relate
-// to SETR events structurally via AcquisitionPhaseMeta.entryMilestone/
-// exitMilestone, not by shared identity.
-//
-// AcquisitionPathway itself is NOT promoted to a data-layer entity: it's
-// already PKM-conformant as a plain, stable, external, human-meaningful ID
-// ("MCA") per Architecture Guidance §9 / PKM §4 — the pathway's name,
-// definition, and phase banding are DoD Adaptive Acquisition Framework
-// doctrine, identical for every program that uses MCA, not per-program
-// data the way a Program or Project record's name/description is.
-// Nothing about it needs a stored record; only a stable id to reference,
-// which the existing type union already provides. Flagged explicitly here
-// (rather than left to be rediscovered) as an "already conformant, no
-// entity needed" finding — the same category PKM Migration Step 0
-// recorded for CI↔LogicalSubsystem cardinality.
+// AcquisitionPathway (the methodology-layer union in aafPhaseGuidance.ts,
+// mirrored here as AcquisitionPathwayId below) is NOT promoted to a
+// data-layer entity: it's already PKM-conformant as a plain, stable,
+// external, human-meaningful ID ("MCA") per Architecture Guidance §9 / PKM
+// §4 — the pathway's name, definition, and phase banding are DoD Adaptive
+// Acquisition Framework doctrine, identical for every program that uses
+// MCA, not per-program data the way a Program or Project record's
+// name/description is. Nothing about it needs a stored record; only a
+// stable id to reference, which the existing type union already provides.
+// Flagged explicitly here (rather than left to be rediscovered) as an
+// "already conformant, no entity needed" finding — the same category PKM
+// Migration Step 0 recorded for CI↔LogicalSubsystem cardinality. Confirmed
+// unchanged by PKM v0.3.0/v0.3.1 (§4: "a stable external id can itself be
+// structural... e.g. Milestone.pathway = 'MCA'").
 //
 // AcquisitionPhase (Materiel Solution Analysis, TMRR, EMD, Production &
 // Deployment, Operations & Support) is also NOT promoted to a stored
@@ -166,7 +186,17 @@ export interface Milestone {
 // truth that could silently drift from the Milestone records that already
 // determine it, with no new information gained. This app's existing
 // "derived, not stored" design choice for current-phase is kept as-is,
-// not revisited by this step.
+// not revisited by this step or by Step 9 above.
+//
+// Deprecated by PKM Migration Step 9 above — superseded by Milestone
+// records with `milestoneType: "AcquisitionGate"`. Kept in place, not
+// removed, per the migration plan's own coexist-then-deprecate window
+// (PKM Migration Plan v0.3.0 §8): the type, its seed data, its CRUD API
+// route, and its client entity wiring all still exist and still work —
+// only the UI (Phase Workbench gate display, PDKM Promises tab) has cut
+// over to reading the consolidated Milestone records instead. Remove
+// entirely once nothing references this table directly; not yet the case,
+// since it's still independently fetchable via its own API/entity.
 export type AcquisitionMilestoneEvent = "MS-A" | "MS-B" | "MS-C";
 
 export const ACQUISITION_MILESTONE_EVENTS: AcquisitionMilestoneEvent[] = ["MS-A", "MS-B", "MS-C"];

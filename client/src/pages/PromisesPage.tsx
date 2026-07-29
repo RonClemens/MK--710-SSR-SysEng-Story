@@ -8,7 +8,6 @@ import {
 import {
   SPEC_SECTION_KEYS,
   type AbCompatibilityRow,
-  type AcquisitionMilestone,
   type Attachment,
   type ChecklistItem,
   type ConfigurationItem,
@@ -32,7 +31,6 @@ interface Props {
   programs: Program[];
   projects: Project[];
   milestones: Milestone[];
-  acquisitionMilestones: AcquisitionMilestone[];
   requirements: Requirement[];
   verificationEvents: VerificationEvent[];
   checklistItems: ChecklistItem[];
@@ -146,7 +144,6 @@ const ENTITY_GROUPS: Record<string, string> = {
   Program: "Program & Project",
   Project: "Program & Project",
   Milestone: "Schedule & Milestones",
-  "Acquisition Milestone": "Schedule & Milestones",
   Requirement: "Requirements & Verification",
   "Verification Event": "Requirements & Verification",
   "Checklist Item": "Requirements & Verification",
@@ -188,7 +185,6 @@ export function PromisesPage({
   programs,
   projects,
   milestones,
-  acquisitionMilestones,
   requirements,
   verificationEvents,
   checklistItems,
@@ -208,11 +204,11 @@ export function PromisesPage({
     () => [
       ...rowsFor("Program", programs, (r) => r.name, ["name", "description"]),
       ...rowsFor("Project", projects, (r) => r.name, ["name", "description"]),
+      // PKM Migration Step 9 (per PKM Migration Plan v0.3.0 §8): Milestone
+      // now covers both SETR and AcquisitionGate records in one table --
+      // this one rowsFor call surfaces both, no separate "Acquisition
+      // Milestone" group needed anymore (see data-schema manifest).
       ...rowsFor("Milestone", milestones, (r) => `${r.event} (${r.baselineId})`, ["actualDate", "plannedDate"]),
-      ...rowsFor("Acquisition Milestone", acquisitionMilestones, (r) => `${r.event} (${r.baselineId})`, [
-        "actualDate",
-        "plannedDate",
-      ]),
       ...rowsFor("Requirement", requirements, (r) => r.id, ["statement"]),
       ...rowsFor("Verification Event", verificationEvents, (r) => r.requirementId, ["evidenceSummary"]),
       ...rowsFor("Checklist Item", checklistItems, (r) => r.milestoneId, ["criterion"]),
@@ -265,7 +261,6 @@ export function PromisesPage({
       programs,
       projects,
       milestones,
-      acquisitionMilestones,
       requirements,
       verificationEvents,
       checklistItems,

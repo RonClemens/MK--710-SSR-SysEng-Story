@@ -10,16 +10,16 @@ import {
   type AcquisitionPhaseId,
 } from "../../../methodology/guidance/aafPhaseGuidance";
 import {
-  acquisitionMilestoneFor,
   cdrlsForPhase,
   deriveCurrentMilestone,
   deriveCurrentPhase,
+  gateMilestoneFor,
   milestoneStatusesForPhase,
 } from "../utils/acquisitionPhase";
 import { findIncoseSubProcess } from "../../../methodology/guidance/incoseGuidance";
 import {
   MILESTONE_STATUSES,
-  type AcquisitionMilestone,
+  type AcquisitionGateEvent,
   type Baseline,
   type ChecklistItem,
   type Milestone,
@@ -35,8 +35,7 @@ type AllTabsTarget = "safetyDeliverables" | "planningDeliverables";
 
 interface Props {
   baselines: Baseline[];
-  milestones: Milestone[];
-  acquisitionMilestones: ReturnType<typeof useEntity<AcquisitionMilestone>>;
+  milestones: ReturnType<typeof useEntity<Milestone>>;
   checklistItems: ReturnType<typeof useEntity<ChecklistItem>>;
   safetyDeliverables: ReturnType<typeof useEntity<SafetyDeliverable>>;
   planningDeliverables: ReturnType<typeof useEntity<ProgramPlanningDeliverable>>;
@@ -46,7 +45,6 @@ interface Props {
 export function PhaseWorkbenchPage({
   baselines,
   milestones,
-  acquisitionMilestones,
   checklistItems,
   safetyDeliverables,
   planningDeliverables,
@@ -63,42 +61,44 @@ export function PhaseWorkbenchPage({
     if (!hasInitialized && baselines.length > 0) {
       const id = baselines[0].id;
       setSelectedBaselineId(id);
-      setSelectedPhaseId(deriveCurrentPhase(milestones, id)?.id ?? "tmrr");
+      setSelectedPhaseId(deriveCurrentPhase(milestones.rows, id)?.id ?? "tmrr");
       setHasInitialized(true);
     }
-  }, [baselines, milestones, hasInitialized]);
+  }, [baselines, milestones.rows, hasInitialized]);
 
   const currentPhase = useMemo(
-    () => (selectedBaselineId ? deriveCurrentPhase(milestones, selectedBaselineId) : null),
-    [milestones, selectedBaselineId],
+    () => (selectedBaselineId ? deriveCurrentPhase(milestones.rows, selectedBaselineId) : null),
+    [milestones.rows, selectedBaselineId],
   );
 
   function selectBaseline(id: string) {
     setSelectedBaselineId(id);
-    const phase = deriveCurrentPhase(milestones, id);
+    const phase = deriveCurrentPhase(milestones.rows, id);
     setSelectedPhaseId(phase?.id ?? "tmrr");
   }
 
   const selectedPhase = MCA_PHASES.find((p) => p.id === selectedPhaseId) ?? MCA_PHASES[0];
   const milestoneStatuses = selectedBaselineId
-    ? milestoneStatusesForPhase(milestones, selectedBaselineId, selectedPhase)
+    ? milestoneStatusesForPhase(milestones.rows, selectedBaselineId, selectedPhase)
     : [];
   const entryGate = selectedPhase.entryMilestone ? MCA_MILESTONE_GATES[selectedPhase.entryMilestone] : null;
   const exitGate = selectedPhase.exitMilestone ? MCA_MILESTONE_GATES[selectedPhase.exitMilestone] : null;
 
   const entryGateOccurrence =
-    entryGate && selectedBaselineId
-      ? acquisitionMilestoneFor(acquisitionMilestones.rows, selectedBaselineId, entryGate.id)
-      : null;
+    entryGate && selectedBaselineId ? gateMilestoneFor(milestones.rows, selectedBaselineId, entryGate.id) : null;
   const exitGateOccurrence =
-    exitGate && selectedBaselineId
-      ? acquisitionMilestoneFor(acquisitionMilestones.rows, selectedBaselineId, exitGate.id)
-      : null;
+    exitGate && selectedBaselineId ? gateMilestoneFor(milestones.rows, selectedBaselineId, exitGate.id) : null;
 
-  const currentMilestone = selectedBaselineId ? deriveCurrentMilestone(milestones, selectedBaselineId) : null;
+  const currentMilestone = selectedBaselineId ? deriveCurrentMilestone(milestones.rows, selectedBaselineId) : null;
   const isViewingCurrentPhase = currentPhase !== null && selectedPhaseId === currentPhase.id;
   const cdrls = selectedBaselineId
-    ? cdrlsForPhase(safetyDeliverables.rows, planningDeliverables.rows, milestones, selectedBaselineId, selectedPhase)
+    ? cdrlsForPhase(
+        safetyDeliverables.rows,
+        planningDeliverables.rows,
+        milestones.rows,
+        selectedBaselineId,
+        selectedPhase,
+      )
     : [];
 
   function updateCdrlStatus(cdrl: PhaseCdrl, status: SpecStatus) {
@@ -106,21 +106,26 @@ export function PhaseWorkbenchPage({
     else planningDeliverables.update(cdrl.record.id, { status });
   }
 
-  // Creates the occurrence record on first status click if this gate has
-  // never been tracked for this baseline yet (e.g. a freshly-added baseline
-  // with no acquisitionMilestones seeded), rather than requiring a separate
-  // create step -- same "click saves immediately" ethos as the guided
-  // checklist panel's status toggles.
-  function updateGateStatus(gate: { id: AcquisitionMilestone["event"] }, status: MilestoneStatus) {
+  // Creates the consolidated Milestone (milestoneType: "AcquisitionGate")
+  // record on first status click if this gate has never been tracked for
+  // this baseline yet, rather than requiring a separate create step -- same
+  // "click saves immediately" ethos as the guided checklist panel's status
+  // toggles. PKM Migration Step 9 (per PKM Migration Plan v0.3.0 §8):
+  // reads/writes the consolidated Milestone entity now, not the deprecated
+  // standalone AcquisitionMilestone entity this used to call.
+  function updateGateStatus(gate: { id: AcquisitionGateEvent }, status: MilestoneStatus) {
     if (!selectedBaselineId) return;
-    const existing = acquisitionMilestoneFor(acquisitionMilestones.rows, selectedBaselineId, gate.id);
+    const existing = gateMilestoneFor(milestones.rows, selectedBaselineId, gate.id);
     if (existing) {
-      acquisitionMilestones.update(existing.id, { status });
+      milestones.update(existing.id, { status });
     } else {
-      acquisitionMilestones.create({
+      const projectId = baselines.find((b) => b.id === selectedBaselineId)?.projectId ?? "";
+      milestones.create({
+        milestoneType: "AcquisitionGate",
         event: gate.id,
-        pathway: "MCA",
+        projectId,
         baselineId: selectedBaselineId,
+        pathway: "MCA",
         status,
         actualDate: null,
         plannedDate: null,

@@ -52,20 +52,22 @@ app is deployed for.
   decision but is modeled as a constrained type, not free text, so there's
   nothing to backfill here beyond adding real values to that enum.
 
-### Milestone (added PKM Migration Step 3)
+### Milestone (added PKM Migration Step 3; broadened Step 9, per PKM Migration Plan v0.3.0 §8)
 - `actualDate`
 - `plannedDate`
 - Not marked: `event` (fixed `MilestoneEvent` enum), `status` (fixed
-  `MilestoneStatus` enum) — both are structural, not domain content, even
-  though their *values* reflect this program's real progress.
+  `MilestoneStatus` enum), `milestoneType` (fixed `MilestoneType` enum),
+  `pathway` (fixed, currently single-valued `AcquisitionPathwayId` or null)
+  — all structural, not domain content, even though their *values* reflect
+  this program's real progress. One entity now covers both SETR technical
+  reviews and AAF acquisition-decision gates (`milestoneType`), consolidating
+  the entry formerly listed separately below for `AcquisitionMilestone`.
 
-### AcquisitionMilestone (added PKM Migration Step 8)
-- `actualDate`
-- `plannedDate`
-- Not marked: `event` (fixed `AcquisitionMilestoneEvent` enum), `status` (fixed
-  `MilestoneStatus` enum, reused from `Milestone`), `pathway` (fixed,
-  currently single-valued `AcquisitionPathwayId`), `baselineId` (reference)
-  — same treatment as `Milestone`'s own entry above.
+### AcquisitionMilestone — deprecated, superseded by Milestone (PKM Migration Step 9)
+Superseded by: `Milestone` records with `milestoneType: "AcquisitionGate"` (see above). The
+type/table itself is still present per the coexist-then-deprecate window (PKM Migration Plan
+v0.3.0 §8) but no longer has its own manifest entry — its two placeholder fields (`actualDate`,
+`plannedDate`) are identical to and now tracked under `Milestone`'s entry above.
 
 ### Requirement (added PKM Migration Step 4)
 - `statement`
