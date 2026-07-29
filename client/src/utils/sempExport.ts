@@ -47,6 +47,7 @@ import type {
   InterfaceRecord,
   LogicalSubsystem,
   Milestone,
+  MilestoneType,
   ProgramPlanningDeliverable,
   Recommendation,
   SafetyDeliverable,
@@ -86,6 +87,47 @@ function attachmentsToLine(attachments: Attachment[]): string {
 }
 
 const NOT_MODELED = "_Not modeled by this app — see the SEMP Migration tab's section mapping for what is._\n";
+
+// SEMP-generation proposal Phase C (structured assembly, no AI/PDKM content,
+// no schema change -- per Architecture Guidance's "structured sections"
+// path): a Baseline-grouped, chronologically-ordered schedule assembled
+// directly from existing Milestone records, both milestoneType: "SETR" and
+// "AcquisitionGate". This is the first slice of a future "Generated SEMP"
+// view -- pure query-and-format over data that already exists elsewhere in
+// this app (the Phase Workbench, the SEMP Migration export below), not new
+// program content. Grouped by baseline, then sorted chronologically within
+// each group (actualDate if set, else plannedDate) -- a milestone with
+// neither date sorts last within its baseline, rather than being dropped.
+export interface MilestoneScheduleRow {
+  event: string;
+  milestoneType: MilestoneType;
+  status: string;
+  actualDate: string | null;
+  plannedDate: string | null;
+}
+
+export interface MilestoneScheduleGroup {
+  baselineId: string;
+  baselineName: string;
+  rows: MilestoneScheduleRow[];
+}
+
+export function buildMilestoneSchedule(milestones: Milestone[], baselines: Baseline[]): MilestoneScheduleGroup[] {
+  return baselines.map((baseline) => {
+    const rows = milestones
+      .filter((m) => m.baselineId === baseline.id)
+      .slice()
+      .sort((a, b) => (a.actualDate ?? a.plannedDate ?? "9999").localeCompare(b.actualDate ?? b.plannedDate ?? "9999"))
+      .map((m) => ({
+        event: m.event,
+        milestoneType: m.milestoneType,
+        status: m.status,
+        actualDate: m.actualDate,
+        plannedDate: m.plannedDate,
+      }));
+    return { baselineId: baseline.id, baselineName: baseline.name, rows };
+  });
+}
 
 export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetValue): string {
   const subsystemName = (id: string | null) =>
@@ -597,24 +639,36 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   lines.push("");
 
   // PKM Migration Step 3: this Project's actual per-baseline milestone
-  // instance data (Workbench data, from the new Milestone entity) — kept as
-  // its own table, separate from the generic SETR_GUIDANCE table above, per
-  // this step's own explicit methodology/data split.
-  lines.push("**This Project's actual milestone status, by baseline** (Workbench data, not generic guidance):");
-  lines.push("");
+  // instance data (Workbench data, from the Milestone entity) — kept as its
+  // own table, separate from the generic SETR_GUIDANCE table above, per
+  // this step's own explicit methodology/data split. Reworked into a
+  // per-baseline, chronologically-sorted, type-labeled schedule (see
+  // buildMilestoneSchedule() above) for the SEMP-generation proposal's
+  // Phase C prototype -- the same helper also backs the on-screen
+  // "Generated SEMP: Schedule" section in SempMigrationPage.tsx, so both
+  // stay in sync from one source.
   lines.push(
-    mdTable(
-      ["Baseline", "Event", "Status", "Actual Date", "Planned Date"],
-      data.milestones.map((m) => [
-        data.baselines.find((b) => b.id === m.baselineId)?.name ?? m.baselineId,
-        m.event,
-        m.status,
-        m.actualDate ?? "—",
-        m.plannedDate ?? "—",
-      ]),
-    ),
+    "**This Project's actual milestone schedule, by baseline** (Workbench data, not generic guidance -- SEMP-" +
+      "generation proposal Phase C: covers both SETR and AcquisitionGate milestone types, chronologically ordered):",
   );
   lines.push("");
+  for (const group of buildMilestoneSchedule(data.milestones, data.baselines)) {
+    lines.push(`### ${group.baselineName}`);
+    lines.push("");
+    lines.push(
+      mdTable(
+        ["Event", "Type", "Status", "Actual Date", "Planned Date"],
+        group.rows.map((r) => [
+          r.event,
+          r.milestoneType,
+          r.status,
+          r.actualDate?.slice(0, 10) ?? "—",
+          r.plannedDate?.slice(0, 10) ?? "—",
+        ]),
+      ),
+    );
+    lines.push("");
+  }
   lines.push(getValue("recurringTechActivities.intro", RECURRING_TECHNICAL_ACTIVITIES_INTRO));
   lines.push("");
   lines.push(

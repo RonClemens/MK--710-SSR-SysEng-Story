@@ -2,7 +2,7 @@ import { EditableText } from "../components/EditableText";
 import { SEMP_APPENDIX_NOTE, SEMP_DID_CITATION, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../../../methodology/guidance/sempGuidance";
 import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../../../methodology/guidance/incoseGuidance";
 import { DbxMbxTransitionGuidance } from "../components/DbxMbxTransitionGuidance";
-import { buildSempMigrationMarkdown, type SempExportData } from "../utils/sempExport";
+import { buildMilestoneSchedule, buildSempMigrationMarkdown, type SempExportData } from "../utils/sempExport";
 import { useSiteContent } from "../contexts/SiteContentContext";
 
 type Props = SempExportData;
@@ -71,6 +71,60 @@ export function SempMigrationPage(data: Props) {
             as="span"
           />
         </p>
+      </section>
+
+      <section>
+        <EditableText
+          contentKey="sempMigration.generatedScheduleHeading"
+          defaultValue="Generated SEMP: Schedule (Phase C prototype)"
+          as="h3"
+        />
+        <EditableText
+          contentKey="sempMigration.generatedScheduleHint"
+          defaultValue={
+            "First slice of a future 'Generated SEMP' view (SEMP-generation proposal Phase C): a schedule table " +
+            "assembled directly from this Project's existing Milestone records — both SETR technical reviews and " +
+            "AAF acquisition-decision gates — grouped by baseline and ordered chronologically. Pure query-and-" +
+            "format over data that already exists elsewhere in this app; no new content, no AI/provider calls. " +
+            "This is a pattern proof, not a usable SEMP document on its own — the fuller generated view (RACI, " +
+            "deliverables, narrative sections) is a separate, later phase."
+          }
+          as="p"
+          className="hint"
+        />
+        {buildMilestoneSchedule(data.milestones, data.baselines).map((group) => (
+          <div className="detail-card" key={group.baselineId}>
+            <h4>{group.baselineName}</h4>
+            {group.rows.length === 0 ? (
+              <p className="empty-row">No milestones yet.</p>
+            ) : (
+              <div className="table-scroll">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Event</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                      <th>Actual Date</th>
+                      <th>Planned Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {group.rows.map((r, i) => (
+                      <tr key={`${group.baselineId}-${r.event}-${i}`}>
+                        <td>{r.event}</td>
+                        <td>{r.milestoneType}</td>
+                        <td>{r.status}</td>
+                        <td>{r.actualDate?.slice(0, 10) ?? "—"}</td>
+                        <td>{r.plannedDate?.slice(0, 10) ?? "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        ))}
       </section>
 
       <section>
