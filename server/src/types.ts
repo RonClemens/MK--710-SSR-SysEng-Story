@@ -520,6 +520,31 @@ export type RecommendationOwnerRole =
   | "Safety Lead"
   | "Program Manager";
 
+// PKM Migration Step 11 (per PKM Migration Plan v0.4.0 §9 / PKM Entity
+// Model v0.5.0 §2-§3): promotes role assignment from the fixed
+// `RecommendationOwnerRole` union above into a real, tailorable entity.
+// The union satisfied "general enough as a default" but not "roles
+// addable/removable per program" -- Ron's confirmed requirement -- since a
+// hardcoded TS type can't be edited by a program without a code change.
+// `Role` is scoped to Project (PKM's own choice, §3: "the same granularity
+// as every other program-specific entity in this model"), with `isDefault`
+// distinguishing the standard starting taxonomy (seeded below, one record
+// per existing RecommendationOwnerRole value) from roles a program adds of
+// its own. `authorityDescription` is optional, SEMP-facing content (a
+// role's actual authority/responsibility language) -- structure, per PKM's
+// own note, same treatment as `Requirement.statement`.
+export interface Role {
+  id: string;
+  projectId: string;
+  // @domain-placeholder
+  name: string;
+  // @domain-placeholder
+  authorityDescription: string | null;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Recommendation {
   id: string;
   // @domain-placeholder
@@ -527,8 +552,19 @@ export interface Recommendation {
   category: RecommendationCategory;
   status: RecommendationStatus;
   // PKM Migration Step 7: constrained to RecommendationOwnerRole (was free
-  // text) -- null means not yet assigned to a role.
+  // text) -- null means not yet assigned to a role. Superseded by
+  // assignedRoleId below (Step 11); kept as-is, not backfilled further, per
+  // the coexist-then-deprecate discipline every prior step has used --
+  // this field simply stops being the UI's edited surface going forward
+  // (see RecommendationsPage.tsx).
   owner: RecommendationOwnerRole | null;
+  // PKM Migration Step 11 (additive): references a real Role record
+  // instead of a fixed union value -- null means not yet assigned. Backfilled
+  // once, at this step, for every pre-existing Recommendation whose `owner`
+  // already names one of the seeded default Roles (a safe, unambiguous
+  // one-time mapping, not an ongoing sync) -- see mock-data/seed.ts's own
+  // comment on this array.
+  assignedRoleId: string | null;
   relatedCiId: string | null;
   // PKM Migration Step 7 (additive): the Gap this recommendation proposes
   // to resolve, where one exists -- a single reference, not an array, per
@@ -718,6 +754,7 @@ export interface Database {
   deltaMatrix: DeltaMatrixRow[];
   abCompatibility: AbCompatibilityRow[];
   cotsRecords: CotsRecord[];
+  roles: Role[];
   recommendations: Recommendation[];
   interfaces: InterfaceRecord[];
   specifications: Specification[];

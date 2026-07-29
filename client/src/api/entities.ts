@@ -17,6 +17,7 @@ import type {
   Project,
   Recommendation,
   Requirement,
+  Role,
   SafetyDeliverable,
   Specification,
   VerificationEvent,
@@ -46,4 +47,5 @@ export const cisApi = entity<ConfigurationItem>("/cis", "cis");
 export const deltaMatrixApi = entity<DeltaMatrixRow>("/delta-matrix", "deltaMatrix");
 export const abCompatibilityApi = entity<AbCompatibilityRow>("/ab-compatibility", "abCompatibility");
 export const cotsRecordsApi = entity<CotsRecord>("/cots-records", "cotsRecords");
+export const rolesApi = entity<Role>("/roles", "roles");
 export const recommendationsApi = entity<Recommendation>("/recommendations", "recommendations");

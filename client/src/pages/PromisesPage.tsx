@@ -22,6 +22,7 @@ import {
   type Project,
   type Recommendation,
   type Requirement,
+  type Role,
   type SafetyDeliverable,
   type Specification,
   type VerificationEvent,
@@ -40,6 +41,7 @@ interface Props {
   deltaMatrix: DeltaMatrixRow[];
   abCompatibility: AbCompatibilityRow[];
   cotsRecords: CotsRecord[];
+  roles: Role[];
   recommendations: Recommendation[];
   interfaces: InterfaceRecord[];
   specifications: Specification[];
@@ -149,6 +151,7 @@ const ENTITY_GROUPS: Record<string, string> = {
   "Checklist Item": "Requirements & Verification",
   Gap: "Gaps & Recommendations",
   Recommendation: "Gaps & Recommendations",
+  Role: "Gaps & Recommendations",
   "Logical Subsystem": "Technical Baseline",
   "Configuration Item": "Technical Baseline",
   Interface: "Technical Baseline",
@@ -194,6 +197,7 @@ export function PromisesPage({
   deltaMatrix,
   abCompatibility,
   cotsRecords,
+  roles,
   recommendations,
   interfaces,
   specifications,
@@ -238,6 +242,7 @@ export function PromisesPage({
       ]),
       ...attachmentRowsFor("COTS Record", cotsRecords, (r) => r.ciId),
       ...qualifiedAlternateRows(cotsRecords),
+      ...rowsFor("Role", roles, (r) => r.name, ["name", "authorityDescription"]),
       ...rowsFor("Recommendation", recommendations, (r) => r.category, ["text"]),
       ...rowsFor("Interface", interfaces, (r) => `${r.aId} ↔ ${r.bId}`, ["description"]),
       ...rowsFor("Specification", specifications, (r) => r.title, ["title"]),
@@ -270,6 +275,7 @@ export function PromisesPage({
       deltaMatrix,
       abCompatibility,
       cotsRecords,
+      roles,
       recommendations,
       interfaces,
       specifications,

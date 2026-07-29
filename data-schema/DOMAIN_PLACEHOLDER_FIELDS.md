@@ -125,12 +125,25 @@ app is deployed for.
   reference), `disposition` (fixed enum, reused from `DeltaMatrixRow`),
   `baselineId`/`blocksMilestoneId`/`blocksChecklistItemId` (references).
 
+### Role (added PKM Migration Step 11)
+- `name`
+- `authorityDescription`
+- Not marked: `isDefault` (structural flag distinguishing the seeded
+  starting taxonomy from program-added roles), `projectId` (reference). A
+  reversal from most entries here: `name`/`authorityDescription` were
+  previously *not* tagged at all, back when role assignment was the fixed
+  `RecommendationOwnerRole` union (a structural taxonomy, like `domain` on
+  ChecklistItem). Promoting it to a real, program-tailorable entity flips
+  the classification — these values are no longer fixed structure, they're
+  exactly the kind of program-specific content a PDKM would supply.
+
 ### Recommendation
 - `text`
 - Not marked: `owner` (converted to the fixed `RecommendationOwnerRole`
   enum in PKM Migration Step 7 — see that type's own comment on why this
-  taxonomy is a starting point, not a definitive one), `resolvesGapId`
-  (reference, added Step 7).
+  taxonomy is a starting point, not a definitive one; superseded by
+  `assignedRoleId` in Step 11, itself a reference, also not tagged),
+  `resolvesGapId` (reference, added Step 7).
 
 ### InterfaceRecord
 - `description`

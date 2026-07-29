@@ -16,6 +16,7 @@ const REQUIRED_KEYS: (keyof Database)[] = [
   "deltaMatrix",
   "abCompatibility",
   "cotsRecords",
+  "roles",
   "recommendations",
   "interfaces",
   "specifications",

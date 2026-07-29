@@ -47,6 +47,7 @@ async function start() {
   app.use("/api/delta-matrix", crudRouter("deltaMatrix"));
   app.use("/api/ab-compatibility", crudRouter("abCompatibility"));
   app.use("/api/cots-records", crudRouter("cotsRecords"));
+  app.use("/api/roles", crudRouter("roles"));
   app.use("/api/recommendations", crudRouter("recommendations"));
   app.use("/api/interfaces", crudRouter("interfaces"));
   app.use("/api/specifications", crudRouter("specifications"));

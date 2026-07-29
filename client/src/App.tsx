@@ -17,6 +17,7 @@ import {
   projectsApi,
   recommendationsApi,
   requirementsApi,
+  rolesApi,
   safetyDeliverablesApi,
   specificationsApi,
   verificationEventsApi,
@@ -87,6 +88,7 @@ export default function App() {
   const deltaMatrix = useEntity(deltaMatrixApi);
   const abCompatibility = useEntity(abCompatibilityApi);
   const cotsRecords = useEntity(cotsRecordsApi);
+  const roles = useEntity(rolesApi);
   const recommendations = useEntity(recommendationsApi);
   const interfaces = useEntity(interfacesApi);
   const specifications = useEntity(specificationsApi);
@@ -118,6 +120,7 @@ export default function App() {
     deltaMatrix.refresh();
     abCompatibility.refresh();
     cotsRecords.refresh();
+    roles.refresh();
     recommendations.refresh();
     interfaces.refresh();
     specifications.refresh();
@@ -307,7 +310,7 @@ export default function App() {
                 />
               )}
               {tab === "recommendations" && (
-                <RecommendationsPage entity={recommendations} cis={cis.rows} gaps={gaps.rows} />
+                <RecommendationsPage entity={recommendations} roles={roles} cis={cis.rows} gaps={gaps.rows} />
               )}
               {tab === "sempMigration" && (
                 <SempMigrationPage
@@ -339,6 +342,7 @@ export default function App() {
                   deltaMatrix={deltaMatrix.rows}
                   abCompatibility={abCompatibility.rows}
                   cotsRecords={cotsRecords.rows}
+                  roles={roles.rows}
                   recommendations={recommendations.rows}
                   interfaces={interfaces.rows}
                   specifications={specifications.rows}

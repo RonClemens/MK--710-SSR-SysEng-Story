@@ -811,12 +811,68 @@ export const SEED_DATA: Database = {
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
   ],
+  // PKM Migration Step 11 (per PKM Migration Plan v0.4.0 §9 / PKM Entity
+  // Model v0.5.0 §2-§3): one Role record per existing RecommendationOwnerRole
+  // value, seeded as isDefault: true -- this preserves Step 7's own
+  // five-role taxonomy exactly, just makes it data instead of a hardcoded
+  // union. All scoped to this app's single Project (project-001), per PKM's
+  // own Project-scoping choice for Role.
+  roles: [
+    {
+      id: "role-lse",
+      projectId: "project-001",
+      name: "Lead Systems Engineer",
+      authorityDescription: null,
+      isDefault: true,
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "role-cm",
+      projectId: "project-001",
+      name: "CM Lead",
+      authorityDescription: null,
+      isDefault: true,
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "role-sw",
+      projectId: "project-001",
+      name: "Software Lead",
+      authorityDescription: null,
+      isDefault: true,
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "role-safety",
+      projectId: "project-001",
+      name: "Safety Lead",
+      authorityDescription: null,
+      isDefault: true,
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+    {
+      id: "role-pm",
+      projectId: "project-001",
+      name: "Program Manager",
+      authorityDescription: null,
+      isDefault: true,
+      createdAt: "2026-01-06T00:00:00.000Z",
+      updatedAt: "2026-01-06T00:00:00.000Z",
+    },
+  ],
   // PKM Migration Step 7: owner is now a constrained role, assigned per
   // recommendation (all three were previously unset free text -- no real
   // value was lost in this conversion). resolvesGapId links rec-001/002
   // to the real Gap records each one proposes to resolve; rec-003 has no
   // corresponding Gap (it's an A/B alignment risk, not an over-decomposition
   // finding) and stays null, per that field's own single-reference note.
+  // PKM Migration Step 11 (additive): assignedRoleId backfilled for all
+  // three -- a safe, one-time, unambiguous mapping since each existing
+  // `owner` value names exactly one of the five default Role records above.
   recommendations: [
     {
       id: "rec-001",
@@ -824,6 +880,7 @@ export const SEED_DATA: Database = {
       category: "CI structure",
       status: "open",
       owner: "CM Lead",
+      assignedRoleId: "role-cm",
       relatedCiId: "ci-001",
       resolvesGapId: "gap-001",
       createdAt: "2026-01-06T00:00:00.000Z",
@@ -835,6 +892,7 @@ export const SEED_DATA: Database = {
       category: "delta matrix",
       status: "open",
       owner: "Lead Systems Engineer",
+      assignedRoleId: "role-lse",
       relatedCiId: "ci-001",
       resolvesGapId: "gap-003",
       createdAt: "2026-01-06T00:00:00.000Z",
@@ -846,6 +904,7 @@ export const SEED_DATA: Database = {
       category: "A-B alignment",
       status: "in progress",
       owner: "Software Lead",
+      assignedRoleId: "role-sw",
       relatedCiId: "ci-002",
       resolvesGapId: null,
       createdAt: "2026-01-06T00:00:00.000Z",

@@ -116,6 +116,20 @@ button {
   min-width: 0;
 }
 
+.page-header-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.roles-panel {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: var(--surface-muted, rgba(0, 0, 0, 0.02));
+}
+
 .hint {
   color: var(--text-muted);
   font-size: 0.85rem;
