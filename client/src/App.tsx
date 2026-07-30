@@ -15,6 +15,7 @@ import {
   programPlanningDeliverablesApi,
   programsApi,
   projectsApi,
+  reconciliationEventsApi,
   recommendationsApi,
   requirementsApi,
   riskItemsApi,
@@ -82,6 +83,7 @@ export default function App() {
   const programs = useEntity(programsApi);
   const projects = useEntity(projectsApi);
   const baselines = useEntity(baselinesApi);
+  const reconciliationEvents = useEntity(reconciliationEventsApi);
   const milestones = useEntity(milestonesApi);
   const requirements = useEntity(requirementsApi);
   const verificationEvents = useEntity(verificationEventsApi);
@@ -115,6 +117,7 @@ export default function App() {
     programs.refresh();
     projects.refresh();
     baselines.refresh();
+    reconciliationEvents.refresh();
     milestones.refresh();
     requirements.refresh();
     verificationEvents.refresh();
@@ -277,6 +280,7 @@ export default function App() {
                   entity={cis}
                   subsystems={logicalSubsystems.rows}
                   baselines={baselines.rows}
+                  reconciliationEvents={reconciliationEvents.rows}
                   gaps={gaps.rows}
                   onSelectCi={selectCi}
                 />
@@ -324,6 +328,7 @@ export default function App() {
               {tab === "sempMigration" && (
                 <SempMigrationPage
                   baselines={baselines.rows}
+                  reconciliationEvents={reconciliationEvents.rows}
                   milestones={milestones.rows}
                   logicalSubsystems={logicalSubsystems.rows}
                   cis={cis.rows}
@@ -331,6 +336,8 @@ export default function App() {
                   abCompatibility={abCompatibility.rows}
                   cotsRecords={cotsRecords.rows}
                   recommendations={recommendations.rows}
+                  riskItems={riskItems.rows}
+                  roles={roles.rows}
                   interfaces={interfaces.rows}
                   specifications={specifications.rows}
                   safetyDeliverables={safetyDeliverables.rows}

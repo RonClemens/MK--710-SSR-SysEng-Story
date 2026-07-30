@@ -110,7 +110,7 @@ export const SEMP_SECTIONS: SempSection[] = [
     defaultNumber: "3.2.1",
     defaultTitle: "Technical Risk, Issue, and Opportunity Management",
     defaultSourceDescription:
-      "Title verified against the table of contents. Sourced from the Recommendations tab and A/B Compatibility risk notes — this app has no dedicated trade-study or formal risk-register entity, so treat this as a partial feed, not a complete one.",
+      "Title verified against the table of contents. Sourced from a dedicated RiskItem register (Risks, Issues, and Opportunities, RIO-Guide-conformant fields, derived risk-level scoring), plus supplementary context from the Recommendations tab and A/B Compatibility risk notes. RIO's own Risk Management Board governance layer is not modeled here — this app's own Migration Plan v0.6.0 §4 tracks that as parked, not yet a PKM entity.",
     verbatimVerified: false,
   },
   {

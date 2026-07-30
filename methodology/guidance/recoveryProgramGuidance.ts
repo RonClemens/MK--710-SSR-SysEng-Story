@@ -1,4 +1,4 @@
-import type { Baseline, CiTier } from "../../client/src/types";
+import type { Baseline, CiTier, ReconciliationEvent } from "../../client/src/types";
 
 // Architecture Guidance §7 Step 5 / PKM Migration Step 2 (coordinated pass —
 // see client/src/types/index.ts's Baseline entity comment for why these two
@@ -75,9 +75,15 @@ export const RECOVERY_DELTA_CLASS_SCOPE_NOTE =
 
 // The data-sourced fact the prose above deliberately no longer hardcodes:
 // which Baseline record this program's recovery delta-classification
-// convention actually applies to. Modeled as "whichever Baseline is
-// reconciling from a prior one" (PKM Entity Model §5 open question #1's
-// reconciledFromBaselineId), not a second hardcoded name.
-export function findReconciliationTargetBaseline(baselines: Baseline[]): Baseline | undefined {
-  return baselines.find((b) => b.reconciledFromBaselineId !== null);
+// convention actually applies to. Modeled as "whichever Baseline is the
+// `fromBaselineId` of a real ReconciliationEvent" (PKM Migration Step 12) --
+// previously read the now-removed Baseline.reconciledFromBaselineId field
+// directly; same derived fact, now sourced from the dedicated entity instead
+// of a field pair on Baseline itself.
+export function findReconciliationTargetBaseline(
+  baselines: Baseline[],
+  reconciliationEvents: ReconciliationEvent[],
+): Baseline | undefined {
+  const fromBaselineIds = new Set(reconciliationEvents.map((e) => e.fromBaselineId));
+  return baselines.find((b) => fromBaselineIds.has(b.id));
 }

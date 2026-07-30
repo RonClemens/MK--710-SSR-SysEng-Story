@@ -26,8 +26,6 @@
       "baselineType": "Product",
       "projectId": "project-001",
       "establishedAtMilestoneId": "milestone-a-cdr",
-      "reconciledFromBaselineId": null,
-      "reconciledIntoBaselineId": "BASELINE-B",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-01-06T00:00:00.000Z"
     },
@@ -37,10 +35,22 @@
       "baselineType": "Allocated",
       "projectId": "project-001",
       "establishedAtMilestoneId": "milestone-b-srr",
-      "reconciledFromBaselineId": "BASELINE-A",
-      "reconciledIntoBaselineId": null,
       "createdAt": "2026-06-01T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
+    }
+  ],
+  "reconciliationEvents": [
+    {
+      "id": "reconciliation-001",
+      "fromBaselineId": "BASELINE-B",
+      "intoBaselineId": "BASELINE-A",
+      "status": "In Progress",
+      "initiatedDate": "2026-06-01",
+      "completedDate": null,
+      "evidenceEntityType": "AbCompatibilityRow",
+      "evidenceEntityIds": ["ab-001", "ab-002"],
+      "createdAt": "2026-07-30T00:00:00.000Z",
+      "updatedAt": "2026-07-30T00:00:00.000Z"
     }
   ],
   "milestones": [
@@ -856,7 +866,7 @@
       "assignedRoleId": "role-sw",
       "relatedCiId": "ci-002",
       "resolvesGapId": null,
-      "resolvesRiskItemId": null,
+      "resolvesRiskItemId": "risk-002",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-06-15T00:00:00.000Z"
     },

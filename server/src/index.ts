@@ -37,6 +37,7 @@ async function start() {
   app.use("/api/programs", crudRouter("programs"));
   app.use("/api/projects", crudRouter("projects"));
   app.use("/api/baselines", crudRouter("baselines"));
+  app.use("/api/reconciliation-events", crudRouter("reconciliationEvents"));
   app.use("/api/milestones", crudRouter("milestones"));
   app.use("/api/requirements", crudRouter("requirements"));
   app.use("/api/verification-events", crudRouter("verificationEvents"));

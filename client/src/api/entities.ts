@@ -16,6 +16,7 @@ import type {
   ProgramPlanningDeliverable,
   Project,
   Recommendation,
+  ReconciliationEvent,
   Requirement,
   RiskItem,
   Role,
@@ -31,6 +32,7 @@ function entity<T extends { id: string }>(path: string, collection: Parameters<t
 export const programsApi = entity<Program>("/programs", "programs");
 export const projectsApi = entity<Project>("/projects", "projects");
 export const baselinesApi = entity<Baseline>("/baselines", "baselines");
+export const reconciliationEventsApi = entity<ReconciliationEvent>("/reconciliation-events", "reconciliationEvents");
 export const milestonesApi = entity<Milestone>("/milestones", "milestones");
 export const requirementsApi = entity<Requirement>("/requirements", "requirements");
 export const verificationEventsApi = entity<VerificationEvent>("/verification-events", "verificationEvents");

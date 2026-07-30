@@ -2,7 +2,7 @@ import { EditableText } from "../components/EditableText";
 import { SEMP_APPENDIX_NOTE, SEMP_DID_CITATION, SEMP_MAPPING_DISCLAIMER, SEMP_SECTIONS } from "../../../methodology/guidance/sempGuidance";
 import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../../../methodology/guidance/incoseGuidance";
 import { DbxMbxTransitionGuidance } from "../components/DbxMbxTransitionGuidance";
-import { buildMilestoneSchedule, buildSempMigrationMarkdown, type SempExportData } from "../utils/sempExport";
+import { buildMilestoneSchedule, buildRiskRegister, buildSempMigrationMarkdown, type SempExportData } from "../utils/sempExport";
 import { useSiteContent } from "../contexts/SiteContentContext";
 
 type Props = SempExportData;
@@ -17,6 +17,7 @@ export function SempMigrationPage(data: Props) {
     { label: "A/B Compatibility rows", count: data.abCompatibility.length },
     { label: "COTS Records", count: data.cotsRecords.length },
     { label: "Recommendations", count: data.recommendations.length },
+    { label: "Risk/Issue/Opportunity Items", count: data.riskItems.length },
     { label: "Interfaces", count: data.interfaces.length },
     { label: "Specifications", count: data.specifications.length },
     { label: "Safety Deliverables", count: data.safetyDeliverables.length },
@@ -125,6 +126,58 @@ export function SempMigrationPage(data: Props) {
             )}
           </div>
         ))}
+      </section>
+
+      <section>
+        <EditableText
+          contentKey="sempMigration.generatedRiskRegisterHeading"
+          defaultValue="Generated SEMP: Risk Register (SEP Outline 3.2.1)"
+          as="h3"
+        />
+        <EditableText
+          contentKey="sempMigration.generatedRiskRegisterHint"
+          defaultValue={
+            "SEMP-generation proposal Phase D, partially approved (RiskItem wired into 3.2.1 only, not the full " +
+            "RACI/deliverables scope originally sketched): a register table assembled directly from this " +
+            "Project's existing RiskItem records — Risks, Issues, and Opportunities alike — sorted by derived " +
+            "risk score, highest first. Pure query-and-format, same pattern as the Schedule table above; no new " +
+            "content, no AI/provider calls."
+          }
+          as="p"
+          className="hint"
+        />
+        {buildRiskRegister(data.riskItems, data.roles).length === 0 ? (
+          <p className="empty-row">No risk items yet.</p>
+        ) : (
+          <div className="table-scroll">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Risk Level</th>
+                  <th>Mitigation</th>
+                  <th>Owner Role</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {buildRiskRegister(data.riskItems, data.roles).map((r, i) => (
+                  <tr key={i}>
+                    <td>{r.itemType}</td>
+                    <td>{r.category}</td>
+                    <td>{r.description}</td>
+                    <td>{r.riskLevel}</td>
+                    <td>{r.mitigationStrategy}</td>
+                    <td>{r.ownerRoleName}</td>
+                    <td>{r.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section>

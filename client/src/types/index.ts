@@ -74,11 +74,36 @@ export interface Baseline {
   // defines this baseline's state (see Milestone's own comment for why
   // "last Complete," not "current," gate). Nullable pending backfill.
   establishedAtMilestoneId: string | null;
-  // Per PKM Entity Model §5 open question #1. Set on the newer/reconciling
-  // baseline; the corresponding sibling should set reconciledIntoBaselineId
-  // to point back, though nothing enforces that symmetry structurally yet.
-  reconciledFromBaselineId: string | null;
-  reconciledIntoBaselineId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// PKM Migration Step 12 (per PKM Migration Plan v0.6.0 Step 12 / PKM Entity
+// Model v0.4.0 §2-3): replaces the reserved Baseline.reconciledFromBaselineId/
+// reconciledIntoBaselineId field pair above (now removed) with a distinct
+// entity for the reconciliation act itself. Those two fields could only
+// represent "reconciliation is happening," not the evidence trail or a
+// closeable, dated, auditable event -- this app's own AbCompatibilityRow
+// records are exactly that ongoing interim evidence, re-reviewed at
+// successive checkpoints, not the terminal act. A Baseline's reconciliation
+// status is derived by querying for a ReconciliationEvent referencing it
+// (see findReconciliationTargetBaseline() in recoveryProgramGuidance.ts),
+// the same derived-not-stored pattern as Acquisition Phase.
+export type ReconciliationStatus = "Proposed" | "In Progress" | "Complete";
+export const RECONCILIATION_STATUSES: ReconciliationStatus[] = ["Proposed", "In Progress", "Complete"];
+
+export interface ReconciliationEvent {
+  id: string;
+  fromBaselineId: string;
+  intoBaselineId: string;
+  status: ReconciliationStatus;
+  initiatedDate: string | null;
+  completedDate: string | null;
+  // Polymorphic evidence trail, per PKM's own intentional looseness here --
+  // only this app's AbCompatibilityRow shape exists so far; not promoted to
+  // a fixed PKM reference type until a second app's evidence converges.
+  evidenceEntityType: string;
+  evidenceEntityIds: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -833,6 +858,7 @@ export interface Database {
   programs: Program[];
   projects: Project[];
   baselines: Baseline[];
+  reconciliationEvents: ReconciliationEvent[];
   milestones: Milestone[];
   requirements: Requirement[];
   verificationEvents: VerificationEvent[];

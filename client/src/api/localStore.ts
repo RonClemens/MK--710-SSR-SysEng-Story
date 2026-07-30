@@ -58,6 +58,7 @@ function normalize(db: Partial<Database>): Database {
     programs: db.programs ?? [],
     projects: db.projects ?? [],
     baselines: db.baselines ?? [],
+    reconciliationEvents: db.reconciliationEvents ?? [],
     milestones: db.milestones ?? [],
     requirements: db.requirements ?? [],
     verificationEvents: db.verificationEvents ?? [],
@@ -101,7 +102,8 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.checklistItems === undefined ||
     db.gaps === undefined ||
     db.roles === undefined ||
-    db.riskItems === undefined;
+    db.riskItems === undefined ||
+    db.reconciliationEvents === undefined;
   return {
     db: {
       ...db,
@@ -120,6 +122,7 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       gaps: db.gaps ?? SEED_DATA.gaps,
       roles: db.roles ?? SEED_DATA.roles,
       riskItems: db.riskItems ?? SEED_DATA.riskItems,
+      reconciliationEvents: db.reconciliationEvents ?? SEED_DATA.reconciliationEvents,
     },
     changed,
   };

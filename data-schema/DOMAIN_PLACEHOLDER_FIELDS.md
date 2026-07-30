@@ -192,3 +192,11 @@ app is deployed for.
 `ContentEntry`, `ContentEntryHistoryItem` — these hold editable site-copy
 overrides for the app's own UI text, not program/domain data, so nothing in
 them is CUI-scoped.
+
+`ReconciliationEvent` (added PKM Migration Step 12) — every field is
+structural: `fromBaselineId`/`intoBaselineId`/`evidenceEntityIds` are
+references, `status` is a fixed enum, `evidenceEntityType` names a real but
+fixed entity-type string (not per-record content), and the two dates are
+timestamps. Unlike `ContentEntry` above, this genuinely is program data —
+it just has no free-text/illustrative field the way `Gap.description` or
+`RiskItem.description` do.

@@ -37,6 +37,7 @@ import {
 } from "../../../methodology/guidance/dbxMbxGuidance";
 import { POINTER_SPEC_CATALOG } from "../../../methodology/guidance/pointerSpecGuidance";
 import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../../../methodology/guidance/incoseGuidance";
+import { deriveRiskLevel, riskScore, type RiskLevel } from "./riskItem";
 import type {
   AbCompatibilityRow,
   Attachment,
@@ -50,6 +51,12 @@ import type {
   MilestoneType,
   ProgramPlanningDeliverable,
   Recommendation,
+  ReconciliationEvent,
+  RiskItem,
+  RiskItemStatus,
+  RiskItemType,
+  RiskMitigationStrategy,
+  Role,
   SafetyDeliverable,
   Specification,
   SpecLevel,
@@ -57,6 +64,7 @@ import type {
 
 export interface SempExportData {
   baselines: Baseline[];
+  reconciliationEvents: ReconciliationEvent[];
   milestones: Milestone[];
   logicalSubsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
@@ -64,6 +72,8 @@ export interface SempExportData {
   abCompatibility: AbCompatibilityRow[];
   cotsRecords: CotsRecord[];
   recommendations: Recommendation[];
+  riskItems: RiskItem[];
+  roles: Role[];
   interfaces: InterfaceRecord[];
   specifications: Specification[];
   safetyDeliverables: SafetyDeliverable[];
@@ -127,6 +137,40 @@ export function buildMilestoneSchedule(milestones: Milestone[], baselines: Basel
       }));
     return { baselineId: baseline.id, baselineName: baseline.name, rows };
   });
+}
+
+// SEMP-generation proposal Phase D, partially approved (RiskItem -> SEP
+// Outline 3.2.1 only, not the full RACI/deliverables-list scope originally
+// sketched -- Migration Plan v0.6.0 items 5/§4). Same "structured sections"
+// pattern as buildMilestoneSchedule(): pure query-and-format over existing
+// RiskItem records, zero AI calls, zero new PDKM content. Sorted by derived
+// risk score descending (highest-risk items first) -- the same "most-
+// actionable-first" ordering a real risk register review would want, not
+// insertion order.
+export interface RiskRegisterRow {
+  itemType: RiskItemType;
+  category: string;
+  description: string;
+  riskLevel: RiskLevel;
+  mitigationStrategy: RiskMitigationStrategy;
+  ownerRoleName: string;
+  status: RiskItemStatus;
+}
+
+export function buildRiskRegister(riskItems: RiskItem[], roles: Role[]): RiskRegisterRow[] {
+  const roleNameById = new Map(roles.map((r) => [r.id, r.name]));
+  return riskItems
+    .slice()
+    .sort((a, b) => riskScore(b) - riskScore(a))
+    .map((item) => ({
+      itemType: item.itemType,
+      category: item.category,
+      description: item.description,
+      riskLevel: deriveRiskLevel(item),
+      mitigationStrategy: item.mitigationStrategy,
+      ownerRoleName: item.ownerRoleId ? roleNameById.get(item.ownerRoleId) ?? "(unknown role)" : "—",
+      status: item.status,
+    }));
 }
 
 export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetValue): string {
@@ -280,10 +324,10 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   lines.push("");
   lines.push(getValue("recovery.intro", RECOVERY_PROGRAM_INTRO));
   lines.push("");
-  const reconciliationTargetBaseline = findReconciliationTargetBaseline(data.baselines);
+  const reconciliationTargetBaseline = findReconciliationTargetBaseline(data.baselines, data.reconciliationEvents);
   lines.push(
-    `_Applies to: ${reconciliationTargetBaseline?.name ?? "—"} (Baseline entity data — the baseline with a set ` +
-      "reconciledFromBaselineId — not hardcoded guidance text)_",
+    `_Applies to: ${reconciliationTargetBaseline?.name ?? "—"} (ReconciliationEvent data — the baseline named as ` +
+      "a real reconciliation event's fromBaselineId — not hardcoded guidance text)_",
   );
   lines.push("");
   lines.push(
@@ -401,7 +445,24 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
 
   // 3.2.1 Technical Risk, Issue, and Opportunity Management
   lines.push(heading("technicalRiskIssueOpportunity"));
-  lines.push("**Recommendations**");
+  lines.push("**Risk, Issue & Opportunity Register** (RiskItem records, RIO-Guide-conformant, sorted highest risk score first)");
+  lines.push("");
+  lines.push(
+    mdTable(
+      ["Type", "Category", "Description", "Risk Level", "Mitigation", "Owner Role", "Status"],
+      buildRiskRegister(data.riskItems, data.roles).map((r) => [
+        r.itemType,
+        r.category,
+        r.description,
+        r.riskLevel,
+        r.mitigationStrategy,
+        r.ownerRoleName,
+        r.status,
+      ]),
+    ),
+  );
+  lines.push("");
+  lines.push("**Recommendations** (ActionItem records — includes both Gap remediations and RiskItem mitigation plans)");
   lines.push("");
   lines.push(
     mdTable(
@@ -421,7 +482,12 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
     ),
   );
   lines.push("");
-  lines.push("_This app has no dedicated trade-study or formal risk-register entity — treat this as a partial feed._");
+  lines.push(
+    "_The Register above is this app's dedicated, structured feed for this section (Migration Plan v0.6.0, " +
+      "Phase D partial). Recommendations and A/B Compatibility risk notes remain useful supplementary context — " +
+      "a mitigation plan's own ActionItem record lives in Recommendations (see `resolvesRiskItemId`), not " +
+      "duplicated in the Register above._",
+  );
   lines.push("");
 
   // 3.2.2 Technical Performance Measures

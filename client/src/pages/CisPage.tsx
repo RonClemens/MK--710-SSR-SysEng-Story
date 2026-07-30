@@ -21,6 +21,7 @@ import {
   type ConfigurationItem,
   type Gap,
   type LogicalSubsystem,
+  type ReconciliationEvent,
 } from "../types";
 import type { useEntity } from "../hooks/useEntity";
 
@@ -45,15 +46,16 @@ interface Props {
   entity: ReturnType<typeof useEntity<ConfigurationItem>>;
   subsystems: LogicalSubsystem[];
   baselines: Baseline[];
+  reconciliationEvents: ReconciliationEvent[];
   gaps: Gap[];
   onSelectCi: (id: string) => void;
 }
 
-export function CisPage({ entity, subsystems, baselines, gaps, onSelectCi }: Props) {
+export function CisPage({ entity, subsystems, baselines, reconciliationEvents, gaps, onSelectCi }: Props) {
   const { rows, loading, error, create, update, remove } = entity;
   const [editing, setEditing] = useState<ConfigurationItem | "new" | null>(null);
   const [showGuidance, setShowGuidance] = useState(false);
-  const reconciliationTargetBaseline = findReconciliationTargetBaseline(baselines);
+  const reconciliationTargetBaseline = findReconciliationTargetBaseline(baselines, reconciliationEvents);
   const gapsById = Object.fromEntries(gaps.map((g) => [g.id, g]));
 
   const subsystemLabels = Object.fromEntries(subsystems.map((s) => [s.id, s.name]));
@@ -177,7 +179,7 @@ export function CisPage({ entity, subsystems, baselines, gaps, onSelectCi }: Pro
           <EditableText contentKey="recovery.appliesToLabel" defaultValue="Applies to" as="p" className="did-guidance-label" />
           <p className="hint">
             {reconciliationTargetBaseline?.name ?? "—"}
-            {" — the baseline with a set reconciledFromBaselineId (Baseline entity data, not hardcoded guidance text)"}
+            {" — the baseline named as a real ReconciliationEvent's fromBaselineId (Workbench data, not hardcoded guidance text)"}
           </p>
           <div className="did-guidance-grid">
             {RECOVERY_DELTA_CLASSES.map((cls) => (

@@ -32,8 +32,6 @@ export const SEED_DATA: Database = {
       baselineType: "Product",
       projectId: "project-001",
       establishedAtMilestoneId: "milestone-a-cdr",
-      reconciledFromBaselineId: null,
-      reconciledIntoBaselineId: "BASELINE-B",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -43,10 +41,29 @@ export const SEED_DATA: Database = {
       baselineType: "Allocated",
       projectId: "project-001",
       establishedAtMilestoneId: "milestone-b-srr",
-      reconciledFromBaselineId: "BASELINE-A",
-      reconciledIntoBaselineId: null,
       createdAt: "2026-06-01T00:00:00.000Z",
       updatedAt: "2026-06-20T00:00:00.000Z",
+    },
+  ],
+  // PKM Migration Step 12 (per PKM Migration Plan v0.6.0 Step 12 / PKM Entity
+  // Model v0.4.0 §2-3): the real reconciliation relationship formerly held
+  // by Baseline.reconciledFromBaselineId/reconciledIntoBaselineId (BASELINE-B
+  // reconciling from BASELINE-A) migrated onto its own entity, per the
+  // canonical model's now-corrected design. evidenceEntityIds names the two
+  // AbCompatibilityRow records (ab-001, ab-002) that are this reconciliation
+  // effort's own ongoing interim evidence trail.
+  reconciliationEvents: [
+    {
+      id: "reconciliation-001",
+      fromBaselineId: "BASELINE-B",
+      intoBaselineId: "BASELINE-A",
+      status: "In Progress",
+      initiatedDate: "2026-06-01",
+      completedDate: null,
+      evidenceEntityType: "AbCompatibilityRow",
+      evidenceEntityIds: ["ab-001", "ab-002"],
+      createdAt: "2026-07-30T00:00:00.000Z",
+      updatedAt: "2026-07-30T00:00:00.000Z",
     },
   ],
   // PKM Migration Step 3 (additive): one record per SETR event per baseline
@@ -914,7 +931,10 @@ export const SEED_DATA: Database = {
       assignedRoleId: "role-sw",
       relatedCiId: "ci-002",
       resolvesGapId: null,
-      resolvesRiskItemId: null,
+      // PKM Migration Step 14 (per PKM Migration Plan v0.6.0 item 2): this is
+      // risk-002's own mitigation plan -- risk-002's description explicitly
+      // names rec-003 as the adapter-layer/script-rewrite work it needs.
+      resolvesRiskItemId: "risk-002",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-06-15T00:00:00.000Z",
     },
