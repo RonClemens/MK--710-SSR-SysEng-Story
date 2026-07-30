@@ -49,6 +49,7 @@ async function start() {
   app.use("/api/cots-records", crudRouter("cotsRecords"));
   app.use("/api/roles", crudRouter("roles"));
   app.use("/api/recommendations", crudRouter("recommendations"));
+  app.use("/api/risk-items", crudRouter("riskItems"));
   app.use("/api/interfaces", crudRouter("interfaces"));
   app.use("/api/specifications", crudRouter("specifications"));
   app.use("/api/safety-deliverables", crudRouter("safetyDeliverables"));

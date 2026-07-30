@@ -18,6 +18,7 @@ const REQUIRED_KEYS: (keyof Database)[] = [
   "cotsRecords",
   "roles",
   "recommendations",
+  "riskItems",
   "interfaces",
   "specifications",
   "safetyDeliverables",

@@ -550,6 +550,7 @@ export const SEED_DATA: Database = {
       disposition: "Accept as-is",
       blocksMilestoneId: "milestone-a-trr",
       blocksChecklistItemId: null,
+      escalatedToRiskItemId: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -563,6 +564,7 @@ export const SEED_DATA: Database = {
       disposition: "Accept as-is",
       blocksMilestoneId: "milestone-a-trr",
       blocksChecklistItemId: null,
+      escalatedToRiskItemId: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -576,6 +578,9 @@ export const SEED_DATA: Database = {
       disposition: "ECP required",
       blocksMilestoneId: "milestone-a-trr",
       blocksChecklistItemId: null,
+      // PKM Migration Step 12 (additive): this gap escalates to risk-001
+      // below -- see that record's own comment for why.
+      escalatedToRiskItemId: "risk-001",
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -883,6 +888,7 @@ export const SEED_DATA: Database = {
       assignedRoleId: "role-cm",
       relatedCiId: "ci-001",
       resolvesGapId: "gap-001",
+      resolvesRiskItemId: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -895,6 +901,7 @@ export const SEED_DATA: Database = {
       assignedRoleId: "role-lse",
       relatedCiId: "ci-001",
       resolvesGapId: "gap-003",
+      resolvesRiskItemId: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-01-06T00:00:00.000Z",
     },
@@ -907,8 +914,110 @@ export const SEED_DATA: Database = {
       assignedRoleId: "role-sw",
       relatedCiId: "ci-002",
       resolvesGapId: null,
+      resolvesRiskItemId: null,
       createdAt: "2026-01-06T00:00:00.000Z",
       updatedAt: "2026-06-15T00:00:00.000Z",
+    },
+    // PKM Migration Step 12 (additive): the first Recommendation to use
+    // resolvesRiskItemId instead of resolvesGapId -- risk-001's own
+    // mitigationStrategy ("Control") implementation plan, distinct from
+    // rec-001 (which already resolves the same underlying gap-001/gap-003
+    // over-decomposition finding on the Gap side).
+    {
+      id: "rec-004",
+      text: "Implement CI-structure consolidation (per rec-001) as the control measure closing risk-001; track residual risk after CCB approval.",
+      category: "CI structure",
+      status: "open",
+      owner: "CM Lead",
+      assignedRoleId: "role-cm",
+      relatedCiId: "ci-001",
+      resolvesGapId: null,
+      resolvesRiskItemId: "risk-001",
+      createdAt: "2026-07-29T00:00:00.000Z",
+      updatedAt: "2026-07-29T00:00:00.000Z",
+    },
+  ],
+  // PKM Migration Step 12 (additive, per PKM Migration Plan v0.5.0 Step 10 /
+  // PKM Entity Model v0.6.0 §79-82): RiskItem records covering all three
+  // itemType values. risk-001 is gap-003's escalation to a tracked program
+  // risk (Control strategy, since the mitigation is the CI-structure
+  // consolidation already proposed in rec-001/rec-004) -- likelihood/
+  // consequence scores are this app's own illustrative judgment call, not a
+  // literal quote from any source document. risk-002 (itemType: "Issue")
+  // demonstrates the null-likelihood convention this entity's own type
+  // comment documents (an Issue has already occurred; likelihood isn't
+  // independently scored). risk-003 (itemType: "Opportunity") shows the
+  // third value exists and behaves identically to Risk in this app --
+  // PKM does not distinguish Opportunity scoring from Risk scoring.
+  riskItems: [
+    {
+      id: "risk-001",
+      projectId: "project-001",
+      itemType: "Risk",
+      category: "Configuration Management",
+      likelihood: 4,
+      consequenceCost: 3,
+      consequenceSchedule: 3,
+      consequencePerformance: 2,
+      mitigationStrategy: "Control",
+      ownerRoleId: "role-cm",
+      linkedMilestoneId: "milestone-a-trr",
+      linkedCiId: "ci-001",
+      description:
+        "Test Set CI over-decomposition (MHC/MCC/IPS tracked as separate CIs vs. as-built assembly) risks a CCB delay at TRR if not resolved before the review; escalated from gap-003.",
+      identifiedDate: "2026-01-06",
+      approvalDate: "2026-01-13",
+      plannedClosureDate: "2026-08-15",
+      actualClosureDate: null,
+      status: "Mitigating",
+      createdAt: "2026-07-29T00:00:00.000Z",
+      updatedAt: "2026-07-29T00:00:00.000Z",
+    },
+    {
+      id: "risk-002",
+      projectId: "project-001",
+      itemType: "Issue",
+      category: "Interface Compatibility",
+      likelihood: null,
+      consequenceCost: 2,
+      consequenceSchedule: 4,
+      consequencePerformance: 3,
+      mitigationStrategy: "Accept",
+      ownerRoleId: "role-sw",
+      linkedMilestoneId: null,
+      linkedCiId: "ci-002",
+      description:
+        "Baseline A's proprietary serial diagnostic protocol has already diverged from Baseline B's Ethernet-based intent (see ab-001); an adapter layer or script rewrite is required before Baseline B System TRR (see rec-003).",
+      identifiedDate: "2026-06-15",
+      approvalDate: "2026-06-15",
+      plannedClosureDate: null,
+      actualClosureDate: null,
+      status: "Approved",
+      createdAt: "2026-07-29T00:00:00.000Z",
+      updatedAt: "2026-07-29T00:00:00.000Z",
+    },
+    {
+      id: "risk-003",
+      projectId: "project-001",
+      itemType: "Opportunity",
+      category: "Test Infrastructure",
+      likelihood: 2,
+      consequenceCost: 2,
+      consequenceSchedule: 1,
+      consequencePerformance: 1,
+      mitigationStrategy: "Accept",
+      ownerRoleId: "role-lse",
+      linkedMilestoneId: null,
+      linkedCiId: null,
+      description:
+        "Baseline B's move to Ethernet-based diagnostic messaging could allow the Test Set to support parallel UUT test sessions, reducing overall DT&E schedule if pursued proactively rather than as an afterthought.",
+      identifiedDate: "2026-06-20",
+      approvalDate: null,
+      plannedClosureDate: null,
+      actualClosureDate: null,
+      status: "Identified",
+      createdAt: "2026-07-29T00:00:00.000Z",
+      updatedAt: "2026-07-29T00:00:00.000Z",
     },
   ],
   interfaces: [

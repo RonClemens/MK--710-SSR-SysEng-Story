@@ -22,6 +22,7 @@ import {
   type Project,
   type Recommendation,
   type Requirement,
+  type RiskItem,
   type Role,
   type SafetyDeliverable,
   type Specification,
@@ -43,6 +44,7 @@ interface Props {
   cotsRecords: CotsRecord[];
   roles: Role[];
   recommendations: Recommendation[];
+  riskItems: RiskItem[];
   interfaces: InterfaceRecord[];
   specifications: Specification[];
   safetyDeliverables: SafetyDeliverable[];
@@ -152,6 +154,7 @@ const ENTITY_GROUPS: Record<string, string> = {
   Gap: "Gaps & Recommendations",
   Recommendation: "Gaps & Recommendations",
   Role: "Gaps & Recommendations",
+  "Risk Item": "Gaps & Recommendations",
   "Logical Subsystem": "Technical Baseline",
   "Configuration Item": "Technical Baseline",
   Interface: "Technical Baseline",
@@ -199,6 +202,7 @@ export function PromisesPage({
   cotsRecords,
   roles,
   recommendations,
+  riskItems,
   interfaces,
   specifications,
   safetyDeliverables,
@@ -244,6 +248,10 @@ export function PromisesPage({
       ...qualifiedAlternateRows(cotsRecords),
       ...rowsFor("Role", roles, (r) => r.name, ["name", "authorityDescription"]),
       ...rowsFor("Recommendation", recommendations, (r) => r.category, ["text"]),
+      // PKM Migration Step 12: only `description` is tagged -- `category` is
+      // a deliberately untagged structural taxonomy string, per this
+      // entity's own type comment.
+      ...rowsFor("Risk Item", riskItems, (r) => `${r.itemType}: ${r.category}`, ["description"]),
       ...rowsFor("Interface", interfaces, (r) => `${r.aId} ↔ ${r.bId}`, ["description"]),
       ...rowsFor("Specification", specifications, (r) => r.title, ["title"]),
       ...attachmentRowsFor("Specification", specifications, (r) => r.title),
@@ -277,6 +285,7 @@ export function PromisesPage({
       cotsRecords,
       roles,
       recommendations,
+      riskItems,
       interfaces,
       specifications,
       safetyDeliverables,

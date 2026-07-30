@@ -17,6 +17,7 @@ import type {
   Project,
   Recommendation,
   Requirement,
+  RiskItem,
   Role,
   SafetyDeliverable,
   Specification,
@@ -49,3 +50,4 @@ export const abCompatibilityApi = entity<AbCompatibilityRow>("/ab-compatibility"
 export const cotsRecordsApi = entity<CotsRecord>("/cots-records", "cotsRecords");
 export const rolesApi = entity<Role>("/roles", "roles");
 export const recommendationsApi = entity<Recommendation>("/recommendations", "recommendations");
+export const riskItemsApi = entity<RiskItem>("/risk-items", "riskItems");

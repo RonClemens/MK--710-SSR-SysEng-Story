@@ -123,7 +123,8 @@ app is deployed for.
 - `description`
 - Not marked: `foundInEntityType`/`foundInEntityId` (polymorphic
   reference), `disposition` (fixed enum, reused from `DeltaMatrixRow`),
-  `baselineId`/`blocksMilestoneId`/`blocksChecklistItemId` (references).
+  `baselineId`/`blocksMilestoneId`/`blocksChecklistItemId`/
+  `escalatedToRiskItemId` (references, the last added Step 12).
 
 ### Role (added PKM Migration Step 11)
 - `name`
@@ -143,7 +144,21 @@ app is deployed for.
   enum in PKM Migration Step 7 — see that type's own comment on why this
   taxonomy is a starting point, not a definitive one; superseded by
   `assignedRoleId` in Step 11, itself a reference, also not tagged),
-  `resolvesGapId` (reference, added Step 7).
+  `resolvesGapId` (reference, added Step 7), `resolvesRiskItemId`
+  (reference, added Step 12).
+
+### RiskItem (added PKM Migration Step 12)
+- `description`
+- Not marked: `itemType`/`mitigationStrategy`/`status` (fixed enums),
+  `category` (deliberately left as an unconstrained-but-structural
+  taxonomy string, same treatment as `ChecklistItem.domain` — not tagged
+  even though its value is free text, because it's a classification label
+  a program would define once, not per-record illustrative content),
+  `likelihood`/`consequenceCost`/`consequenceSchedule`/`consequencePerformance`
+  (bounded 1-5 scores), `ownerRoleId`/`linkedMilestoneId`/`linkedCiId`
+  (references), the four lifecycle date fields. `riskLevel` isn't a stored
+  field at all — see this entity's own type comment and
+  `client/src/utils/riskItem.ts`.
 
 ### InterfaceRecord
 - `description`

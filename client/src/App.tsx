@@ -17,6 +17,7 @@ import {
   projectsApi,
   recommendationsApi,
   requirementsApi,
+  riskItemsApi,
   rolesApi,
   safetyDeliverablesApi,
   specificationsApi,
@@ -31,6 +32,7 @@ import { DeltaMatrixPage } from "./pages/DeltaMatrixPage";
 import { AbCompatibilityPage } from "./pages/AbCompatibilityPage";
 import { CotsRecordsPage } from "./pages/CotsRecordsPage";
 import { RecommendationsPage } from "./pages/RecommendationsPage";
+import { RiskItemsPage } from "./pages/RiskItemsPage";
 import { SpecificationsPage } from "./pages/SpecificationsPage";
 import { SpecificationDetailPage } from "./pages/SpecificationDetailPage";
 import { SafetyDeliverablesPage } from "./pages/SafetyDeliverablesPage";
@@ -56,6 +58,7 @@ type Tab =
   | "safetyDeliverables"
   | "planningDeliverables"
   | "recommendations"
+  | "riskItems"
   | "sempMigration"
   | "promises";
 
@@ -70,6 +73,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "safetyDeliverables", label: "Safety Deliverables" },
   { key: "planningDeliverables", label: "Program Planning" },
   { key: "recommendations", label: "Recommendations" },
+  { key: "riskItems", label: "Risks & Issues" },
   { key: "sempMigration", label: "SEMP Migration" },
   { key: "promises", label: "PDKM Promises" },
 ];
@@ -90,6 +94,7 @@ export default function App() {
   const cotsRecords = useEntity(cotsRecordsApi);
   const roles = useEntity(rolesApi);
   const recommendations = useEntity(recommendationsApi);
+  const riskItems = useEntity(riskItemsApi);
   const interfaces = useEntity(interfacesApi);
   const specifications = useEntity(specificationsApi);
   const safetyDeliverables = useEntity(safetyDeliverablesApi);
@@ -122,6 +127,7 @@ export default function App() {
     cotsRecords.refresh();
     roles.refresh();
     recommendations.refresh();
+    riskItems.refresh();
     interfaces.refresh();
     specifications.refresh();
     safetyDeliverables.refresh();
@@ -312,6 +318,9 @@ export default function App() {
               {tab === "recommendations" && (
                 <RecommendationsPage entity={recommendations} roles={roles} cis={cis.rows} gaps={gaps.rows} />
               )}
+              {tab === "riskItems" && (
+                <RiskItemsPage entity={riskItems} roles={roles.rows} milestones={milestones.rows} cis={cis.rows} />
+              )}
               {tab === "sempMigration" && (
                 <SempMigrationPage
                   baselines={baselines.rows}
@@ -344,6 +353,7 @@ export default function App() {
                   cotsRecords={cotsRecords.rows}
                   roles={roles.rows}
                   recommendations={recommendations.rows}
+                  riskItems={riskItems.rows}
                   interfaces={interfaces.rows}
                   specifications={specifications.rows}
                   safetyDeliverables={safetyDeliverables.rows}

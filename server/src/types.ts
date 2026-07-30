@@ -437,6 +437,83 @@ export interface Gap {
   disposition: Disposition;
   blocksMilestoneId: string | null;
   blocksChecklistItemId: string | null;
+  // PKM Migration Step 12 (additive, per PKM Migration Plan v0.5.0 Step 10 /
+  // PKM Entity Model v0.6.0): the bridge to RiskItem when a Gap's real
+  // consequence extends beyond its immediate SE/CM finding (e.g. a
+  // supply-chain-driven schedule slip has zero SE/CM-conformance dimension
+  // of its own). Gap keeps its narrow, precise conformance-finding meaning;
+  // this is a reference, not a merge -- populated only when a real
+  // escalation occurs, no migration of existing records required.
+  escalatedToRiskItemId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// PKM Migration Step 12 (per PKM Migration Plan v0.5.0 Step 10 / PKM Entity
+// Model v0.6.0 §2-§3): a tracked risk, issue, or opportunity, grounded in
+// the DoD RIO (Risk/Issue/Opportunity) Management Guide (Dec 2023) and
+// INCOSE SE Handbook §2.3.4.4-2.3.4.5. One entity with an `itemType`
+// discriminator, the same pattern as Milestone's `SETR`/`AcquisitionGate`
+// split -- RIO's own guide suggests programs may combine all three
+// registers into one, and INCOSE treats opportunity management as risk
+// management with terminology substituted.
+//
+// `likelihood` is null specifically for `itemType: "Issue"`, not defaulted
+// to a value -- RIO treats issue probability as 1 by definition (an issue
+// has already occurred), so it isn't independently scored. `riskLevel` is
+// NOT a stored field -- see deriveRiskLevel() in
+// client/src/utils/riskItem.ts, the same derived-not-stored pattern already
+// used for Acquisition Phase and Baseline reconciliation status. That
+// function's own comment documents this app's specific interpretation of
+// "likelihood x max consequence" for the Issue case (probability treated as
+// 1 in the multiplication, per the RIO Guide's own framing), flagged there
+// as a pragmatic reading of the PKM model's text, not a literal quote from
+// it -- worth confirming upstream if it doesn't match real RIO practice.
+//
+// `category` is a plain string, structural taxonomy like ChecklistItem's
+// own `domain` field -- not `@domain-placeholder` tagged, and deliberately
+// left as an open string rather than a fixed union, since neither PKM nor
+// the RIO Guide proposes a closed taxonomy for it.
+//
+// `description` is not named in PKM's own entity-table listing, but is
+// added here following this app's established pattern for entities that
+// hold illustrative content directly rather than only bare structure (see
+// Requirement.statement's own comment for the precedent) -- a RiskItem
+// with no description of what the risk/issue/opportunity actually *is*
+// would be structurally complete but practically unusable.
+export type RiskItemType = "Risk" | "Issue" | "Opportunity";
+export type RiskMitigationStrategy = "Accept" | "Avoid" | "Transfer" | "Control";
+export type RiskItemStatus = "Identified" | "Approved" | "Mitigating" | "Closed";
+
+export const RISK_ITEM_TYPES: RiskItemType[] = ["Risk", "Issue", "Opportunity"];
+export const RISK_MITIGATION_STRATEGIES: RiskMitigationStrategy[] = ["Accept", "Avoid", "Transfer", "Control"];
+export const RISK_ITEM_STATUSES: RiskItemStatus[] = ["Identified", "Approved", "Mitigating", "Closed"];
+export const RISK_SCORE_VALUES = [1, 2, 3, 4, 5] as const;
+export type RiskScoreValue = (typeof RISK_SCORE_VALUES)[number];
+
+export interface RiskItem {
+  id: string;
+  projectId: string;
+  itemType: RiskItemType;
+  category: string;
+  // Null only for itemType: "Issue" -- see this type's own header comment.
+  likelihood: RiskScoreValue | null;
+  consequenceCost: RiskScoreValue;
+  consequenceSchedule: RiskScoreValue;
+  consequencePerformance: RiskScoreValue;
+  mitigationStrategy: RiskMitigationStrategy;
+  // References the Role entity (PKM Migration Step 11) -- null means not
+  // yet assigned, same convention as Recommendation.assignedRoleId.
+  ownerRoleId: string | null;
+  linkedMilestoneId: string | null;
+  linkedCiId: string | null;
+  // @domain-placeholder
+  description: string;
+  identifiedDate: string | null;
+  approvalDate: string | null;
+  plannedClosureDate: string | null;
+  actualClosureDate: string | null;
+  status: RiskItemStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -756,6 +833,7 @@ export interface Database {
   cotsRecords: CotsRecord[];
   roles: Role[];
   recommendations: Recommendation[];
+  riskItems: RiskItem[];
   interfaces: InterfaceRecord[];
   specifications: Specification[];
   safetyDeliverables: SafetyDeliverable[];

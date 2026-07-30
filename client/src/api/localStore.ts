@@ -70,6 +70,7 @@ function normalize(db: Partial<Database>): Database {
     cotsRecords,
     roles: db.roles ?? [],
     recommendations: db.recommendations ?? [],
+    riskItems: db.riskItems ?? [],
     interfaces: db.interfaces ?? [],
     specifications,
     safetyDeliverables,
@@ -99,7 +100,8 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.verificationEvents === undefined ||
     db.checklistItems === undefined ||
     db.gaps === undefined ||
-    db.roles === undefined;
+    db.roles === undefined ||
+    db.riskItems === undefined;
   return {
     db: {
       ...db,
@@ -117,6 +119,7 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       checklistItems: db.checklistItems ?? SEED_DATA.checklistItems,
       gaps: db.gaps ?? SEED_DATA.gaps,
       roles: db.roles ?? SEED_DATA.roles,
+      riskItems: db.riskItems ?? SEED_DATA.riskItems,
     },
     changed,
   };
