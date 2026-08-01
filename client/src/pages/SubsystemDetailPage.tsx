@@ -1,7 +1,17 @@
 import { AttachmentLinks } from "../components/AttachmentLinks";
 import { EditableText } from "../components/EditableText";
+import { EntityComments } from "../components/EntityComments";
 import { UNVERIFIED_SUBSYSTEM_SAFETY_NOTE } from "../../../methodology/guidance/safetyGuidance";
-import type { ConfigurationItem, LogicalSubsystem, ProgramPlanningDeliverable, SafetyDeliverable, Specification } from "../types";
+import type {
+  Comment,
+  ConfigurationItem,
+  LogicalSubsystem,
+  ProgramPlanningDeliverable,
+  Role,
+  SafetyDeliverable,
+  Specification,
+} from "../types";
+import type { useEntity } from "../hooks/useEntity";
 
 interface Props {
   subsystem: LogicalSubsystem;
@@ -9,6 +19,8 @@ interface Props {
   specifications: Specification[];
   safetyDeliverables: SafetyDeliverable[];
   planningDeliverables: ProgramPlanningDeliverable[];
+  comments: ReturnType<typeof useEntity<Comment>>;
+  roles: Role[];
   onBack: () => void;
   onSelectCi: (id: string) => void;
   onSelectSpecification: (id: string) => void;
@@ -20,6 +32,8 @@ export function SubsystemDetailPage({
   specifications,
   safetyDeliverables,
   planningDeliverables,
+  comments,
+  roles,
   onBack,
   onSelectCi,
   onSelectSpecification,
@@ -34,6 +48,7 @@ export function SubsystemDetailPage({
         <span className="badge">{subsystem.baseline}</span>
         <span className="badge">{subsystem.source}</span>
       </div>
+      <EntityComments entityType="LogicalSubsystem" entityId={subsystem.id} comments={comments} roles={roles} />
       <dl className="detail-grid">
         <dt><EditableText contentKey="subsystemDetail.descriptionLabel" defaultValue="Description" as="span" /></dt>
         <dd>{subsystem.description || "—"}</dd>

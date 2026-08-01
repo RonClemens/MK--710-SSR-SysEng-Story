@@ -1659,5 +1659,51 @@ export const SEED_DATA: Database = {
       updatedAt: "2026-07-29T00:00:00.000Z",
     },
   ],
+  // PKM Migration Step 15 (per PKM Migration Plan v0.7.0 Step 15 / PKM Entity
+  // Model v0.7.0 §2-§3, Architecture Guidance v1.6.0 §13): three illustrative
+  // records covering the shape's real range -- comment-001 is attached to a
+  // specific CI (the inline-surface case), comment-002 is unattached (the
+  // global-list-only case), comment-003 demonstrates the resolved lifecycle.
+  comments: [
+    {
+      id: "comment-001",
+      projectId: "project-001",
+      entityType: "ConfigurationItem",
+      entityId: "ci-001",
+      text: "Double-check the ICD-TS-014 revision cited in this CI's attachments before CDR closeout -- vendor mentioned a Rev D is coming.",
+      status: "Open",
+      createdByRoleId: "role-lse",
+      createdDate: "2026-07-20",
+      resolvedDate: null,
+      createdAt: "2026-07-20T00:00:00.000Z",
+      updatedAt: "2026-07-20T00:00:00.000Z",
+    },
+    {
+      id: "comment-002",
+      projectId: "project-001",
+      entityType: null,
+      entityId: null,
+      text: "Ask the CM lead whether the recovery-program Tier-to-delta-class mapping needs a formal CCB read-in, or if this workbench's own guidance page is sufficient for now.",
+      status: "Open",
+      createdByRoleId: "role-cm",
+      createdDate: "2026-07-25",
+      resolvedDate: null,
+      createdAt: "2026-07-25T00:00:00.000Z",
+      updatedAt: "2026-07-25T00:00:00.000Z",
+    },
+    {
+      id: "comment-003",
+      projectId: "project-001",
+      entityType: "LogicalSubsystem",
+      entityId: "sub-b-002",
+      text: "Confirm the Ethernet diagnostic messaging subsystem's port allocation doesn't collide with the Test Set's existing network segment.",
+      status: "Resolved",
+      createdByRoleId: "role-sw",
+      createdDate: "2026-06-25",
+      resolvedDate: "2026-07-10",
+      createdAt: "2026-06-25T00:00:00.000Z",
+      updatedAt: "2026-07-10T00:00:00.000Z",
+    },
+  ],
   content: [],
 };

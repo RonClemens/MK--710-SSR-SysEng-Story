@@ -836,6 +836,45 @@ export interface ProgramPlanningDeliverable {
   updatedAt: string;
 }
 
+// PKM Migration Step 15 (per PKM Migration Plan v0.7.0 Step 15 / PKM Entity
+// Model v0.7.0 §2-§3, Architecture Guidance v1.6.0 §13): the one entity in
+// this model created by direct end-user input rather than a defined SE
+// process step -- no severity, category, or derived score, deliberately
+// (Gap/RiskItem already own that rigor; Comment exists specifically not to
+// require it).
+//
+// entityType/entityId reuse Gap's polymorphic-attachment mechanism, but
+// unlike GapEntityType (a closed union of the 7 types Gap can be found in),
+// Comment's own entity model text says it "may attach to any current or
+// future PKM entity" -- a closed union would need editing every time a new
+// entity type is added, defeating that forward-compatibility. Left as plain
+// strings, both nullable (an unattached Comment is a real, intended case,
+// not a gap to fill in).
+export type CommentStatus = "Open" | "Resolved";
+export const COMMENT_STATUSES: CommentStatus[] = ["Open", "Resolved"];
+
+export interface Comment {
+  id: string;
+  projectId: string;
+  entityType: string | null;
+  entityId: string | null;
+  // Not @domain-placeholder, per Architecture Guidance §13.4: every real
+  // Comment only exists because a user actually created it, so there's no
+  // "default value" standing in for future real content the way e.g.
+  // Requirement.statement's illustrative seed text does. Demo/seed records
+  // follow the same §10.6 exemption every other entity's seed data has.
+  text: string;
+  status: CommentStatus;
+  // Architecture Guidance §13.2: manually selected at creation (a Role-select
+  // dropdown), same UX as ActionItem.assignedRoleId -- no auth system to
+  // derive this from automatically.
+  createdByRoleId: string | null;
+  createdDate: string;
+  resolvedDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // A site-wide editable-prose entry. Keyed by a stable string `key` chosen at
 // each call site (not a random id), so a save is always an upsert: "does an
 // override for this key exist yet, or does the UI still fall back to the
@@ -876,6 +915,7 @@ export interface Database {
   specifications: Specification[];
   safetyDeliverables: SafetyDeliverable[];
   programPlanningDeliverables: ProgramPlanningDeliverable[];
+  comments: Comment[];
   content: ContentEntry[];
 }
 

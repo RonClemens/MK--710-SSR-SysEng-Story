@@ -6,6 +6,7 @@ import {
   baselinesApi,
   checklistItemsApi,
   cisApi,
+  commentsApi,
   cotsRecordsApi,
   deltaMatrixApi,
   gapsApi,
@@ -34,6 +35,7 @@ import { AbCompatibilityPage } from "./pages/AbCompatibilityPage";
 import { CotsRecordsPage } from "./pages/CotsRecordsPage";
 import { RecommendationsPage } from "./pages/RecommendationsPage";
 import { RiskItemsPage } from "./pages/RiskItemsPage";
+import { CommentsPage } from "./pages/CommentsPage";
 import { SpecificationsPage } from "./pages/SpecificationsPage";
 import { SpecificationDetailPage } from "./pages/SpecificationDetailPage";
 import { SafetyDeliverablesPage } from "./pages/SafetyDeliverablesPage";
@@ -60,6 +62,7 @@ type Tab =
   | "planningDeliverables"
   | "recommendations"
   | "riskItems"
+  | "comments"
   | "sempMigration"
   | "promises";
 
@@ -75,6 +78,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "planningDeliverables", label: "Program Planning" },
   { key: "recommendations", label: "Recommendations" },
   { key: "riskItems", label: "Risks & Issues" },
+  { key: "comments", label: "Comments / TODOs" },
   { key: "sempMigration", label: "SEMP Migration" },
   { key: "promises", label: "PDKM Promises" },
 ];
@@ -97,6 +101,7 @@ export default function App() {
   const roles = useEntity(rolesApi);
   const recommendations = useEntity(recommendationsApi);
   const riskItems = useEntity(riskItemsApi);
+  const comments = useEntity(commentsApi);
   const interfaces = useEntity(interfacesApi);
   const specifications = useEntity(specificationsApi);
   const safetyDeliverables = useEntity(safetyDeliverablesApi);
@@ -131,6 +136,7 @@ export default function App() {
     roles.refresh();
     recommendations.refresh();
     riskItems.refresh();
+    comments.refresh();
     interfaces.refresh();
     specifications.refresh();
     safetyDeliverables.refresh();
@@ -209,6 +215,8 @@ export default function App() {
               specifications={specifications.rows.filter((s) => s.linkedCiId === selectedCi.id)}
               safetyDeliverables={safetyDeliverables.rows.filter((sd) => sd.linkedCiId === selectedCi.id)}
               planningDeliverables={planningDeliverables.rows.filter((pd) => pd.linkedCiId === selectedCi.id)}
+              comments={comments}
+              roles={roles.rows}
               onBack={clearSelection}
               onSelectSubsystem={selectSubsystem}
               onSelectSpecification={selectSpecification}
@@ -220,6 +228,8 @@ export default function App() {
               specifications={specifications.rows.filter((s) => s.linkedSubsystemId === selectedSubsystem.id)}
               safetyDeliverables={safetyDeliverables.rows.filter((sd) => sd.linkedSubsystemId === selectedSubsystem.id)}
               planningDeliverables={planningDeliverables.rows.filter((pd) => pd.linkedSubsystemId === selectedSubsystem.id)}
+              comments={comments}
+              roles={roles.rows}
               onBack={clearSelection}
               onSelectCi={selectCi}
               onSelectSpecification={selectSpecification}
@@ -229,6 +239,8 @@ export default function App() {
               spec={selectedSpec}
               subsystems={logicalSubsystems.rows}
               cis={cis.rows}
+              comments={comments}
+              roles={roles.rows}
               onBack={clearSelection}
               onUpdate={specifications.update}
               onDelete={async (id) => {
@@ -325,6 +337,7 @@ export default function App() {
               {tab === "riskItems" && (
                 <RiskItemsPage entity={riskItems} roles={roles.rows} milestones={milestones.rows} cis={cis.rows} />
               )}
+              {tab === "comments" && <CommentsPage entity={comments} roles={roles.rows} />}
               {tab === "sempMigration" && (
                 <SempMigrationPage
                   baselines={baselines.rows}

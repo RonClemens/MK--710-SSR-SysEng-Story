@@ -5,6 +5,7 @@ import type {
   AbCompatibilityRow,
   Baseline,
   ChecklistItem,
+  Comment,
   ConfigurationItem,
   CotsRecord,
   DeltaMatrixRow,
@@ -42,6 +43,7 @@ export const logicalSubsystemsApi = entity<LogicalSubsystem>("/subsystems", "log
 export const interfacesApi = entity<InterfaceRecord>("/interfaces", "interfaces");
 export const specificationsApi = entity<Specification>("/specifications", "specifications");
 export const safetyDeliverablesApi = entity<SafetyDeliverable>("/safety-deliverables", "safetyDeliverables");
+export const commentsApi = entity<Comment>("/comments", "comments");
 export const programPlanningDeliverablesApi = entity<ProgramPlanningDeliverable>(
   "/program-planning-deliverables",
   "programPlanningDeliverables"

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AttachmentLinks } from "../components/AttachmentLinks";
 import { EditableText } from "../components/EditableText";
+import { EntityComments } from "../components/EntityComments";
 import { Modal } from "../components/Modal";
 import { SpecMetadataForm, type SpecMetadataValues } from "../components/SpecMetadataForm";
 import {
@@ -14,12 +15,15 @@ import {
 } from "../../../methodology/guidance/didGuidance";
 import { HAZARD_ANALYSIS_META, SAFETY_BY_LEVEL } from "../../../methodology/guidance/safetyGuidance";
 import { attachmentsToText, textToAttachments } from "../utils/attachments";
-import type { ConfigurationItem, LogicalSubsystem, SpecSections, Specification } from "../types";
+import type { Comment, ConfigurationItem, LogicalSubsystem, Role, SpecSections, Specification } from "../types";
+import type { useEntity } from "../hooks/useEntity";
 
 interface Props {
   spec: Specification;
   subsystems: LogicalSubsystem[];
   cis: ConfigurationItem[];
+  comments: ReturnType<typeof useEntity<Comment>>;
+  roles: Role[];
   onBack: () => void;
   onUpdate: (id: string, patch: Partial<Specification>) => Promise<Specification>;
   onDelete: (id: string) => Promise<void>;
@@ -33,7 +37,18 @@ const RELEVANCE_CLASS: Record<string, string> = {
   "Typically N/A": "badge",
 };
 
-export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdate, onDelete, onSelectSubsystem, onSelectCi }: Props) {
+export function SpecificationDetailPage({
+  spec,
+  subsystems,
+  cis,
+  comments,
+  roles,
+  onBack,
+  onUpdate,
+  onDelete,
+  onSelectSubsystem,
+  onSelectCi,
+}: Props) {
   const [draft, setDraft] = useState<SpecSections>(spec.sections);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,6 +101,7 @@ export function SpecificationDetailPage({ spec, subsystems, cis, onBack, onUpdat
         <span className="badge">{spec.baseline}</span>
         <span className="badge badge-info">{spec.status}</span>
       </div>
+      <EntityComments entityType="Specification" entityId={spec.id} comments={comments} roles={roles} />
 
       <p className="hint">
         {spec.level === "Subsystem" &&

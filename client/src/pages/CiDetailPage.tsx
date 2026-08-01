@@ -1,17 +1,21 @@
 import { AttachmentLinks } from "../components/AttachmentLinks";
 import { EditableText } from "../components/EditableText";
+import { EntityComments } from "../components/EntityComments";
 import { OVER_DECOMPOSITION_SAFETY_NOTE } from "../../../methodology/guidance/safetyGuidance";
 import type {
   AbCompatibilityRow,
+  Comment,
   ConfigurationItem,
   CotsRecord,
   DeltaMatrixRow,
   LogicalSubsystem,
   ProgramPlanningDeliverable,
   Recommendation,
+  Role,
   SafetyDeliverable,
   Specification,
 } from "../types";
+import type { useEntity } from "../hooks/useEntity";
 
 interface Props {
   ci: ConfigurationItem;
@@ -24,6 +28,8 @@ interface Props {
   specifications: Specification[];
   safetyDeliverables: SafetyDeliverable[];
   planningDeliverables: ProgramPlanningDeliverable[];
+  comments: ReturnType<typeof useEntity<Comment>>;
+  roles: Role[];
   onBack: () => void;
   onSelectSubsystem: (id: string) => void;
   onSelectSpecification: (id: string) => void;
@@ -40,6 +46,8 @@ export function CiDetailPage({
   specifications,
   safetyDeliverables,
   planningDeliverables,
+  comments,
+  roles,
   onBack,
   onSelectSubsystem,
   onSelectSpecification,
@@ -57,6 +65,7 @@ export function CiDetailPage({
         <span className={`badge tier-${ci.tier.replace(/\s/g, "")}`}>{ci.tier}</span>
         {ci.overDecompositionFlag && <span className="badge badge-warning">Over-decomposition flagged</span>}
       </div>
+      <EntityComments entityType="ConfigurationItem" entityId={ci.id} comments={comments} roles={roles} />
       <dl className="detail-grid">
         <dt><EditableText contentKey="ciDetail.typeLabel" defaultValue="Type" as="span" /></dt>
         <dd>{ci.type}</dd>

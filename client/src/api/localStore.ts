@@ -76,6 +76,7 @@ function normalize(db: Partial<Database>): Database {
     specifications,
     safetyDeliverables,
     programPlanningDeliverables,
+    comments: db.comments ?? [],
     content: db.content ?? [],
   };
 }
@@ -103,7 +104,8 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
     db.gaps === undefined ||
     db.roles === undefined ||
     db.riskItems === undefined ||
-    db.reconciliationEvents === undefined;
+    db.reconciliationEvents === undefined ||
+    db.comments === undefined;
   return {
     db: {
       ...db,
@@ -123,6 +125,7 @@ function backfillNewCollectionsFromSeed(db: Partial<Database>): { db: Partial<Da
       roles: db.roles ?? SEED_DATA.roles,
       riskItems: db.riskItems ?? SEED_DATA.riskItems,
       reconciliationEvents: db.reconciliationEvents ?? SEED_DATA.reconciliationEvents,
+      comments: db.comments ?? SEED_DATA.comments,
     },
     changed,
   };

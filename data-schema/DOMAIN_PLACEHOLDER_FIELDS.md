@@ -200,3 +200,13 @@ fixed entity-type string (not per-record content), and the two dates are
 timestamps. Unlike `ContentEntry` above, this genuinely is program data —
 it just has no free-text/illustrative field the way `Gap.description` or
 `RiskItem.description` do.
+
+`Comment` (added PKM Migration Step 15, per Architecture Guidance v1.6.0
+§13.4) — a different reason from either entity above: `Comment.text` *is*
+free-text real content, but per §13.4 it's never a placeholder because
+every real `Comment` record only exists because a user actually created it
+— there's no "default value standing in for future real content" the way
+e.g. `Requirement.statement`'s illustrative seed text is. This app's own
+demo seed records (`comment-001`/`002`/`003`) follow the same §10.6
+seed-data exemption every other entity's illustrative data already has, not
+a reason to tag the field itself.

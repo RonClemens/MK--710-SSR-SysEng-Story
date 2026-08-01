@@ -130,6 +130,53 @@ button {
   background: var(--surface-muted, rgba(0, 0, 0, 0.02));
 }
 
+.entity-comments {
+  margin: 1rem 0;
+}
+
+.entity-comments-panel {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+  background: var(--surface-muted, rgba(0, 0, 0, 0.02));
+}
+
+.entity-comments-list {
+  list-style: none;
+  margin: 0 0 0.75rem 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.entity-comments-list li {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.6rem;
+}
+
+.entity-comments-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.entity-comments-list li.resolved p:first-child {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.entity-comments-add {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.entity-comments-add textarea,
+.entity-comments-add select {
+  width: 100%;
+}
+
 .hint {
   color: var(--text-muted);
   font-size: 0.85rem;
