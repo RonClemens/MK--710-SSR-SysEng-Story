@@ -1,6 +1,6 @@
 # /data-schema
 
-Per [Architecture Guidance](/vendor/architecture-guidance-v1.4.0.md) §2, `/data-schema` is meant to hold the
+Per [Architecture Guidance](/vendor/architecture-guidance-v1.7.0.md) §2, `/data-schema` is meant to hold the
 **shape** of program data (field definitions), not actual content — the part of the app that says "a
 Configuration Item has these fields" without asserting what any real CI is named.
 
@@ -38,3 +38,14 @@ guidance's §9 (non-blocking, but cheap to apply while already touching this are
    description field.
 
 No changes were needed as a result of this check.
+
+## `PKM_VERSIONS.json` (Architecture Guidance §8.1)
+
+`PKM_VERSIONS.json` in this directory is the single source of truth for the vendored Architecture
+Guidance and PKM Entity Model versions/dates this app currently conforms to — read by the in-app
+footer (`client/src/components/ArchitectureFooter.tsx`) and included as a `meta` block in this
+app's data exports (Export JSON, SEMP Migration package), per §8.1. Update this one file whenever
+`/vendor/architecture-guidance-vX.Y.Z.md` is re-vendored — nowhere else needs a matching manual
+edit, which is the entire point: the prior approach (separate hardcoded `ARCHITECTURE_VERSION`/
+`ARCHITECTURE_DATE` TS constants) let the footer drift two version bumps stale before anyone
+noticed, per §8.1's own account of that failure.

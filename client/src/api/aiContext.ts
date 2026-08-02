@@ -1,6 +1,6 @@
 import { getLocalDb } from "./localStore";
 
-// Loaded from the shared /methodology/prompts tree (Architecture Guidance v1.4.0 §5) via Vite's
+// Loaded from the shared /methodology/prompts tree (Architecture Guidance v1.7.0 §5) via Vite's
 // `?raw` import, so the static/browser build and the server (server/src/ai/context.ts,
 // server/src/routes/ai.ts) read the exact same source instead of hand-duplicated copies.
 import systemPromptTemplate from "../../../methodology/prompts/system-prompt.md?raw";

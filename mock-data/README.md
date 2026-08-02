@@ -1,6 +1,6 @@
 # /mock-data
 
-Synthetic mirror-baseline data for public-side testing, per [Architecture Guidance](/vendor/architecture-guidance-v1.4.0.md)
+Synthetic mirror-baseline data for public-side testing, per [Architecture Guidance](/vendor/architecture-guidance-v1.7.0.md)
 §2/§4. Everything here is illustrative/demo data (the MHC/MCC/IPS "Test Set" example) — **not real program data** —
 and is safe to keep in the public repo.
 

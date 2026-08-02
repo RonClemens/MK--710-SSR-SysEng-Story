@@ -38,6 +38,7 @@ import {
 import { POINTER_SPEC_CATALOG } from "../../../methodology/guidance/pointerSpecGuidance";
 import { INCOSE_FRAMEWORK_INTRO, INCOSE_GROUP_META, INCOSE_PROCESS_GROUPS } from "../../../methodology/guidance/incoseGuidance";
 import { deriveRiskLevel, riskScore, type RiskLevel } from "./riskItem";
+import pkmVersions from "../../../data-schema/PKM_VERSIONS.json";
 import type {
   AbCompatibilityRow,
   Attachment,
@@ -195,6 +196,16 @@ export function buildSempMigrationMarkdown(data: SempExportData, getValue: GetVa
   lines.push("# Systems Engineering Management Plan — Migration Package");
   lines.push("");
   lines.push(`_Generated ${new Date().toISOString()} from the SE Workbench._`);
+  lines.push("");
+  // Architecture Guidance §8.1: every PKM/PDKM data export carries the same
+  // /data-schema/PKM_VERSIONS.json values, so an exported file is self-describing about which
+  // guidance versions produced it -- the same self-verification instinct as SHA-pinned commit
+  // checking elsewhere in this UDM effort, applied to a downloaded file instead of a commit.
+  lines.push(
+    `_Produced against Architecture Guidance v${pkmVersions.architectureGuidanceVersion} ` +
+      `(${pkmVersions.architectureGuidanceDate}) / PKM Entity Model v${pkmVersions.pkmEntityModelVersion} ` +
+      `(${pkmVersions.pkmEntityModelDate})._`,
+  );
   lines.push("");
   lines.push("> " + getValue("semp.didCitation", SEMP_DID_CITATION));
   lines.push("");

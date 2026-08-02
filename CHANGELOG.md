@@ -1,6 +1,6 @@
 # Changelog
 
-Tracks this app's compliance with the [Reusable SE Webapp Architecture Guidance](vendor/architecture-guidance-v1.4.0.md),
+Tracks this app's compliance with the [Reusable SE Webapp Architecture Guidance](vendor/architecture-guidance-v1.7.0.md),
 per its §6 versioning/vendoring discipline. This app is the reference implementation the guidance's v1.1.0, v1.2.0,
 and v1.4.0 §10 revisions were informed by (see that doc's own changelog).
 
@@ -10,6 +10,11 @@ and v1.4.0 §10 revisions were informed by (see that doc's own changelog).
 |---|---|---|
 | v1.3.0 | 2026-07-25 | this program's Lead Systems Engineer |
 | v1.4.0 | 2026-07-28 | this program's Lead Systems Engineer |
+| v1.7.0 | 2026-08-01 | this program's Lead Systems Engineer |
+
+Current version tracked in [`/data-schema/PKM_VERSIONS.json`](data-schema/PKM_VERSIONS.json) (§8.1) — not this
+table. This table is historical import record only; do not treat it as the source of truth for "what version is
+this app on" going forward.
 
 ## App-side migration history (Architecture Guidance §7)
 
@@ -37,6 +42,18 @@ and v1.4.0 §10 revisions were informed by (see that doc's own changelog).
   paperwork-only vendoring update: re-vendored `/vendor/architecture-guidance-v1.4.0.md`, bumped
   `ARCHITECTURE_VERSION`/`ARCHITECTURE_DATE` to `1.4.0`/`2026-07-27`, and updated every in-repo doc/comment citing
   the vendored version. No code behavior changed — the app already conformed to the content this bump formalizes.
+- **2026-08-01 — Vendoring bump to v1.7.0 (§8.1, single JSON source of truth for version display).**
+  Design chat found this app's footer displaying stale, hand-copied `"1.4.0"`/`"2026-07-27"` values —
+  at least two version bumps of undetected drift, the exact failure mode §8.1 was rewritten to prevent.
+  Re-vendored `/vendor/architecture-guidance-v1.7.0.md` (removing the stale v1.4.0 copy), replaced the
+  hand-maintained `ARCHITECTURE_VERSION`/`ARCHITECTURE_DATE` TS constants (`client/src/config/architectureVersion.ts`,
+  now deleted) with `/data-schema/PKM_VERSIONS.json` — the single file both the footer
+  (`ArchitectureFooter.tsx`, via a build-time JSON import — this app's own adaptation of §8.1's "fetch, not
+  embedded constants" for a Vite SPA that already imports shared repo-root content this way) and every data
+  export now read from. Added the same `PKM_VERSIONS.json` object as a `meta` block to both the "Export JSON"
+  feature (`ExportImport.tsx`) and the SEMP Migration package (`sempExport.ts`), stripped back out on import
+  (`api.importData`) so re-importing an exported file doesn't persist a stray `meta` key. Updated every
+  in-repo doc/comment citing the vendored version/path.
 - **Not yet done — Phase 5: Methodology-vs-program-data content split.** The ~10 files under
   `/methodology/guidance/` were relocated as-is in Phase 1; several (most notably
   `recoveryProgramGuidance.ts`, parts of `dbxMbxGuidance.ts` and `setrGuidance.ts`) still interleave genuinely

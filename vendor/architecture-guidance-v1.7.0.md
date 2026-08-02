@@ -1,17 +1,13 @@
-Applies to: MK 710 program / PDR Reconciliation & Baseline Alignment Workbench
-Vendored version: v1.4.0
-Imported: 2026-07-28
-Reviewer: this program's Lead Systems Engineer
-
----
-
 # Reusable SE Webapp Architecture Guidance
 
-**Version:** 1.4.0
-**Last updated:** 2026-07-27
+**Version:** 1.7.0
+**Last updated:** 2026-08-01
 **Status:** Draft
 
 **Changelog:**
+- **v1.7.0** — Redesigned §8.1 around a single JSON source of truth (`/data-schema/PKM_VERSIONS.json`) for guidance version display, replacing the prior pair of hardcoded JS constants. Prompted by a real, visible failure of the old approach: SE Workbench's live footer showed v1.4.0 — the *literal example value* from the prior snippet — while actual current was v1.6.0, at least two version bumps of undetected drift (Ron, 2026-08-01). This file is now also the intended source for any PKM/PDKM data export's own `meta` block, so exported data becomes self-describing about which guidance versions produced it. §2's directory convention and §8 item 5 updated to match.
+- **v1.6.0** — Added §13, the Comment / TODO UI Pattern — a user-editable UI convention for PKM's new `Comment` entity (PKM v0.7.0), needed because every prior entity's UI precedent (§10.5's "Promises" view) is explicitly read-only. Renumbered former §13 ("Why This Matters Long-Term") to §14.
+- **v1.5.0** — Added §11 (brief — `RiskItem` fields follow the existing `@domain-placeholder` convention, §10, no new mechanism) and §12, the SEMP Generation Pattern: a directory convention and generation approach for assembling a Systems Engineering Management Plan from PKM structure + PDKM content, per `proposals/UDM_V2_SEMP_GENERATION_PROPOSAL.md` §2 (design chat, 2026-07-29). No new provider capability required — reuses the existing provider abstraction (§3) and data-injection pattern (§4) exactly as designed; these sections document the pattern, they don't introduce new mechanism. Renumbered former §11 ("Why This Matters Long-Term") to §13.
 - **v1.4.0** — Added §10, the `@domain-placeholder` convention: a field/type-level marker for program-specific illustrative content, plus a required manifest and a recommended "Promises" UI pattern. Generalized from SE Workbench's own implementation, refined through Workbench's response to the original proposal (JSDoc-comment form, whole-type and shared-subtype tagging patterns, mock-data scope settled as out-of-scope). Renumbered former §10 ("Why This Matters Long-Term") to §11. Added a §7 migration-checklist line for retroactive tagging.
 - **v1.3.0** — Added §10 (now §11), forward-compatibility conventions for an eventual Unified Data Model (UDM) spanning multiple apps. Non-blocking; sets conventions only.
 - **v1.2.0** — Clarified §4: `config.json` doesn't have to own every setting (e.g., provider selection can stay on existing env vars); it exists to give settings without an existing home, like `dataSource`, a documented place to live. Prompted by SE Workbench implementation review of v1.1.0.
@@ -70,11 +66,12 @@ A common half-measure is building a runtime override system (e.g., a CMS-style "
     provider-interface.js   # shared contract both adapters implement
   /ui/                    # presentation components
   /data-schema/           # SHAPE of program data (field defs), not actual data
+    PKM_VERSIONS.json      # single source of truth for guidance versions (§8.1)
   /mock-data/             # synthetic mirror baseline for public-side testing
   config.json             # points at which provider + which program data source
 ```
 
-**Rule:** `/methodology`, `/provider`, `/ui`, and `/data-schema` are what get vendored into CUI repos. `/mock-data` stays public-only. Real program data never lives in this tree at all — it's injected at runtime (see §4).
+**Rule:** `/methodology`, `/provider`, `/ui`, and `/data-schema` are what get vendored into CUI repos. `/mock-data` stays public-only. Real program data never lives in this tree at all — it's injected at runtime (see §4). `PKM_VERSIONS.json` is the one file in `/data-schema` that isn't about program data shape — it's build/vendoring metadata (§8.1), and belongs there because it travels with the same vendoring lifecycle as everything else in that folder.
 
 ---
 
@@ -199,24 +196,46 @@ This guidance document is itself methodology-layer content — public-safe, prog
 
 4. **Compliance requests reference the version, not "the doc."** When requesting a CUI team update to comply with this architecture, cite the specific vendored version (e.g., "bring `/vendor` up to architecture-guidance-v1.4.0") so compliance is checkable and auditable, consistent with the version-pinning discipline in §6.
 
-5. **Update the app's displayed version tag alongside the vendored doc.** Every app implementing this architecture should surface its current guidance version in-app (see §8.1 below). When `/vendor/architecture-guidance-vX.Y.Z.md` is bumped, update that app's `ARCHITECTURE_VERSION`/`ARCHITECTURE_DATE` config in the same commit. A compliance check is not complete until the visible tag matches the vendored file — this is the fastest way to catch drift across multiple apps without inspecting each repo.
+5. **Update the app's displayed version tag alongside the vendored doc.** Every app implementing this architecture should surface its current guidance version in-app (see §8.1 below). When `/vendor/architecture-guidance-vX.Y.Z.md` is bumped, update `/data-schema/PKM_VERSIONS.json` in the same commit — the single source of truth for this, per §8.1. A compliance check is not complete until the visible tag matches the vendored file — this is the fastest way to catch drift across multiple apps without inspecting each repo, and now checkable by inspecting one JSON file rather than hunting for hardcoded constants in app code.
 
 6. **This section travels with the file.** Because this section is itself part of the public-source document, it stays intact in every vendored copy — CUI teams always have the instructions for how to treat the file, without needing a second document or side-channel explanation.
 
-### 8.1 Standard In-App Version Footer
+### 8.1 Version Metadata — Single Source of Truth, Not Hardcoded Constants
 
-Every webapp built against this architecture (public or CUI-side) should include this snippet so its current guidance version is visible at a glance. Drop into any existing or new app — it requires no dependencies and works in single-file HTML/JS tools.
+**This subsection replaces the prior version of itself, and the reason why matters:** the previous version of this snippet shipped its own example values (`"1.4.0"`, `"2026-07-27"`) directly in the code sample. At least one real deployment copy-pasted that snippet verbatim and never revisited it — the footer displayed those literal example values, unchanged, for at least two version bumps' worth of drift, discovered only when someone happened to compare the footer against the actual current version by hand. Two hardcoded constants with no verification mechanism is exactly the failure mode this whole document exists to prevent (§1's own separation discipline) — a docs bug, not just an app bug, and worth stating plainly rather than quietly fixing.
 
-**Note for SPA/multi-file frameworks (React, Vue, etc.):** the snippet below is written for single-file HTML tools. In a framework-based app, adapt the *concept* rather than pasting it verbatim — e.g., a small `architectureVersion.ts` config module exporting the version/date constants, consumed by a lightweight `<ArchitectureFooter />` component. The requirement is the visible tag and the config-in-one-place discipline, not this exact markup.
+**The fix: one JSON file is the source of truth, consumed by both the footer and every data export — never two places to keep in sync.**
+
+```
+/data-schema/
+  PKM_VERSIONS.json      # the only place these numbers are typed by hand
+```
+
+```json
+{
+  "architectureGuidanceVersion": "1.7.0",
+  "architectureGuidanceDate": "2026-08-01",
+  "pkmEntityModelVersion": "0.7.2",
+  "pkmEntityModelDate": "2026-08-01"
+}
+```
+
+- **Update this one file** whenever the vendored `architecture-guidance-vX.Y.Z.md` or `PKM_ENTITY_MODEL.md` is bumped in that repo, in the same commit (§6, §8 item 5) — same discipline as before, but now a single mechanical edit instead of remembering to update JS constants *and* keep them consistent with whatever the data layer separately claims.
+- **The footer reads this file at runtime**, not from embedded constants — fetch it (or import it, in a bundled app) the same way `config.json`'s `dataSource` is already loaded (§4). If it's stale, the footer is stale by definition, which is at least honestly traceable to one file rather than silently drifting from an untracked pair of constants.
+- **Every PKM/PDKM data export (§4's data-injection pattern, the "Export JSON" pattern any app with real program data should have) includes this same object as a `meta` block** at the top of the exported file — not a separately-typed copy, the literal same source. This makes staleness checkable from *outside* the running app too: any exported data file is self-describing about which guidance versions produced it, the same self-verification instinct behind SHA-pinned commit checking elsewhere in this UDM effort.
 
 ```html
-<!-- Add near top of <script>, alongside other config -->
+<!-- Framework-agnostic sketch — adapt to your app's actual data-loading pattern,
+     same "concept, not verbatim markup" guidance as before -->
 <script>
-  const ARCHITECTURE_VERSION = "1.4.0";
-  const ARCHITECTURE_DATE = "2026-07-27";
+  fetch('/data-schema/PKM_VERSIONS.json')
+    .then(r => r.json())
+    .then(v => {
+      document.getElementById('arch-version').textContent = v.architectureGuidanceVersion;
+      document.getElementById('arch-date').textContent = v.architectureGuidanceDate;
+    });
 </script>
 
-<!-- Add near end of <body> -->
 <footer style="
   position: fixed; bottom: 0; right: 0;
   font-size: 11px; color: #888;
@@ -224,14 +243,9 @@ Every webapp built against this architecture (public or CUI-side) should include
 ">
   Architecture: v<span id="arch-version"></span> (<span id="arch-date"></span>)
 </footer>
-
-<script>
-  document.getElementById('arch-version').textContent = ARCHITECTURE_VERSION;
-  document.getElementById('arch-date').textContent = ARCHITECTURE_DATE;
-</script>
 ```
 
-Update `ARCHITECTURE_VERSION` and `ARCHITECTURE_DATE` whenever the vendored guidance doc is bumped in that repo (see item 5 above). Optionally wrap the footer text in an `<a href="...">` pointing to the vendored doc's location in that repo.
+**Migration for existing apps:** move whatever the current hardcoded constants are into this new file (correcting them to the actual current vendored version while you're at it — don't just relocate stale values), point the footer at the file, and check any existing data-export feature for whether it should carry the same `meta` block.
 
 ---
 
@@ -321,6 +335,86 @@ Retroactively tagging an existing app's fields is additive and comment-only — 
 
 ---
 
-## 11. Why This Matters Long-Term
+## 11. Risk, Issue, and Opportunity Tracking
+
+`RiskItem` (PKM v0.6.0) follows the same data-injection pattern every other entity already uses (§4) — no new mechanism, just noting it explicitly since risk content has a genuine PDKM-sensitivity worth calling out. Risk statements, root-cause narratives, and mitigation rationale are program-specific content (real cost/schedule impact, real technical concerns) — apply the `@domain-placeholder` convention (§10) to these fields the same way any other illustrative content gets tagged. `itemType`, `category`, `mitigationStrategy`, and `riskLevel` (derived) are structural — not tagged, same test as any other field (§10.1).
+
+---
+
+## 12. SEMP Generation Pattern
+
+An automated Systems Engineering Management Plan (SEMP) generation capability is under design (`proposals/UDM_V2_SEMP_GENERATION_PROPOSAL.md`), building directly on §9's PKM/PDKM split and §10's `@domain-placeholder` convention. This section documents the pattern once it's ready for apps to build against — **it introduces no new provider capability or data-injection mechanism**; it's a specific *consumer* of both, assembled the same way any other AI-assisted feature in this architecture already works.
+
+### 12.1 Three inputs, one generated output
+
+```
+SEMP Template (methodology layer, public-safe)
+        +
+PKM instance data (structure — per-baseline/per-project, already exists)
+        +
+PDKM instance data (real program content — per-program, CUI)
+        ↓
+   Generated SEMP (program-specific output — never committed publicly)
+```
+
+The generated document itself is data-layer output by definition — same rule as any other real program data (§1, §4): it's generated at runtime from real content, and it never gets committed to any public repo, including this one.
+
+### 12.2 Directory convention addition
+
+```
+/methodology/
+  semp-template/          # new — section-by-section mapping + generation prompts
+    section-mapping.md     # which PKM entities/PDKM fields feed each SEMP section
+    prompts/                 # narrative-section prompts, same discipline as §5
+```
+
+`semp-template/` sits alongside the existing `/methodology/prompts` and `/methodology/checklists` — same versioning, same public-safe/CUI-vendoring treatment as everything else in `/methodology` (§6, §8).
+
+### 12.3 Generation approach — two kinds of sections, two mechanisms
+
+**Structured sections** (schedule tables, deliverable lists, RACI-style role/action tables) are assembled directly from PKM+PDKM data via query-and-format — no AI call, same risk profile and same code path as any other read-only view already in an app. Example: a schedule table is a direct query over `Milestone` records, formatted per the template's mapping — nothing about this requires the provider abstraction at all.
+
+**Narrative sections** (SE process description, objectives/constraints prose) go through the existing provider abstraction (§3) via `complete()` or `completeStructured()` — the same interface every other AI-assisted feature in an app already calls. No new provider method, no new adapter requirement.
+
+**Content-boundary test applies at the section level**, same test as everywhere else in this document (§1): is a section's *assembly logic* (which fields to pull, how to lay out the table, which prompt template to use) the same regardless of program? If yes, methodology layer, public-safe, belongs in `semp-template/`. Is the *generated output itself* real program content? Always yes, by definition (§12.1) — so it's data-layer, never public.
+
+### 12.4 What this deliberately doesn't require
+
+- No new entity type solely for SEMP generation — it's a consumer of `Milestone`, `Deliverable`, `Requirement`, `Role`, `RiskItem`, and whatever PKM already models, not a reason to add structure.
+- No change to the provider interface (§3) — `complete()`/`completeStructured()` already cover narrative generation.
+- No change to the data-injection pattern (§4) — PDKM content loads exactly the way any other program data already does.
+
+If a real implementation surfaces a need for any of the above, that's a gap to route back through the normal Documentation Drift / conformance-feedback path (per `UDM_WORKFLOW_PROTOCOL.md` §3.5), not something to build ad hoc inside a single app's SEMP feature.
+
+---
+
+## 13. The Comment / TODO UI Pattern
+
+`Comment` (PKM v0.7.0) is different from every entity this document has addressed a UI pattern for so far. §10.5's "Promises" view — the closest existing precedent — is explicitly **read-only**: a display of synthetic values waiting to be replaced by real PDKM content. `Comment` is the opposite: it's meant for direct, real, end-user-authored input, persisted live, with no synthetic/placeholder framing at all. This section exists because that gap is real, not because `Comment` needed new provider or data-injection mechanism — it doesn't; it's CRUD like every other entity (§2, §4).
+
+### 13.1 Recommended shape, not mandated
+
+Two complementary surfaces, matching how `Comment`'s polymorphic attachment actually gets used:
+
+- **Inline, on any entity detail view the app already has:** a small comment-count affordance (e.g., a badge or icon) that expands to a thread — create, edit own text, mark `Resolved`/reopen. This is where most comments will actually get created, attached to whatever record the user was already looking at (`entityType`/`entityId` populated from context, not user-entered).
+- **A global list view**, filterable by `status` and by `entityType`, sortable by `createdDate` — the only place an *unattached* `Comment` (no `entityType`/`entityId`) is visible at all, and a useful cross-cutting view even for attached ones. This plays a similar role to §10.5's Promises view structurally (one screen, everything in one place), but is fully editable rather than read-only.
+
+Every app doesn't need identical UI for either surface — the requirement is that both exist in *some* form, the same "every app needs some visible way to answer X" standard §10.5 already sets for its own question.
+
+### 13.2 Authorship without assuming authentication
+
+Most apps built against this architecture are internal SE tools without individual user login (per this document's own scope — synthetic demo apps, shared-access tools). `Comment.createdByRoleId` should therefore be a **manually selected value at creation time** — the same UX already established for `ActionItem.assignedRoleId` (a Role-select dropdown, not an auto-derived session identity). If an app later adds real authentication, deriving `createdByRoleId` from a logged-in user's role becomes a natural enhancement, not a breaking change to the entity shape.
+
+### 13.3 Resolution, not deletion, as the default
+
+Prefer setting `status: "Resolved"` (with `resolvedDate` populated) over hard-deleting a `Comment` record — this preserves it as historical context, consistent with how this document treats every other entity's lifecycle (nothing else in the PKM model is designed around silent deletion). Hard delete isn't prohibited, just not the default pattern to reach for.
+
+### 13.4 Content-boundary note
+
+`Comment.text` is always PDKM content — real, user-authored, by definition never synthetic. Nothing about `Comment` needs `@domain-placeholder` tagging (§10): there's no "default value" to tag, since every real `Comment` record only exists because a user actually created it. Mock/seed data, if an app includes example `Comment` records for demo purposes, follows the same §10.6 exemption every other entity's seed data already has.
+
+---
+
+## 14. Why This Matters Long-Term
 
 Right now each app (PDR readiness, Dispatch, translator) independently reinvents: an AI provider call, a prompt, a data shape, a UI. Once `/methodology` + `/provider` are standardized, a new tool for a new program becomes: define a data schema, write a few checklist/prompt files, reuse everything else. That's the actual scaling unlock — not just CUI-compliance, but turning one-off tools into a genuine internal SE toolkit product line.

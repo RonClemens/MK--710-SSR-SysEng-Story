@@ -47,11 +47,16 @@ export const api = {
     return request<Record<string, unknown>>("/data/export");
   },
   importData: async (data: unknown) => {
+    // Architecture Guidance §8.1: exported files carry a `meta` version block (see
+    // ExportImport.tsx) that isn't part of the Database shape -- strip it here, once, for
+    // both deploy modes, so re-importing a previously-exported file doesn't persist a stray
+    // `meta` key into either localStorage or the server's db.json.
+    const { meta: _meta, ...rest } = (data ?? {}) as Record<string, unknown>;
     if (IS_STATIC_MODE) {
-      replaceLocalDb(data as Database);
+      replaceLocalDb(rest as unknown as Partial<Database>);
       return { ok: true };
     }
-    return request<{ ok: boolean }>("/data/import", { method: "POST", body: JSON.stringify(data) });
+    return request<{ ok: boolean }>("/data/import", { method: "POST", body: JSON.stringify(rest) });
   },
   chat: async (messages: ChatMessage[]) => {
     if (IS_STATIC_MODE) {

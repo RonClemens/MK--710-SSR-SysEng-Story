@@ -54,7 +54,7 @@ editable data tool with zero external API calls.
 ### Reusable SE Webapp Architecture Guidance compliance
 
 This app is the reference implementation a companion cross-app architecture guidance doc (vendored at
-[`vendor/architecture-guidance-v1.4.0.md`](vendor/architecture-guidance-v1.4.0.md)) was informed by — the current
+[`vendor/architecture-guidance-v1.7.0.md`](vendor/architecture-guidance-v1.7.0.md)) was informed by — the current
 guidance version is shown live in the app's bottom-right footer. That guidance separates a reusable
 **methodology layer** (SE logic, prompts, checklists — public-safe, program-agnostic) from a **data layer**
 (real program content — CUI-only, per-program). Its migration checklist has five phases; this app has completed

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { api } from "../api/client";
+import pkmVersions from "../../../data-schema/PKM_VERSIONS.json";
 
 interface Props {
   onImported: () => void;
@@ -12,7 +13,14 @@ export function ExportImport({ onImported }: Props) {
 
   async function handleExport() {
     const data = await api.exportData();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    // Architecture Guidance §8.1: every PKM/PDKM data export carries the same
+    // /data-schema/PKM_VERSIONS.json object as a `meta` block, so the exported
+    // file is self-describing about which guidance versions produced it.
+    // Stripped back out on import (see api.importData / the server's import
+    // route) so re-importing this same file doesn't persist a stray `meta`
+    // key into the store.
+    const exportPayload = { meta: pkmVersions, ...data };
+    const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
