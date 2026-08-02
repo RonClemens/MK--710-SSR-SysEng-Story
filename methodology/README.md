@@ -1,6 +1,6 @@
 # /methodology
 
-Reusable SE methodology content, per [Architecture Guidance](/vendor/architecture-guidance-v1.7.0.md) §2. This is
+Reusable SE methodology content, per [Architecture Guidance](/vendor/architecture-guidance-v1.7.1.md) §2. This is
 the "how" — SE domain logic, checklists, prompt templates, scoring rules, document-structure schemas — meant to be
 the same regardless of which program or contract this app is pointed at.
 

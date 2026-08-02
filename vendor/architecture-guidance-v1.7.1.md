@@ -1,10 +1,11 @@
 # Reusable SE Webapp Architecture Guidance
 
-**Version:** 1.7.0
-**Last updated:** 2026-08-01
+**Version:** 1.7.1
+**Last updated:** 2026-08-02
 **Status:** Draft
 
 **Changelog:**
+- **v1.7.1** — §8.1 now explicitly blesses build-time import as equally conformant to runtime `fetch()` for `PKM_VERSIONS.json`, with its own example — per Workbench's own optional follow-up item 10 (status report v2.1.0 §13/§14), which correctly identified that their dual server-backed/static deploy modes make a literal runtime fetch impractical without duplicating the file. Their adaptation is now the documented recommended pattern for that case, not just a tolerated deviation.
 - **v1.7.0** — Redesigned §8.1 around a single JSON source of truth (`/data-schema/PKM_VERSIONS.json`) for guidance version display, replacing the prior pair of hardcoded JS constants. Prompted by a real, visible failure of the old approach: SE Workbench's live footer showed v1.4.0 — the *literal example value* from the prior snippet — while actual current was v1.6.0, at least two version bumps of undetected drift (Ron, 2026-08-01). This file is now also the intended source for any PKM/PDKM data export's own `meta` block, so exported data becomes self-describing about which guidance versions produced it. §2's directory convention and §8 item 5 updated to match.
 - **v1.6.0** — Added §13, the Comment / TODO UI Pattern — a user-editable UI convention for PKM's new `Comment` entity (PKM v0.7.0), needed because every prior entity's UI precedent (§10.5's "Promises" view) is explicitly read-only. Renumbered former §13 ("Why This Matters Long-Term") to §14.
 - **v1.5.0** — Added §11 (brief — `RiskItem` fields follow the existing `@domain-placeholder` convention, §10, no new mechanism) and §12, the SEMP Generation Pattern: a directory convention and generation approach for assembling a Systems Engineering Management Plan from PKM structure + PDKM content, per `proposals/UDM_V2_SEMP_GENERATION_PROPOSAL.md` §2 (design chat, 2026-07-29). No new provider capability required — reuses the existing provider abstraction (§3) and data-injection pattern (§4) exactly as designed; these sections document the pattern, they don't introduce new mechanism. Renumbered former §11 ("Why This Matters Long-Term") to §13.
@@ -215,16 +216,17 @@ This guidance document is itself methodology-layer content — public-safe, prog
 {
   "architectureGuidanceVersion": "1.7.0",
   "architectureGuidanceDate": "2026-08-01",
-  "pkmEntityModelVersion": "0.7.2",
+  "pkmEntityModelVersion": "0.7.1",
   "pkmEntityModelDate": "2026-08-01"
 }
 ```
 
 - **Update this one file** whenever the vendored `architecture-guidance-vX.Y.Z.md` or `PKM_ENTITY_MODEL.md` is bumped in that repo, in the same commit (§6, §8 item 5) — same discipline as before, but now a single mechanical edit instead of remembering to update JS constants *and* keep them consistent with whatever the data layer separately claims.
-- **The footer reads this file at runtime**, not from embedded constants — fetch it (or import it, in a bundled app) the same way `config.json`'s `dataSource` is already loaded (§4). If it's stale, the footer is stale by definition, which is at least honestly traceable to one file rather than silently drifting from an untracked pair of constants.
+- **The footer reads this file, not embedded constants — via runtime `fetch()` or a build-time import, both equally conformant.** A genuine runtime `fetch()` is the default assumption below, but a bundled SPA reading the same file via `import pkmVersions from "../../data-schema/PKM_VERSIONS.json"` (with a bundler's JSON-import support, e.g. TypeScript's `resolveJsonModule`) satisfies this requirement exactly as well — it's still one canonical file, still zero duplication, still updates automatically on next build. This matters specifically for apps with a static/serverless deploy mode (§3.1) where `/data-schema` isn't otherwise a client-servable path: a literal `fetch()` there would force either duplicating the file into a public-assets directory (recreating the exact two-places-to-keep-in-sync problem this section exists to eliminate) or an extra build step just to relocate it. Build-time import avoids both without weakening the single-source-of-truth guarantee. If it's stale, the footer is stale by definition either way, which is at least honestly traceable to one file rather than silently drifting from an untracked pair of constants.
 - **Every PKM/PDKM data export (§4's data-injection pattern, the "Export JSON" pattern any app with real program data should have) includes this same object as a `meta` block** at the top of the exported file — not a separately-typed copy, the literal same source. This makes staleness checkable from *outside* the running app too: any exported data file is self-describing about which guidance versions produced it, the same self-verification instinct behind SHA-pinned commit checking elsewhere in this UDM effort.
 
 ```html
+<!-- Runtime fetch — the default assumption, works for any server-backed app -->
 <!-- Framework-agnostic sketch — adapt to your app's actual data-loading pattern,
      same "concept, not verbatim markup" guidance as before -->
 <script>
@@ -243,6 +245,22 @@ This guidance document is itself methodology-layer content — public-safe, prog
 ">
   Architecture: v<span id="arch-version"></span> (<span id="arch-date"></span>)
 </footer>
+```
+
+```ts
+// Build-time import — equally conformant, recommended for bundled SPAs with a
+// static/serverless deploy mode (§3.1), where /data-schema isn't otherwise
+// client-servable without duplicating the file
+import pkmVersions from "../../data-schema/PKM_VERSIONS.json";
+// requires a bundler JSON-import capability, e.g. TypeScript's resolveJsonModule
+
+function ArchitectureFooter() {
+  return (
+    <footer>
+      Architecture: v{pkmVersions.architectureGuidanceVersion} ({pkmVersions.architectureGuidanceDate})
+    </footer>
+  );
+}
 ```
 
 **Migration for existing apps:** move whatever the current hardcoded constants are into this new file (correcting them to the actual current vendored version while you're at it — don't just relocate stale values), point the footer at the file, and check any existing data-export feature for whether it should carry the same `meta` block.

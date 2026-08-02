@@ -1,6 +1,6 @@
 # Changelog
 
-Tracks this app's compliance with the [Reusable SE Webapp Architecture Guidance](vendor/architecture-guidance-v1.7.0.md),
+Tracks this app's compliance with the [Reusable SE Webapp Architecture Guidance](vendor/architecture-guidance-v1.7.1.md),
 per its §6 versioning/vendoring discipline. This app is the reference implementation the guidance's v1.1.0, v1.2.0,
 and v1.4.0 §10 revisions were informed by (see that doc's own changelog).
 
@@ -11,6 +11,7 @@ and v1.4.0 §10 revisions were informed by (see that doc's own changelog).
 | v1.3.0 | 2026-07-25 | this program's Lead Systems Engineer |
 | v1.4.0 | 2026-07-28 | this program's Lead Systems Engineer |
 | v1.7.0 | 2026-08-01 | this program's Lead Systems Engineer |
+| v1.7.1 | 2026-08-02 | this program's Lead Systems Engineer |
 
 Current version tracked in [`/data-schema/PKM_VERSIONS.json`](data-schema/PKM_VERSIONS.json) (§8.1) — not this
 table. This table is historical import record only; do not treat it as the source of truth for "what version is
@@ -54,6 +55,16 @@ this app on" going forward.
   feature (`ExportImport.tsx`) and the SEMP Migration package (`sempExport.ts`), stripped back out on import
   (`api.importData`) so re-importing an exported file doesn't persist a stray `meta` key. Updated every
   in-repo doc/comment citing the vendored version/path.
+- **2026-08-02 — Vendoring bump to v1.7.1 (§8.1's build-time-import note; PKM Entity Model bumped
+  to v0.7.3).** Both of this app's own optional follow-up items from the v1.7.0 bump (status
+  report §14 items 9-10) were resolved upstream in the same pass: §8.1 now explicitly blesses the
+  build-time JSON import this app already used as equally conformant to runtime `fetch()` for
+  bundled SPAs, citing this app's dual deploy modes as the motivating case; PKM Entity Model v0.7.3
+  §4 documents the closed-union-vs-plain-string convention `Comment.entityType` surfaced, citing
+  this app's implementation by name. Re-vendored `/vendor/architecture-guidance-v1.7.1.md`
+  (removing the v1.7.0 copy) and bumped `/data-schema/PKM_VERSIONS.json` to match both the
+  Architecture Guidance and PKM Entity Model current versions. No code behavior changed — this app
+  already conformed to what both bumps formalize.
 - **Not yet done — Phase 5: Methodology-vs-program-data content split.** The ~10 files under
   `/methodology/guidance/` were relocated as-is in Phase 1; several (most notably
   `recoveryProgramGuidance.ts`, parts of `dbxMbxGuidance.ts` and `setrGuidance.ts`) still interleave genuinely
