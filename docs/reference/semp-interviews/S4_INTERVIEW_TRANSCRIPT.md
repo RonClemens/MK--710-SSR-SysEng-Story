@@ -6,7 +6,9 @@
 
 **Governing structure:** DoD SEP Outline v4.1 (non-CUI, public methodology layer).
 
-**Status:** §2.1 complete. More sections to follow in future design-chat sessions.
+**Status:** §2.1 and §2.2 complete. More sections to follow in future design-chat sessions — this file accumulates them all rather than one file per section (renamed from `S4_REQUIREMENTS_DEVELOPMENT.md`, its original §2.1-only name, on receiving the §2.2 addendum).
+
+**Companion file:** `S4_OPTION_TAXONOMY.md` (started with §2.2) tracks the generalized multiple-choice option sets these interviews surface — PKM-safe candidate menu content, distinct from which option this program actually picked (recorded here, in this transcript).
 
 **Placement note:** This document is PDKM-adjacent (real program answers — role names, tool choices, process specifics) and does not belong in the public `udm-exchange` repo — it lives here, in this app's private repo, per Design chat's HANDOFF (2026-08-04).
 
@@ -153,3 +155,98 @@
 6. Possible `requirement_domain` classifier (product vs. process/manufacturing requirements) for complex programs.
 
 *(End of §2.1 — transcript continues at next design-chat session.)*
+
+---
+
+## §2.2 Architectures and Interface Control
+
+**Governing sources:** ISO/IEC/IEEE 15288:2023 §6.4.4 (System Architecture Definition), interface-management thread across §6.4.4/§6.4.5; INCOSE SEH §2.3.5.4 (architecture views/viewpoints per ISO/IEC/IEEE 42010, ICDs under CM).
+
+**New standing conventions started this section:** (1) Claude now proposes a recommended answer before Ron answers, on every question. (2) A second artifact, the PKM Wizard Option-Taxonomy Tracker (`S4_OPTION_TAXONOMY.md`), is now built alongside this transcript — it tracks the generalized multiple-choice menus themselves as separate PKM-safe content, distinct from which option a program picks.
+
+### Atomic breakout — People, Process, Tools, Purpose
+
+**Q1 (People).** Who owns system architecture definition on your program — a named Architect role, the Chief Engineer, a board/IPT structure?
+
+**Ron's answer (verbatim):** Lead System Engineer.
+
+**Claude's generalization note:** Distinct from §2.1's Chief-Engineer-owns-elicitation pattern — architecture definition ownership sits with the Lead Systems Engineer role specifically, not the Chief Engineer. Worth carrying forward as a data point when the Role taxonomy is reviewed: these are evidently treated as distinct roles with distinct process ownership on this program, not interchangeable titles.
+
+---
+
+**Q2 (People).** Is interface definition/control owned by the same role as overall architecture, or separated out (e.g., a dedicated Interface Control Working Group)?
+
+**Ron's answer (verbatim):** Same role (Lead SE) owns both.
+
+**Claude's generalization note:** Consolidated ownership — the Lead Systems Engineer role covers both architecture definition and interface control on this program, rather than splitting into a separate ICWG. Consistent with §2.1's Q1 finding that the Chief Engineer role covers stakeholder identification; both sections show role consolidation rather than fragmented ownership as this program's general pattern so far.
+
+---
+
+**Q3 (Process).** What method/framework governs your architecture description — a named framework (e.g., DoDAF, an MBSE methodology), an internal tailored approach, or ad hoc?
+
+**Ron's answer (verbatim):** MBSE methodology (e.g., via Cameo/SysML).
+
+**Claude's generalization note:** Consistent with §2.1 Q6's tool list (Cameo Enterprise Architect named there as one candidate RM/MBSE tool) — confirms Cameo/SysML is actually in active use for architecture, not just a listed option among several.
+
+---
+
+**Q4 (Process).** How are internal (between system elements) vs. external (to other systems) interfaces distinguished and tracked differently, if at all?
+
+**Ron's answer (verbatim):** Distinguished by scope tag/attribute in the model.
+
+**Claude's generalization note:** A single interface model with a scope attribute (internal/external), not two separate tracking mechanisms.
+
+---
+
+**Q5 (Process).** At what point does an interface get formalized into an ICD (Interface Control Document) or equivalent, and what triggers that formalization?
+
+**Ron's answer (verbatim):** At preliminary design/architecture baseline.
+
+**Claude's generalization note:** Ties formalization to a specific milestone/baseline event, consistent with the `LifecycleState`/`Released` concept from §2.1.
+
+---
+
+**Q6 (Tools).** What tool(s) capture architecture views/models — is this the same Cameo Enterprise Architect you mentioned for requirements, a separate tool, or multiple?
+
+**Ron's answer (verbatim):** Same tool (Cameo) for both requirements and architecture.
+
+**Claude's generalization note:** Single-tool consolidation across requirements and architecture, consistent with MBSE practice.
+
+---
+
+**Q7 (Tools).** How are interfaces tracked as data — a register/matrix, embedded in the architecture model, a standalone ICD per interface?
+
+**Ron's answer (verbatim):** Depends if DBx or MBx. Ultimately, both can be pushed into ICDs in document form. What properties in the UDM should be updated here?
+
+**Claude's generalization note + proposed `Interface` entity properties:** Two upstream tracking methods (DBx, MBx) converge on a single downstream artifact — the ICD. Proposed: `Interface.scope`, `Interface.trackingMethod`, `Interface.icdReference` (later revised at Q9), `Interface` as `LifecycleState`-bearing.
+
+---
+
+**Q8 (Purpose).** What's the real failure mode this process exists to prevent on your program — what goes wrong when architecture/interface definition is skipped or rushed?
+
+**Ron's answer (verbatim):** Integration between functional teams (e.g. mechanical, electrical, software, systems, etc.) becomes scattered and unmanageable. Work breakdown, task definition, and general design maturity and alignment across the team is difficult or non-existent. What else do you think?
+
+**Claude's research-grounded additions (INCOSE SEH §3.2.4, §1.3.2; DoD RIO Management Guide):** late-discovered integration failures with sharply growing fix-cost; undesirable emergent behavior/cascading failures; cross-program/cross-contractor risk (funding/schedule/SWaP-C misalignment); HMI-specific acceptance risk; loss of change-impact analysis capability.
+
+---
+
+**Q9 (Purpose).** Where's the scope boundary — does architecture definition on your program stop at the "essential" structure/behavior level, or does it commonly blend into detailed design in practice?
+
+**Claude's proposed answer (first instance of the new recommend-first convention):** Formally distinct per ISO 15288 (§6.4.4 vs §6.4.5), but likely blurs in practice given this program's single-role, single-tool consolidation pattern; real boundary is probably a maturity-gate question, not a process-type split.
+
+**Ron's answer (verbatim, confirming and substantially elaborating):** This is interesting. I agree with it. This also highlights the friction and team workflow strains with designing in both MBx and DBx approaches. Ultimately, there are Design Inputs (e.g. Requirements) and Design Outputs (e.g. TDP and physical products). Interface definition should ultimately be output into Interface Requirement Specifications (a design input) and Interface Control Documents (a design output). Architecture definition at the Subsystem level should derive IRSs and ICDs. Then, they should be further decomposed into CIs (HW and SW) with relayed requirement specifications and TDPs. The overall challenge is establishing the right level of engineering documentation for PDR, then for CDR SETR events.
+
+**Claude's grounded PKM implications (MIL-STD-31000C):** new `artifactRole` classifier (design_input/design_output); `Interface` revised to carry both `irsReference` and `icdReference`; recursive decomposition confirmed with named artifacts (Subsystem → IRS/ICD → CI → requirement specs + TDP); TDP Level taxonomy (Conceptual/Developmental/Product, per MIL-STD-31000C) proposed as the grounded answer to the SETR maturity-gating question.
+
+---
+
+## §2.2 Architectures and Interface Control — INTERVIEW COMPLETE (Q1–Q9)
+
+**Cross-cutting design items surfaced, carried to the udm-exchange candidate batch (not detailed here — see design chat's parallel relay to udm-exchange for full PKM specification):**
+1. `Interface` entity (scope, trackingMethod, irsReference, icdReference, LifecycleState-bearing).
+2. `artifactRole` classifier (design_input/design_output).
+3. `TDP`/`TechnicalDataPackage` entity, grounded in MIL-STD-31000C.
+4. `tool_category` amendment — needs an `entity_scope` field.
+5. PKM Wizard Option-Taxonomy Tracker started (see `S4_OPTION_TAXONOMY.md`).
+
+*(End of §2.2 — transcript continues at next design-chat session.)*
