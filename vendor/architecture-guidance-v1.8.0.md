@@ -1,10 +1,11 @@
 # Reusable SE Webapp Architecture Guidance
 
-**Version:** 1.7.1
-**Last updated:** 2026-08-02
+**Version:** 1.8.0
+**Last updated:** 2026-08-08
 **Status:** Draft
 
 **Changelog:**
+- **v1.8.0** — Added §14, Traceability Interchange Schema and Tool Category, grounded in S4 SEMP interview evidence (§2.1 Requirements Development Q6/Q7; §2.2 Architectures and Interface Control Q6; DI-SESS-81785B / DoD SEP Outline v4.1): a `tool_category` convention (open, extensible; a program's actual tool choice is PDKM, the category it falls into is PKM-safe) with an `entity_scope` field added per real evidence that one MBSE tool instance commonly spans more than one PKM entity type, plus a canonical CSV/JSON traceability-interchange export schema, tool-agnostic by design since programs already assemble this across heterogeneous toolchains. Renumbered former §14 ("Why This Matters Long-Term") to §15.
 - **v1.7.1** — §8.1 now explicitly blesses build-time import as equally conformant to runtime `fetch()` for `PKM_VERSIONS.json`, with its own example — per Workbench's own optional follow-up item 10 (status report v2.1.0 §13/§14), which correctly identified that their dual server-backed/static deploy modes make a literal runtime fetch impractical without duplicating the file. Their adaptation is now the documented recommended pattern for that case, not just a tolerated deviation.
 - **v1.7.0** — Redesigned §8.1 around a single JSON source of truth (`/data-schema/PKM_VERSIONS.json`) for guidance version display, replacing the prior pair of hardcoded JS constants. Prompted by a real, visible failure of the old approach: SE Workbench's live footer showed v1.4.0 — the *literal example value* from the prior snippet — while actual current was v1.6.0, at least two version bumps of undetected drift (Ron, 2026-08-01). This file is now also the intended source for any PKM/PDKM data export's own `meta` block, so exported data becomes self-describing about which guidance versions produced it. §2's directory convention and §8 item 5 updated to match.
 - **v1.6.0** — Added §13, the Comment / TODO UI Pattern — a user-editable UI convention for PKM's new `Comment` entity (PKM v0.7.0), needed because every prior entity's UI precedent (§10.5's "Promises" view) is explicitly read-only. Renumbered former §13 ("Why This Matters Long-Term") to §14.
@@ -433,6 +434,24 @@ Prefer setting `status: "Resolved"` (with `resolvedDate` populated) over hard-de
 
 ---
 
-## 14. Why This Matters Long-Term
+## 14. Traceability Interchange Schema and Tool Category
+
+Grounded in S4 SEMP interview evidence (§2.1 Requirements Development, Q6/Q7; §2.2 Architectures and Interface Control, Q6; DI-SESS-81785B / DoD SEP Outline v4.1): real programs already extract/assemble CSV or JSON traceability chains across heterogeneous RM/MBSE toolchains (spreadsheet/document tools, dedicated RM platforms, MBSE tools) when needed — confirming a tool-agnostic interchange convention formalizes established practice, not a new burden.
+
+### 14.1 `tool_category` — an open, extensible classification of tooling, not a fixed tool list
+
+A program's actual RM/architecture tool choice (which specific product it uses) is PDKM instance data, per this document's own §1 test — but the *category* of tool it is (spreadsheet/document-based; dedicated RM platform; MBSE/architecture tool) is PKM-safe generic structure. Represent this as an open, extensible `tool_category` enum rather than a closed list of named tools, since new tools will keep appearing.
+
+**`entity_scope` field.** Evidence from a single program shows one tool instance commonly spans more than one PKM entity type — the same MBSE tool (model-based, SysML-capable) was used for both `Requirement` and `Interface`/architecture data, not a separate tool per artifact category. `tool_category` should therefore carry an `entity_scope` field (which PKM entity types a given tool instance actually covers) rather than assuming a 1:1 tool-to-artifact-type mapping.
+
+### 14.2 Tool-agnostic traceability interchange schema
+
+Vertical (parent/child) and horizontal (sibling, within-spec) `Requirement` traceability chains (PKM Entity Model §2) should be exportable as a canonical CSV/JSON schema, independent of source RM tool — the same self-describing, tool-agnostic discipline §8.1 already establishes for version metadata. Minimum shape: `requirementId`, `parentRequirementIds[]` (vertical), `siblingRequirementIds[]` (horizontal) — sourced directly from `Requirement`'s own traceability fields. This is an export convention over existing structure, not a new data-injection mechanism (§4).
+
+This directly supports the UDM's core mission: letting non-CUI structure interface with CUI program data without requiring a single tool standard across programs.
+
+---
+
+## 15. Why This Matters Long-Term
 
 Right now each app (PDR readiness, Dispatch, translator) independently reinvents: an AI provider call, a prompt, a data shape, a UI. Once `/methodology` + `/provider` are standardized, a new tool for a new program becomes: define a data schema, write a few checklist/prompt files, reuse everything else. That's the actual scaling unlock — not just CUI-compliance, but turning one-off tools into a genuine internal SE toolkit product line.

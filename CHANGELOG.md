@@ -1,6 +1,6 @@
 # Changelog
 
-Tracks this app's compliance with the [Reusable SE Webapp Architecture Guidance](vendor/architecture-guidance-v1.7.1.md),
+Tracks this app's compliance with the [Reusable SE Webapp Architecture Guidance](vendor/architecture-guidance-v1.8.0.md),
 per its §6 versioning/vendoring discipline. This app is the reference implementation the guidance's v1.1.0, v1.2.0,
 and v1.4.0 §10 revisions were informed by (see that doc's own changelog).
 
@@ -12,6 +12,7 @@ and v1.4.0 §10 revisions were informed by (see that doc's own changelog).
 | v1.4.0 | 2026-07-28 | this program's Lead Systems Engineer |
 | v1.7.0 | 2026-08-01 | this program's Lead Systems Engineer |
 | v1.7.1 | 2026-08-02 | this program's Lead Systems Engineer |
+| v1.8.0 | 2026-08-08 | this program's Lead Systems Engineer |
 
 Current version tracked in [`/data-schema/PKM_VERSIONS.json`](data-schema/PKM_VERSIONS.json) (§8.1) — not this
 table. This table is historical import record only; do not treat it as the source of truth for "what version is
@@ -65,6 +66,19 @@ this app on" going forward.
   (removing the v1.7.0 copy) and bumped `/data-schema/PKM_VERSIONS.json` to match both the
   Architecture Guidance and PKM Entity Model current versions. No code behavior changed — this app
   already conformed to what both bumps formalize.
+- **2026-08-08 — Vendoring bump to v1.8.0 (§14, Traceability Interchange Schema and Tool Category;
+  PKM Entity Model bumped to v0.8.0).** Both documents grew directly from the S4 SEMP interview
+  transcripts stored in `docs/reference/semp-interviews/` (§2.1/§2.2): PKM Entity Model v0.8.0 adds
+  `LifecycleState`, `DerivationStep`, and `Interface` as new entities, plus a substantial
+  `Requirement` attribute expansion; Architecture Guidance v1.8.0 adds the `tool_category`/
+  `entity_scope` convention and a tool-agnostic traceability interchange schema. Re-vendored
+  `/vendor/architecture-guidance-v1.8.0.md` (removing the v1.7.1 copy) and bumped
+  `/data-schema/PKM_VERSIONS.json` to match. **Vendoring only, per this HANDOFF's own explicit
+  "no implementation obligation"** — none of the new entities (`LifecycleState`, `DerivationStep`,
+  `Interface`) or the §14 traceability schema are implemented in this app's data model yet; that
+  awaits an actual relayed HANDOFF/ACTION requesting it, same accountability convention as every
+  other step so far. `artifactRole` and `TDP` remain explicitly unresolved upstream and are not
+  referenced anywhere in this app.
 - **Not yet done — Phase 5: Methodology-vs-program-data content split.** The ~10 files under
   `/methodology/guidance/` were relocated as-is in Phase 1; several (most notably
   `recoveryProgramGuidance.ts`, parts of `dbxMbxGuidance.ts` and `setrGuidance.ts`) still interleave genuinely

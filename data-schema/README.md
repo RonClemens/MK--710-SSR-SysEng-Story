@@ -1,6 +1,6 @@
 # /data-schema
 
-Per [Architecture Guidance](/vendor/architecture-guidance-v1.7.1.md) §2, `/data-schema` is meant to hold the
+Per [Architecture Guidance](/vendor/architecture-guidance-v1.8.0.md) §2, `/data-schema` is meant to hold the
 **shape** of program data (field definitions), not actual content — the part of the app that says "a
 Configuration Item has these fields" without asserting what any real CI is named.
 
