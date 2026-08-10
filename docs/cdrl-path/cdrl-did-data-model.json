@@ -1,0 +1,2067 @@
+{
+  "purpose_statement": "This model exists to give the entire program engineering and management team - not just Ron - clear guidance on Design Input and Design Output CDRLs through every System Development Lifecycle phase and SETR maturity expectation. The core value isn't the list of DIDs; it's making visible how these documents work together back and forth, in sequence, across the whole team: early analysis (LORA, CMRS, FMECA, RM_PREDICTIONS) shapes design decisions, design maturity in turn reshapes that analysis, and the ECP process is what keeps everything synchronized after baseline. Every relationship field in this model (influences/influenced_by, maturity_states, confirmed_patterns) exists to make that back-and-forth explicit and visible in the eventual webapp - not to just catalog documents in isolation. Any future contributor to this model (human or AI) should treat capturing those cross-document dependencies as the primary goal, with the DID/event/level bookkeeping as the supporting structure that makes it renderable. Scope boundary (confirmed): the subway map graph (nodes + influences/influenced_by edges) covers PROCESS and PRODUCT ARTIFACTS only. Change-request objects (ECP, RFV, NOR, SCN, ERR) are explicitly out of that graph - they appear only as a lightweight cross-cutting badge/indicator on artifacts that require one before a given SETR event, never as their own station or edge-bearing node.",
+  "$schema_notes": "Data model for SEMP 'subway map' figure showing CDRL/DID relationships across the SE Technical Review (SETR) sequence and CM baselines. Two primary lines: DESIGN_INPUT and DESIGN_OUTPUT. Support lines: MGMT, TEST, LOGISTICS, SAFETY_RELIABILITY, CM. Nodes = individual DIDs. Edges = directional influence relationships. 'station' = the SETR event/baseline where a DID is drafted, updated, or formally baselined.",
+  "lifecycle_lanes": {
+    "phases": [
+      "MSA",
+      "TMRR",
+      "EMD",
+      "P&D",
+      "O&S"
+    ],
+    "setr_events": [
+      {
+        "id": "ASR",
+        "name": "Alternative Systems Review",
+        "phase": "MSA"
+      },
+      {
+        "id": "SRR",
+        "name": "System Requirements Review",
+        "phase": "TMRR"
+      },
+      {
+        "id": "SFR",
+        "name": "System Functional Review",
+        "phase": "TMRR"
+      },
+      {
+        "id": "SSR",
+        "name": "Software Specification Review",
+        "phase": "TMRR",
+        "notes": "NAVAIR software-intensive SETR supplement (NAVAIRINST 4355.19 series) - reviews completeness of the software specification; this is where SRS gets baselined, ahead of PDR baselining the hardware/system Allocated Baseline. Not called out by name in NAVSEA's generic SETR handbook - confirm whether your program's SEP invokes the NAVAIR software supplement before treating this as a mandatory station."
+      },
+      {
+        "id": "PDR",
+        "name": "Preliminary Design Review",
+        "phase": "EMD"
+      },
+      {
+        "id": "CDR",
+        "name": "Critical Design Review",
+        "phase": "EMD"
+      },
+      {
+        "id": "TRR",
+        "name": "Test Readiness Review",
+        "phase": "EMD"
+      },
+      {
+        "id": "SVR_FCA",
+        "name": "System Verification Review / Functional Configuration Audit",
+        "phase": "EMD"
+      },
+      {
+        "id": "PRR",
+        "name": "Production Readiness Review",
+        "phase": "P&D"
+      },
+      {
+        "id": "PCA",
+        "name": "Physical Configuration Audit",
+        "phase": "P&D"
+      },
+      {
+        "id": "ISR",
+        "name": "In-Service Review",
+        "phase": "O&S"
+      }
+    ],
+    "cm_baselines": [
+      {
+        "id": "FUNCTIONAL",
+        "established_at": "SFR",
+        "controls": "System-level performance requirements (allocated to system)"
+      },
+      {
+        "id": "ALLOCATED",
+        "established_at": "PDR",
+        "controls": "Performance requirements allocated to CIs/subsystems"
+      },
+      {
+        "id": "PRODUCT",
+        "established_at": "PCA",
+        "controls": "'As-built' technical data package for production/sustainment"
+      }
+    ]
+  },
+  "lines": [
+    {
+      "id": "DESIGN_INPUT",
+      "label": "Design Input CDRLs",
+      "color_hint": "blue",
+      "description": "Requirements-flow artifacts: what the system must do/interface with, drafted before or during a review and baselined as the basis for the next design activity."
+    },
+    {
+      "id": "DESIGN_OUTPUT",
+      "label": "Design Output CDRLs",
+      "color_hint": "orange",
+      "description": "Design-description artifacts: how the system satisfies the input requirements, produced in response to a Design Input baseline."
+    },
+    {
+      "id": "MGMT",
+      "label": "Program/SE Management CDRLs",
+      "color_hint": "gray",
+      "description": "Governs how the whole effort is planned and controlled; runs the full length of the map."
+    },
+    {
+      "id": "TEST",
+      "label": "Verification & Validation CDRLs",
+      "color_hint": "green",
+      "description": "Plans and records that verify Design Output against Design Input."
+    },
+    {
+      "id": "LOGISTICS",
+      "label": "Product Support / ILS CDRLs",
+      "color_hint": "purple",
+      "description": "Sustainment-facing artifacts derived from design and reliability data."
+    },
+    {
+      "id": "SAFETY_RELIABILITY",
+      "label": "Safety & Reliability CDRLs",
+      "color_hint": "red",
+      "description": "Cross-cutting specialty engineering artifacts that both constrain design input and validate design output."
+    },
+    {
+      "id": "CM",
+      "label": "Configuration Management CDRLs",
+      "color_hint": "black",
+      "description": "The baseline-control artifacts themselves; these are the 'interchange stations' where lines merge."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "SEP",
+      "did": "N/A - not a DID (OSD/PM-authored)",
+      "title": "Systems Engineering Plan",
+      "line": "MGMT",
+      "drafted_at": "MSA",
+      "baselined_at": "each Milestone",
+      "notes": "Government-authored; sets the SEMP's required content mapping. Include as a 'station marker' even though it's not a contractor CDRL.",
+      "render_style": "context_marker",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "MSA"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "Milestone A"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "each subsequent Milestone",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influences": [
+        "ALL"
+      ],
+      "influenced_by": [],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "SEMP",
+      "did": "DI-SESS-81785A",
+      "title": "Systems Engineering Management Plan",
+      "line": "MGMT",
+      "drafted_at": "SRR (proposal)",
+      "baselined_at": "SRR, updated at each SETR",
+      "influences": [
+        "ALL"
+      ],
+      "notes": "The document this whole diagram lives in - shown as the spine/backbone line, not a station.",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "FINAL",
+          "at_event": "SRR",
+          "note": "No separate DRAFT state - confirmed by Ron."
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every subsequent SETR event",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "influenced_by": [
+        "SEP"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "IMP_IMS",
+      "did": "DI-MGMT-81650 [VERIFY]",
+      "title": "Integrated Master Plan / Integrated Master Schedule",
+      "line": "MGMT",
+      "drafted_at": "SRR",
+      "baselined_at": "each SETR",
+      "notes": "Event-driven IMP entry/exit criteria should mirror the SETR stations on this map.",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "FINAL",
+          "at_event": "SRR",
+          "note": "No separate DRAFT state - same pattern as SEMP, confirmed by Ron."
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every subsequent SETR event",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "influences": [
+        "ALL"
+      ],
+      "influenced_by": [
+        "SEMP"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "RMP",
+      "did": "DI-MGMT-81808 [VERIFY]",
+      "title": "Risk/Issue/Opportunity Management Plan",
+      "line": "MGMT",
+      "drafted_at": "SRR",
+      "baselined_at": "SRR",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "FINAL",
+          "at_event": "SRR",
+          "note": "No separate DRAFT state - same pattern as SEMP, confirmed by Ron."
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every subsequent SETR event",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "influences": [
+        "ALL"
+      ],
+      "influenced_by": [
+        "SEMP"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "CDD",
+      "did": "N/A - JCIDS doc, not a DID",
+      "title": "Capability Development Document",
+      "line": "DESIGN_INPUT",
+      "drafted_at": "pre-MSA",
+      "baselined_at": "Milestone A/B",
+      "notes": "Government-provided top-level input; anchors the input line before SRR.",
+      "render_style": "context_marker",
+      "maturity_states": [],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influences": [
+        "SSS",
+        "IRS"
+      ],
+      "influenced_by": [],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "SSS",
+      "did": "DI-IPSC-81431",
+      "title": "System/Subsystem Specification",
+      "line": "DESIGN_INPUT",
+      "drafted_at": "SRR",
+      "baselined_at": "SFR (Functional Baseline)",
+      "influences": [
+        "SSDD",
+        "SRS",
+        "HW_DEV_SPEC",
+        "STP",
+        "LCSP",
+        "RM_PREDICTIONS",
+        "FMECA",
+        "TEMP"
+      ],
+      "influenced_by": [
+        "CDD"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SRR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "SFR",
+          "note": "Establishes Functional Baseline"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PRR",
+          "note": "Post-baseline changes flow via ECP, at minimum reviewed at every subsequent SETR through PRR.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "IRS",
+      "did": "DI-IPSC-81434",
+      "title": "Interface Requirements Specification",
+      "line": "DESIGN_INPUT",
+      "drafted_at": "SRR",
+      "baselined_at": "SFR",
+      "influences": [
+        "IDD",
+        "ICD"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SRR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "SFR"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PRR",
+          "note": "Same ECP-driven update pattern as SSS.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "influenced_by": [
+        "SSS"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "ICD",
+      "did": "DI-CMAN-81248 [VERIFY]",
+      "title": "Interface Control Document",
+      "line": "DESIGN_INPUT",
+      "drafted_at": "SFR",
+      "baselined_at": "CDR",
+      "influences": [
+        "IDD"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SFR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "CDR",
+          "note": "Corrected from original draft which had this at PDR."
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PRR",
+          "note": "Same ECP-driven update pattern as SSS/IRS.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "ELEMENT_SUBSYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "influenced_by": [
+        "IRS",
+        "SSS"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "SRS",
+      "did": "DI-IPSC-81433",
+      "title": "Software Requirements Specification",
+      "line": "DESIGN_INPUT",
+      "drafted_at": "SSR",
+      "baselined_at": "PDR",
+      "verify_note": "Corrected - SRS baselines at SSR (Software Specification Review), not PDR. PDR baselines the hardware/system-level Allocated Baseline; SSR is the software-track equivalent milestone. If your program doesn't run SSR as a separate event, SRS baseline reverts to PDR by default.",
+      "influenced_by": [
+        "SSS"
+      ],
+      "influences": [
+        "SDD",
+        "STP"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SSR",
+          "note": "Revised from original model (was SFR)."
+        },
+        {
+          "state": "FINAL",
+          "at_event": "PDR",
+          "note": "Revised - reverts to PDR baseline rather than SSR, per Ron's confirmation."
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PRR",
+          "note": "Via ECP, same pattern as SSS/IRS/ICD.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "SSDD",
+      "did": "DI-IPSC-81432",
+      "title": "System/Subsystem Design Description",
+      "line": "DESIGN_OUTPUT",
+      "drafted_at": "SFR",
+      "baselined_at": "PDR (Allocated Baseline)",
+      "influenced_by": [
+        "SSS",
+        "IRS"
+      ],
+      "influences": [
+        "IDD",
+        "SDD",
+        "LORA",
+        "CMRS",
+        "FMECA",
+        "SAR",
+        "SSHAR",
+        "LCSP",
+        "ENG_DRAWINGS"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SFR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "PDR",
+          "note": "Establishes Allocated Baseline."
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PRR",
+          "note": "Via ECP.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "ELEMENT_SUBSYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "IDD",
+      "did": "DI-IPSC-81436",
+      "title": "Interface Design Description",
+      "line": "DESIGN_OUTPUT",
+      "drafted_at": "SFR",
+      "baselined_at": "PDR",
+      "influenced_by": [
+        "IRS",
+        "ICD",
+        "SSDD"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SFR",
+          "note": "Revised from original model (was PDR)."
+        },
+        {
+          "state": "FINAL",
+          "at_event": "PDR",
+          "note": "Revised from original model (was CDR)."
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PRR",
+          "note": "Via ECP.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "ELEMENT_SUBSYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "influences": [
+        "SDD",
+        "DBDD"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "SDD",
+      "did": "DI-IPSC-81435",
+      "title": "Software Design Description",
+      "line": "DESIGN_OUTPUT",
+      "drafted_at": "PDR",
+      "baselined_at": "CDR",
+      "influenced_by": [
+        "SRS",
+        "SSDD",
+        "IDD"
+      ],
+      "influences": [
+        "DBDD",
+        "STD",
+        "SPS"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "PDR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "CDR"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PRR",
+          "note": "Via ECP.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "DBDD",
+      "did": "DI-IPSC-81437",
+      "title": "Database Design Description",
+      "line": "DESIGN_OUTPUT",
+      "drafted_at": "PDR",
+      "baselined_at": "CDR",
+      "influenced_by": [
+        "SDD"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "PDR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "CDR"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PRR",
+          "note": "Via ECP.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "influences": [
+        "SPS"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "ENG_DRAWINGS",
+      "did": "DI-SESS-81000 series / MIL-STD-31000 TDP [VERIFY per level]",
+      "title": "Engineering Drawings / Technical Data Package",
+      "line": "DESIGN_OUTPUT",
+      "drafted_at": "PDR",
+      "baselined_at": "CDR (FINAL), PCA (AS_BUILT/Product Baseline)",
+      "influenced_by": [
+        "SSDD",
+        "HW_DEV_SPEC"
+      ],
+      "influences": [
+        "PROVISIONING",
+        "LORA",
+        "CMRS",
+        "HW_PROD_SPEC"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "PDR",
+          "note": "Preliminary drawings."
+        },
+        {
+          "state": "FINAL",
+          "at_event": "CDR"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PCA",
+          "note": "Via ECP. Revised - no separate AS_BUILT state; PCA is just the last UPDATE point, per Ron.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "SVD",
+      "did": "DI-IPSC-81442",
+      "title": "Software Version Description",
+      "line": "DESIGN_OUTPUT",
+      "drafted_at": "TRR",
+      "baselined_at": "PRR",
+      "influenced_by": [
+        "SDD",
+        "STR"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "TRR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "PRR",
+          "note": "Revised from original model (was SVR/FCA)."
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PCA",
+          "note": "Via ECP.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "confirmed_via_did_interview": true,
+      "influences": [
+        "FCA_PCA_evidence"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "SPS",
+      "did": "DI-IPSC-81441",
+      "title": "Software Product Specification",
+      "line": "DESIGN_OUTPUT",
+      "drafted_at": "CDR",
+      "baselined_at": "PCA (software Product Baseline)",
+      "influenced_by": [
+        "SDD",
+        "DBDD"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "CDR",
+          "note": "Kept as originally modeled - Ron unsure, flagged for later review."
+        },
+        {
+          "state": "FINAL",
+          "at_event": "PCA",
+          "note": "Kept as originally modeled - Ron unsure, flagged for later review.",
+          "note2": "Software Product Baseline"
+        }
+      ],
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "flagged_for_further_research": true,
+      "influences": [
+        "PROVISIONING",
+        "FCA_PCA_evidence"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "STP",
+      "did": "DI-IPSC-81438",
+      "title": "Software Test Plan",
+      "line": "TEST",
+      "drafted_at": "PDR",
+      "baselined_at": "CDR",
+      "influenced_by": [
+        "SSS",
+        "SRS",
+        "TEMP"
+      ],
+      "influences": [
+        "STD"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "PDR",
+          "note": "Revised from original model (was SFR)."
+        },
+        {
+          "state": "FINAL",
+          "at_event": "CDR",
+          "note": "Revised from original model (was PDR)."
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "confirmed_via_did_interview": true,
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "STD",
+      "did": "DI-IPSC-81439",
+      "title": "Software Test Description",
+      "line": "TEST",
+      "drafted_at": "CDR",
+      "baselined_at": "TRR",
+      "influenced_by": [
+        "SDD",
+        "STP"
+      ],
+      "influences": [
+        "STR"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "CDR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "TRR"
+        }
+      ],
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "confirmed_via_did_interview": true,
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "STR",
+      "did": "DI-IPSC-81440",
+      "title": "Software Test Report",
+      "line": "TEST",
+      "drafted_at": "SVR_FCA",
+      "baselined_at": "SVR_FCA",
+      "influenced_by": [
+        "STD"
+      ],
+      "influences": [
+        "SVD",
+        "RVTM",
+        "FAILURE_SUMMARY_REPORT",
+        "FCA_PCA_evidence"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "FINAL",
+          "at_event": "SVR_FCA",
+          "note": "Report of completed test results - no separate draft or update stage."
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "confirmed_via_did_interview": true,
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "RVTM",
+      "did": "No standard MIL-STD-963 DID number exists - RVTM is typically delivered as a program-tailored data item (locally-defined CDRL) or as an embedded appendix/deliverable under the SEMP, STP, or Requirements Management Plan CDRLs, not its own DD-1664 DID.",
+      "title": "Requirements Verification Traceability Matrix",
+      "line": "TEST",
+      "drafted_at": "SRR",
+      "baselined_at": "updated at every SETR through SVR_FCA",
+      "influenced_by": [
+        "IRS",
+        "SSS",
+        "STR",
+        "HW_DEV_SPEC",
+        "SRS"
+      ],
+      "influences": [
+        "FCA_PCA_evidence"
+      ],
+      "notes": "This is the natural 'interchange station' artifact - it literally records where Design Input and Design Output lines cross at each review. Confirmed via search: no universal standard DID exists for this; it's almost always contract- or SEMP-tailored. Worth deciding whether to show it as its own CDRL line item on your program, or as a sub-artifact of the SEMP/STP.",
+      "render_style": "full_station",
+      "decomposition_level": [
+        "SYSTEM",
+        "CONFIGURATION_ITEM"
+      ],
+      "decomposition_level_note": "RVTM is the first node confirmed to genuinely require level-specific maturity timing rather than a single flat timeline - System-level RVTM matures SRR->SFR, CI-level RVTM (per HWCI/CSCI) matures PDR->CDR. Check ICD, FMECA, and drawings for the same treatment when their turn comes, since they were flagged earlier as legitimately multi-level.",
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "maturity_states_by_level": {
+        "SYSTEM": [
+          {
+            "state": "DRAFT",
+            "at_event": "SRR"
+          },
+          {
+            "state": "FINAL",
+            "at_event": "SFR"
+          },
+          {
+            "state": "UPDATE",
+            "at_event": "aligned with SSS/SHRS/SRS updates via ECP",
+            "note": "Not an independent update cadence - RVTM updates in lockstep with whatever requirements doc it traces (SSS at system level).",
+            "recurring": true
+          }
+        ],
+        "CONFIGURATION_ITEM": [
+          {
+            "state": "DRAFT",
+            "at_event": "PDR"
+          },
+          {
+            "state": "FINAL",
+            "at_event": "CDR"
+          },
+          {
+            "state": "UPDATE",
+            "at_event": "aligned with HW_DEV_SPEC(SHRS)/SRS updates via ECP, per CI",
+            "note": "Same lockstep pattern as system level, tracked per HWCI/CSCI.",
+            "recurring": true
+          }
+        ]
+      },
+      "confirmed_via_did_interview": true,
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "TEMP",
+      "did": "DoD 5000-series doc, often carried as a CDRL [VERIFY program-specific number]",
+      "title": "Test & Evaluation Master Plan",
+      "line": "TEST",
+      "drafted_at": "MSA/SRR",
+      "baselined_at": "each Milestone",
+      "influenced_by": [
+        "SSS",
+        "CDD"
+      ],
+      "render_style": "context_marker",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SRR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "SFR",
+          "note": "Loosely tied - TEMP baselines are formally Milestone-driven, SFR is the closest SETR-event proxy."
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "each subsequent Milestone",
+          "note": "Management Track item - recurring on Milestone cadence, not SETR-event cadence.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influences": [
+        "STP"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "confirmed_via_did_interview": true,
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "SSPP",
+      "did": "DI-SAFT-81626",
+      "title": "System Safety Program Plan",
+      "line": "SAFETY_RELIABILITY",
+      "drafted_at": "SRR",
+      "baselined_at": "SRR",
+      "influences": [
+        "SSS",
+        "SAR",
+        "SSHAR"
+      ],
+      "verified": true,
+      "verify_note": "Confirmed via EverySpec/International System Safety Society DID index.",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "3 MAC",
+          "note": "Contract-day marker, predates ASR."
+        },
+        {
+          "state": "FINAL",
+          "at_event": "SRR"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "WSESRB/SSSTRP Intro/Design/Production reviews (loosely pre-SRR, pre-CDR, pre-PRR)",
+          "note": "Paced by external safety review board cadence, not a direct SETR/ECP pattern like most other docs.",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influenced_by": [],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "confirmed_via_did_interview": true,
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "SAR",
+      "did": "DI-SAFT-80102C",
+      "title": "Safety Assessment Report",
+      "line": "SAFETY_RELIABILITY",
+      "drafted_at": "PDR",
+      "baselined_at": "CDR, updated through PRR",
+      "influenced_by": [
+        "SSDD",
+        "FMECA",
+        "SSHAR"
+      ],
+      "verified": true,
+      "verify_note": "Corrected from prior draft - DI-SAFT-80101 series is actually the System Safety Hazard Analysis Report (SSHAR), a related but distinct DID.",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "PDR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "CDR"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "PRR",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influences": [
+        "SSS",
+        "LCSP"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "SSHAR",
+      "did": "DI-SAFT-80101C",
+      "title": "System Safety Hazard Analysis Report (covers PHA/SSHA/SHA/O&SHA phases)",
+      "line": "SAFETY_RELIABILITY",
+      "drafted_at": "SRR (as PHA)",
+      "baselined_at": "updated at each SETR through CDR (SHA), then O&SHA through PRR",
+      "influences": [
+        "SAR",
+        "SSS"
+      ],
+      "verified": true,
+      "notes": "Added node - this is the actual hazard-tracking artifact that feeds the SAR; wasn't in the original draft.",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SRR",
+          "note": "as Preliminary Hazard Analysis (PHA)"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "CDR",
+          "note": "as System Hazard Analysis (SHA)"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "PRR",
+          "note": "as Operating & Support Hazard Analysis (O&SHA)",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influenced_by": [
+        "SSDD",
+        "SSPP"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "RPP",
+      "did": "DI-SESS-81613A",
+      "title": "Reliability & Maintainability (R&M) Program Plan",
+      "line": "SAFETY_RELIABILITY",
+      "drafted_at": "SRR",
+      "baselined_at": "SRR",
+      "verified": true,
+      "verify_note": "Current combined R&M Program Plan DID (Navy/NAVAIR-updated series); older DI-RELI-80247 designation is legacy/likely superseded - use this number.",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SRR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "SRR"
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influences": [
+        "FMECA",
+        "RM_PREDICTIONS"
+      ],
+      "influenced_by": [],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "FMECA",
+      "did": "DI-SESS-81495A",
+      "title": "Failure Modes, Effects & Criticality Analysis",
+      "line": "SAFETY_RELIABILITY",
+      "drafted_at": "PDR",
+      "baselined_at": "CDR",
+      "influenced_by": [
+        "SSDD",
+        "HW_DEV_SPEC",
+        "RM_PREDICTIONS"
+      ],
+      "influences": [
+        "SAR",
+        "LCSP",
+        "LORA"
+      ],
+      "verified": true,
+      "verify_note": "Corrected from placeholder DI-RELI-80255 (which is actually the Failure Summary and Analysis Report, DI-SESS-80255A - a related downstream report, not the FMECA itself).",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "PDR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "CDR"
+        }
+      ],
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "RM_PREDICTIONS",
+      "did": "DI-SESS-81497A",
+      "title": "Reliability & Maintainability Predictions",
+      "line": "SAFETY_RELIABILITY",
+      "drafted_at": "PDR",
+      "baselined_at": "CDR",
+      "influenced_by": [
+        "SSS",
+        "SSDD"
+      ],
+      "notes": "Added node - quantitative RAM prediction report, distinct from FMECA and often shown as its own station. Historical note: a separate Maintainability Predictions Report DID (DI-MNTY-81602, aka 'MPR') once existed but was CANCELED per DoD R&M tailoring guidance and consolidated into this combined R&M Predictions DID. Ron's 'RPR' and 'MPD' both resolve to this same node - no separate node needed.",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "PDR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "CDR"
+        }
+      ],
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "supersedes": [
+        {
+          "did": "DI-MNTY-81602",
+          "title": "Maintainability Predictions Report (MPR)",
+          "status": "CANCELED"
+        }
+      ],
+      "influences": [
+        "FMECA",
+        "LCSP"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "FAILURE_SUMMARY_REPORT",
+      "did": "DI-SESS-80255A",
+      "title": "Failure Summary and Analysis Report",
+      "line": "SAFETY_RELIABILITY",
+      "drafted_at": "TRR",
+      "baselined_at": "SVR_FCA, updated in O&S",
+      "influenced_by": [
+        "STR",
+        "FMECA"
+      ],
+      "notes": "This was mislabeled as FMECA's DID number in the earlier draft; it's actually a distinct, later-occurring report fed by test/field failure data.",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "TRR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "SVR_FCA"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "O&S",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influences": [
+        "FMECA",
+        "LCSP"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "LCSP",
+      "did": "N/A - PM-authored strategy doc, not a classic DID",
+      "title": "Life Cycle Sustainment Plan",
+      "line": "LOGISTICS",
+      "drafted_at": "PDR",
+      "baselined_at": "each Milestone",
+      "influenced_by": [
+        "FMECA",
+        "SSDD",
+        "LORA"
+      ],
+      "render_style": "context_marker",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "PDR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "each Milestone",
+          "recurring": true
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influences": [
+        "PROVISIONING"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "PROVISIONING",
+      "did": "DI-SESS/DI-ALSS series [VERIFY]",
+      "title": "Provisioning Technical Documentation",
+      "line": "LOGISTICS",
+      "drafted_at": "CDR",
+      "baselined_at": "PCA",
+      "influenced_by": [
+        "FMECA",
+        "ENG_DRAWINGS",
+        "LCSP",
+        "LORA"
+      ],
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "CDR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "PCA"
+        }
+      ],
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influences": [],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "CMP",
+      "did": "DI-CMAN-80858B (current confirmed) - some programs have migrated CM-series DIDs to DI-SESS numbers [VERIFY latest]",
+      "title": "Contractor's Configuration Management Plan",
+      "line": "CM",
+      "drafted_at": "SRR",
+      "baselined_at": "SRR",
+      "verified": true,
+      "verify_note": "Corrected DID number from prior placeholder DI-CMAN-81021 (not a real CMP DID).",
+      "render_style": "full_station",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SRR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "SRR"
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influences": [],
+      "influenced_by": [
+        "SEMP"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "FCA_PCA_evidence",
+      "did": "N/A - audit record, not a single DID",
+      "title": "FCA/PCA Audit Record",
+      "line": "CM",
+      "drafted_at": "SVR_FCA / PCA",
+      "baselined_at": "SVR_FCA (Functional), PCA (Product)",
+      "notes": "This is the terminal interchange station - Design Input line (via RVTM) and Design Output line (via ENG_DRAWINGS/SPS) formally converge here.",
+      "render_style": "context_marker",
+      "maturity_states": [
+        {
+          "state": "FINAL",
+          "at_event": "SVR_FCA",
+          "note": "Functional Configuration Audit record"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "PCA",
+          "note": "Physical Configuration Audit record"
+        }
+      ],
+      "decomposition_level": "SYSTEM",
+      "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+      "influences": [],
+      "influenced_by": [
+        "RVTM",
+        "STR",
+        "ENG_DRAWINGS",
+        "HW_PROD_SPEC",
+        "SPS",
+        "SVD"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "HW_DEV_SPEC",
+      "did": "DI-IPSC-82259",
+      "title": "Software/Hardware Requirements Specification (SHRS)",
+      "line": "DESIGN_INPUT",
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "drafted_at": "SFR",
+      "baselined_at": "PDR",
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "SFR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "PDR",
+          "note": "Establishes this CI Allocated Baseline."
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through CDR",
+          "note": "Via ECP, until it matures into HW_PROD_SPEC at CDR/PCA.",
+          "recurring": true
+        }
+      ],
+      "matures_into": "HW_PROD_SPEC",
+      "notes": "This is the node that was missing entirely - the hardware-CI-level equivalent of what SRS/SDD already do for CSCIs. Recurs once per HWCI, not once per program. DID corrected/confirmed to DI-IPSC-82259 (SHRS) per Ron - covers combined SW/HW requirements at system/subsystem/CI level, used as basis for design and qualification testing.",
+      "confirmed_via_did_interview": true,
+      "influences": [
+        "SSDD",
+        "ENG_DRAWINGS",
+        "HW_PROD_SPEC",
+        "CMRS",
+        "LORA"
+      ],
+      "influenced_by": [
+        "SSS",
+        "IRS"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "HW_PROD_SPEC",
+      "did": "No confirmed generic DID number found this session - see HW_DEV_SPEC note. [VERIFY against your program's CDRL/AMSDL]",
+      "title": "Prime/Critical Item Product Specification (MIL-STD-961E Type C)",
+      "line": "DESIGN_OUTPUT",
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "drafted_at": "CDR",
+      "baselined_at": "PRR",
+      "influenced_by": [
+        "HW_DEV_SPEC",
+        "ENG_DRAWINGS"
+      ],
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "CDR"
+        },
+        {
+          "state": "FINAL",
+          "at_event": "PRR"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "every SETR through PCA",
+          "note": "Via ECP. No separate AS_BUILT state.",
+          "recurring": true
+        }
+      ],
+      "notes": "The 'production specification' Ron referenced - matured from HW_DEV_SPEC. This is the exact Type B -> Type C progression the Vee model requires and the previous flat model had no place for.",
+      "confirmed_via_did_interview": true,
+      "influences": [
+        "PROVISIONING",
+        "FCA_PCA_evidence"
+      ],
+      "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "LORA",
+      "did": "DI-SESS-81901",
+      "title": "Level of Repair Analysis (LORA) Report",
+      "line": "LOGISTICS",
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "notes": "Companion input-data DID: DI-SESS-81873 (LORA Input Data), used when the government furnishes LORA data for contractor analysis rather than the contractor delivering the full report. SETR event placement not yet interviewed.",
+      "confirmed_via_did_interview": true,
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "PDR"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "as needed, tied to ECP against related design docs",
+          "note": "No independent/periodic update cadence of its own. If it changes, it's because a related requirement (design input) or design description/TDP (design output) changed via ECP - this CDRL updates in lockstep with those, not on its own schedule.",
+          "recurring": false
+        }
+      ],
+      "drafted_at": "PDR",
+      "baselined_at": "CDR",
+      "influenced_by": [
+        "FMECA",
+        "RM_PREDICTIONS",
+        "HW_DEV_SPEC"
+      ],
+      "influences": [
+        "SSDD",
+        "HW_PROD_SPEC",
+        "ENG_DRAWINGS"
+      ],
+      "bidirectional_relationship_note": "Early/draft-stage analysis influences design (design-for-repairability, design-for-testability recommendations feed into design input docs); final content is in turn driven by the as-designed system (final design output docs determine the final analysis results). Both directions are real, not just one-way derivation.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    },
+    {
+      "id": "CMRS",
+      "did": "DI-QCIC-80278C",
+      "title": "Calibration and Measurement Requirements Summary (CMRS)",
+      "line": "LOGISTICS",
+      "decomposition_level": "CONFIGURATION_ITEM",
+      "notes": "Ties to MIL-STD-1839 - details TMDE and calibration standards required to support the system. SETR event placement not yet interviewed.",
+      "confirmed_via_did_interview": true,
+      "maturity_states": [
+        {
+          "state": "DRAFT",
+          "at_event": "PDR"
+        },
+        {
+          "state": "UPDATE",
+          "at_event": "as needed, tied to ECP against related design docs",
+          "note": "No independent/periodic update cadence of its own. If it changes, it's because a related requirement (design input) or design description/TDP (design output) changed via ECP - this CDRL updates in lockstep with those, not on its own schedule.",
+          "recurring": false
+        }
+      ],
+      "drafted_at": "PDR",
+      "baselined_at": "CDR",
+      "influenced_by": [
+        "HW_DEV_SPEC"
+      ],
+      "influences": [
+        "SSDD",
+        "HW_PROD_SPEC",
+        "ENG_DRAWINGS"
+      ],
+      "bidirectional_relationship_note": "Early/draft-stage analysis influences design (design-for-repairability, design-for-testability recommendations feed into design input docs); final content is in turn driven by the as-designed system (final design output docs determine the final analysis results). Both directions are real, not just one-way derivation.",
+      "raci": {
+        "responsible": null,
+        "accountable": null,
+        "consulted": [],
+        "informed": []
+      },
+      "aliases": []
+    }
+  ],
+  "station_summary_by_setr_event": {
+    "SRR": [
+      "SEMP(final)",
+      "IMP_IMS(final)",
+      "RMP(final)",
+      "SSS(draft)",
+      "IRS(draft)",
+      "RVTM[SYS](draft)",
+      "TEMP(draft)",
+      "SSPP(draft)",
+      "SSPP(final)",
+      "SSHAR(draft)",
+      "RPP(draft)",
+      "RPP(final)",
+      "CMP(draft)",
+      "CMP(final)"
+    ],
+    "SFR": [
+      "SSS(final)",
+      "IRS(final)",
+      "ICD(draft)",
+      "SSDD(draft)",
+      "IDD(draft)",
+      "RVTM[SYS](final)",
+      "TEMP(final)",
+      "HW_DEV_SPEC(draft)"
+    ],
+    "SSR": [
+      "SRS(draft)"
+    ],
+    "PDR": [
+      "SRS(final)",
+      "SSDD(final)",
+      "IDD(final)",
+      "SDD(draft)",
+      "DBDD(draft)",
+      "ENG_DRAWINGS(draft)",
+      "STP(draft)",
+      "RVTM[CI](draft)",
+      "SAR(draft)",
+      "FMECA(draft)",
+      "RM_PREDICTIONS(draft)",
+      "LCSP(draft)",
+      "HW_DEV_SPEC(final)",
+      "LORA(draft)",
+      "CMRS(draft)"
+    ],
+    "CDR": [
+      "ICD(final)",
+      "SDD(final)",
+      "DBDD(final)",
+      "ENG_DRAWINGS(final)",
+      "SPS(draft)",
+      "STP(final)",
+      "STD(draft)",
+      "RVTM[CI](final)",
+      "SAR(final)",
+      "SSHAR(final)",
+      "FMECA(final)",
+      "RM_PREDICTIONS(final)",
+      "PROVISIONING(draft)",
+      "HW_PROD_SPEC(draft)"
+    ],
+    "TRR": [
+      "SVD(draft)",
+      "STD(final)",
+      "FAILURE_SUMMARY_REPORT(draft)"
+    ],
+    "SVR_FCA": [
+      "STR(final)",
+      "FAILURE_SUMMARY_REPORT(final)",
+      "FCA_PCA_evidence(final)"
+    ],
+    "PRR": [
+      "SVD(final)",
+      "SAR(update)",
+      "SSHAR(update)",
+      "HW_PROD_SPEC(final)"
+    ],
+    "PCA": [
+      "SPS(final)",
+      "PROVISIONING(final)",
+      "FCA_PCA_evidence(final)"
+    ]
+  },
+  "confirmed_decisions": {
+    "setr_framework": "Navy SETR (ASR/SRR/SFR/PDR/CDR/TRR/SVR-FCA/PRR/PCA/ISR) - confirmed.",
+    "software_hardware_lines": "Merged - IPSC (software) and SESS (system/hardware) artifacts stay on single Design Input / Design Output lines rather than parallel sub-lines.",
+    "non_cdrl_artifacts": "TEMP, LCSP, CDD, SEP, and the FCA/PCA audit record render as light context markers (not full stations) since they aren't true DID/CDRL deliverables.",
+    "did_number_verification": "Completed via web search 2026-08-08. See 'verified': true / 'verify_note' fields on individual nodes for corrections and confirmations. Remaining items still marked [VERIFY] were not found with a single authoritative current number and should be checked against your program's actual CDRL/AMSDL before publishing."
+  },
+  "still_needs_verification": [
+    "IMP_IMS (DI-MGMT-81650) - not independently confirmed this session.",
+    "RMP (DI-MGMT-81808) - not independently confirmed this session.",
+    "ENG_DRAWINGS/TDP DID - varies by TDP level (MIL-STD-31000); confirm which Level (1-3) applies to your program.",
+    "PROVISIONING DID series - ALSS/SESS numbering varies by service; NAVAIR uses DI-ALSS-81529 family, confirm applicability.",
+    "CMP - confirm whether your program office still cites the legacy DI-CMAN-80858B or has migrated to a DI-SESS equivalent."
+  ],
+  "corrections_from_initial_draft": [
+    "SAR was misattributed to DI-SAFT-80101B (that number is actually the System Safety Hazard Analysis Report/SSHAR); correct SAR number is DI-SAFT-80102C. Added SSHAR as its own node since it's a real, distinct upstream artifact.",
+    "FMECA was misattributed to DI-RELI-80255 (that number is actually the Failure Summary and Analysis Report); correct FMECA number is DI-SESS-81495A. Added Failure Summary and Analysis Report (DI-SESS-80255A) as its own downstream node.",
+    "Reliability Program Plan corrected to the current combined R&M Program Plan, DI-SESS-81613A.",
+    "CMP corrected to DI-CMAN-80858B (was citing a non-existent DI-CMAN-81021).",
+    "ECP corrected to current DI-SESS-80639D (was citing superseded DI-CMAN-80639C).",
+    "RVTM confirmed to have no standard DID - flagged as program-tailored rather than a fixed DI number.",
+    "SSR (Software Specification Review) was missing entirely from the initial SETR event list - not deliberately excluded, just not checked for. Confirmed via NAVAIRINST 4355.19 series as a real software-intensive SETR supplement sitting between SFR and PDR. Added as an event; moved SRS's baseline point from PDR to SSR accordingly. Note this event is NAVAIR-specific and not named in NAVSEA's generic SETR handbook - confirm applicability against your program's SEP."
+  ],
+  "maturity_state_legend": {
+    "description": "Every CDRL node carries a maturity_states array capturing the DRAFT/FINAL cadence (and, where the DID requires periodic resubmission, an UPDATE state) required by DoD 5010.12-M / the DID's own submission requirements. This is the actual per-station marker data the chart renders - distinct from the separate live per-program status overlay (draft/submitted/approved) discussed for the 'CDRL Path' tracking feature.",
+    "states": {
+      "DRAFT": "Preliminary version submitted for government review ahead of a SETR event - not yet approved as a controlled baseline artifact.",
+      "FINAL": "Approved/baselined version - establishes or updates a CM baseline (Functional/Allocated/Product) or otherwise becomes the controlled version of record at that event.",
+      "UPDATE": "A required resubmission after FINAL, tied to a later SETR event or milestone rather than a one-time deliverable. Some CDRLs (SEMP, IMP/IMS, RVTM, SAR/SSHAR) update at every subsequent review rather than going final once.",
+      "AS_NEEDED": "Event-driven rather than review-driven (e.g., ECP) - doesn't follow the standard DRAFT/FINAL/UPDATE cadence tied to SETR events."
+    },
+    "recommended_chart_rendering": {
+      "DRAFT": "hollow/outline station marker on the line",
+      "FINAL": "filled station marker on the line, larger if it also establishes a CM baseline",
+      "UPDATE": "filled marker with a ring/halo, repeating at each recurrence point",
+      "AS_NEEDED": "diamond marker floating off the main line rather than an inline station, since it isn't tied to a fixed SETR position"
+    },
+    "note": "Where at_event is a range or 'recurring': true, the chart should render one marker per matching SETR event rather than a single fixed station - e.g., RVTM's UPDATE state should appear at SFR, SSR, PDR, CDR, and TRR, not just once."
+  },
+  "confirmation_status": {
+    "confirmed_by": "Ron",
+    "confirmed_date": "2026-08-08",
+    "method": "Walked event-by-event (SRR through PCA) confirming each CDRL, DID number, and title against the model.",
+    "result": "All 9 populated SETR events (SRR, SFR, SSR, PDR, CDR, TRR, SVR_FCA, PRR, PCA) confirmed as-is, no changes.",
+    "ASR_ISR_note": "ASR and ISR intentionally carry no CDRLs in this model - confirmed as correct, not a gap."
+  },
+  "decomposition_dimension": {
+    "description": "Third dimension orthogonal to SETR-event (time) and Design Input/Output (line): where in the system decomposition a given CDRL instance applies. Most system-level artifacts (SSS, SEMP, etc.) exist once. CI-level and below recur once PER applicable CI - the chart should treat these as a 'drill-down' from the System-level default view, not permanent extra lines.",
+    "levels": [
+      {
+        "id": "SYSTEM",
+        "hw_term": "System",
+        "sw_term": "System",
+        "notes": "Top-level, single instance."
+      },
+      {
+        "id": "ELEMENT_SUBSYSTEM",
+        "hw_term": "Subsystem / Element",
+        "sw_term": "Software Subsystem",
+        "notes": "Optional intermediate level - no Segment level used on this program."
+      },
+      {
+        "id": "CONFIGURATION_ITEM",
+        "hw_term": "Hardware Configuration Item (HWCI)",
+        "sw_term": "Computer Software Configuration Item (CSCI)",
+        "notes": "This is where MIL-STD-961E spec-type maturity (Type B -> Type C) actually lives. One instance per CI."
+      },
+      {
+        "id": "COMPONENT",
+        "hw_term": "Component / Assembly / Part",
+        "sw_term": "Computer Software Component (CSC)",
+        "notes": "Typically documented inside the parent CI's design description (SDD, drawings) rather than as its own separate CDRL."
+      },
+      {
+        "id": "UNIT",
+        "hw_term": "Piece Part (rarely separately specified)",
+        "sw_term": "Computer Software Unit (CSU)",
+        "notes": "Lowest level; almost never a standalone CDRL - internal structure of the SDD/DBDD."
+      }
+    ],
+    "recommended_chart_interaction": "Level filter/toggle on the existing zoomable map, not a separate stacked map. Default view = SYSTEM level. Selecting a specific CI 'drills down' to reveal that CI's own Dev-Spec -> Product-Spec progression, consistent with the GPS zoom metaphor already chosen for SETR-event granularity.",
+    "gap_identified": "The event-by-event confirmation walkthrough only validated nodes already in the model - it did not surface CI-level artifacts because the model had no decomposition axis at all. The two most significant missing nodes (per MIL-STD-961E) are added below: the CI-level Development Specification (Type B) and Product Specification (Type C), which is the actual 'developmental spec -> production spec' progression Ron described."
+  },
+  "removed_nodes": [
+    {
+      "id": "OCD",
+      "reason": "Removed per Ron - not applicable to this program.",
+      "removed_during": "DID-by-DID maturity/event interview"
+    }
+  ],
+  "confirmed_patterns": {
+    "ECP_driven_update_pattern": "For baselined requirements/design docs, UPDATE maturity is typically NOT a fixed single re-baseline event - it's handled via the ECP process and reviewed at minimum at every subsequent SETR event through PRR. Applied so far to: SSS, IRS. Check this pattern against each subsequent baselined document rather than assuming a single UPDATE event.",
+    "MGMT_no_draft_pattern": "SEMP, IMP/IMS, and RMP have no separate DRAFT maturity state - they are delivered as FINAL starting at SRR, then updated at every subsequent SETR event. SEP is the exception, tied to Milestones rather than SETR events.",
+    "no_as_built_state_pattern": "Reverted an earlier addition - there is no separate AS_BUILT maturity state. PCA is simply the final SETR event in a document's normal UPDATE cadence (via ECP), same as any other post-baseline revision. Applies to ENG_DRAWINGS and HW_PROD_SPEC; check this against any other CI-level design-output artifact still carrying an AS_BUILT reference.",
+    "analysis_derived_docs_pattern": "LORA and CMRS (and likely other ILS/specialty-engineering analysis products) don't follow the ECP-through-PRR update cadence used by core design docs. Instead: (1) no independent update schedule, (2) if they change, it's in lockstep with an ECP against a related design input or design output document, and (3) the relationship is bidirectional - draft-stage analysis feeds design decisions (design-for-X), while final analysis content is in turn shaped by the as-designed system. Check this pattern against other analysis-type CDRLs (FMECA, RM_PREDICTIONS, SSHAR) as they come up for review, since they may follow the same logic rather than the ECP-recurring-update pattern currently assigned to them.",
+    "relationship_assessment_status": "influences/influenced_by fields were populated in a single pass by Claude based on standard SE domain reasoning, not confirmed individually with Ron like the DID/event mappings were. These should be reviewed together, especially the ECP node (currently modeled as influencing/being influenced by nearly everything, which may be too broad to be useful in the actual chart) and any node where the relationship crosses from LOGISTICS/SAFETY_RELIABILITY back into DESIGN_INPUT/DESIGN_OUTPUT lines, since those cross-line edges are exactly the 'back and forth' Ron identified as the core value of this model.",
+    "station_summary_generation": "station_summary_by_setr_event is now PROGRAMMATICALLY DERIVED from each node's maturity_states array, not hand-maintained. Regenerate it any time a node's maturity_states change, rather than editing both places - this eliminates the drift found during the 2026-08-08 verification pass (15 issues, mostly stale summary entries).",
+    "multi_level_maturity_pattern": "Some documents (confirmed so far: RVTM) mature at different SETR events depending on decomposition level - System-level and CI-level instances of the same document type follow different DRAFT->FINAL timing. These use 'maturity_states_by_level' (a dict keyed by decomposition level) instead of the flat 'maturity_states' array. The station_summary generator now handles both formats, rendering multi-level nodes with a level tag e.g. 'RVTM[SYS](draft)' vs 'RVTM[CI](final)'."
+  },
+  "superseded_dids": [
+    {
+      "cancelled_did": "DI-MNTY-81602",
+      "cancelled_title": "Maintainability Predictions Report (MPR)",
+      "cancelled_by_authority": "National Security Agency (per DoD R&M Engineering Data Tailoring guidance)",
+      "status": "CANCELED",
+      "superseded_by_did": "DI-SESS-81497A",
+      "superseded_by_node_id": "RM_PREDICTIONS",
+      "superseded_by_title": "Reliability & Maintainability (R&M) Predictions",
+      "source": "DoD 'Guidance for the Tailoring of R&M Engineering Data' (cto.mil)",
+      "notes": "Ron referred to this by the acronyms 'RPR' and 'MPD' during the DID interview - both resolve to this same cancellation/consolidation event. Should render as a visible badge/tooltip on the RM_PREDICTIONS node in the webapp (e.g., 'Consolidates: DI-MNTY-81602 (CANCELED)'), not just a buried text note, so the history stays discoverable in the UI."
+    }
+  ],
+  "ui_requirements": [
+    {
+      "requirement": "Superseded/canceled DID visibility",
+      "description": "Any node with a non-empty 'supersedes' array must display a visible badge or icon (not just hover text) indicating it consolidates a canceled/superseded DID. Clicking should reveal the full record from the top-level 'superseded_dids' array (canceled DID number, title, canceling authority, and source).",
+      "applies_to": "Station detail panel (Zoom Level 3, per the decomposition/zoom interaction model already defined)."
+    },
+    {
+      "requirement": "CDRL schedule import",
+      "description": "Webapp needs a JSON import feature (file picker or paste) that runs the matching/merge logic defined in 'import_schema', shows a preview/diff before committing, and writes an audit log entry. This is a first-class feature, not an afterthought - Ron's authoritative schedule is expected to supersede much of the manually-interviewed content in this model.",
+      "applies_to": "CDRL Path module - likely its own settings/admin view, separate from the main zoomable map."
+    }
+  ],
+  "change_request_mechanisms": {
+    "scope_note": "ECP, RFV, and NOR (plus SCN and ERR, included for completeness) are change-request OBJECTS, not process or product engineering artifacts. Per Ron's explicit scope decision, they are excluded from the subway map's node/edge graph entirely. Their only role in the visualization is as a cross-cutting GROUPING INDICATOR - i.e., flagging which process/product artifacts require one of these change-request objects to be updated ahead of a given SETR event - not as first-class stations with their own influence relationships.",
+    "objects": [
+      {
+        "id": "ECP",
+        "did": "DI-SESS-80639D",
+        "title": "Engineering Change Proposal",
+        "dd_form": "DD 1692/1693",
+        "purpose": "Proposes a permanent change to an approved baseline (Class I or Class II)."
+      },
+      {
+        "id": "RFV",
+        "did": "DI-SESS-80640",
+        "title": "Request for Variance",
+        "dd_form": "DD 1694",
+        "purpose": "Requests a temporary departure from an approved baseline requirement."
+      },
+      {
+        "id": "NOR",
+        "did": "DI-SESS-80642",
+        "title": "Notice of Revision",
+        "dd_form": "DD 1695",
+        "purpose": "Documents a revision to a specification tied to an approved ECP."
+      },
+      {
+        "id": "SCN",
+        "did": "DI-SESS-80643",
+        "title": "Specification Change Notice",
+        "dd_form": "DD 1696",
+        "purpose": "Documents a permanent change to a specification (as opposed to RFV's temporary departure)."
+      },
+      {
+        "id": "ERR",
+        "did": "DI-SESS-80463",
+        "title": "Engineering Release Record",
+        "dd_form": "DD 2617",
+        "purpose": "Records formal release of engineering data/drawings."
+      }
+    ],
+    "recommended_chart_rendering": "A small badge/icon on any node whose UPDATE maturity_state references a change-request mechanism (currently phrased as 'via ECP' throughout the model), rather than a drawn edge or a station of its own. Clicking the badge could show which mechanism applies and at which SETR events, without cluttering the main influence graph."
+  },
+  "nodes_removed_from_process_product_scope": [
+    {
+      "id": "ECP",
+      "moved_to": "change_request_mechanisms",
+      "reason": "Ron clarified ECPs/NORs/RFVs are change-request objects, not process or product engineering artifacts. The subway map's scope is process and product artifact relationships only. Removed ECP's broad influences/influenced_by edges (previously touching nearly every node) accordingly.",
+      "original_node_data": {
+        "id": "ECP",
+        "did": "DI-SESS-80639D",
+        "title": "Engineering Change Proposal",
+        "line": "CM",
+        "drafted_at": "post-CDR (as needed)",
+        "baselined_at": "any baseline, event-driven not review-driven",
+        "influenced_by": [
+          "RVTM",
+          "SAR",
+          "FMECA"
+        ],
+        "influences": [
+          "SSS",
+          "IRS",
+          "ICD",
+          "SSDD",
+          "IDD",
+          "SDD",
+          "DBDD",
+          "ENG_DRAWINGS",
+          "HW_DEV_SPEC",
+          "HW_PROD_SPEC",
+          "SVD",
+          "SPS",
+          "LCSP",
+          "SAR",
+          "FMECA"
+        ],
+        "verified": true,
+        "verify_note": "Current version confirmed - supersedes legacy DI-CMAN-80639C.",
+        "render_style": "full_station",
+        "maturity_states": [
+          {
+            "state": "AS_NEEDED",
+            "at_event": "event-driven, not tied to a specific SETR",
+            "note": "ECPs don't follow the standard DRAFT/FINAL cadence - each ECP instance is its own draft->approved cycle at the CCB"
+          }
+        ],
+        "decomposition_level": "SYSTEM",
+        "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
+        "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact."
+      }
+    }
+  ],
+  "temporal_marker_types": {
+    "description": "Not every CDRL due date is tied to a SETR event. Three distinct temporal marker types exist in this model:",
+    "types": {
+      "SETR_EVENT": "Tied to a specific technical review (ASR, SRR, SFR, etc.) - the majority of engineering artifacts.",
+      "MILESTONE": "Tied to an acquisition Milestone (A/B/C) rather than a SETR event - e.g., SEP, TEMP.",
+      "CONTRACT_DAY": "Tied to a fixed number of days/months after contract award (e.g., 3 MAC = 3 Months After Contract), independent of any review or milestone. Often the EARLIEST due dates in the whole program, predating ASR.",
+      "MANAGEMENT_TRACK": "Recurring on a periodic cadence (e.g., annual, per subsequent Milestone) rather than tied to a single fixed point."
+    },
+    "chart_implication": "CONTRACT_DAY markers should render as their own leftmost station(s) on the map, before ASR, not folded into the SETR event sequence."
+  },
+  "external_review_boards": {
+    "description": "Safety-domain artifacts are additionally paced by external review boards, not just SETR events. These occur loosely BEFORE the SETR event they're associated with, not at the same time.",
+    "boards": [
+      {
+        "id": "WSESRB",
+        "name": "Weapon System Explosives Safety Review Board",
+        "phases": [
+          "Intro",
+          "Design",
+          "Production"
+        ],
+        "loosely_precedes": [
+          "SRR",
+          "CDR",
+          "PRR"
+        ]
+      },
+      {
+        "id": "SSSTRP",
+        "name": "Software/System Safety Test Review Panel",
+        "phases": [
+          "Intro",
+          "Design",
+          "Production"
+        ],
+        "loosely_precedes": [
+          "SRR",
+          "CDR",
+          "PRR"
+        ]
+      }
+    ],
+    "chart_implication": "Safety-line UPDATE markers tied to these boards should note the board+phase explicitly (e.g., 'WSESRB/SSSTRP Design Review, ~pre-CDR') rather than being flattened to the SETR event itself, since the actual review happens beforehand."
+  },
+  "import_schema": {
+    "description": "Defines how an external, authoritative CDRL schedule (Ron's own JSON export, including RACI) gets imported/merged into this model - either by a future Code Chat feature or manually in a follow-up session.",
+    "external_key_field": "Key - acronym/initials matching (or closely matching) this model's node 'id' field.",
+    "matching_strategy": [
+      "1. Exact match: external Key == node.id (case-insensitive).",
+      "2. Alias match: check node.aliases array for a match if exact match fails.",
+      "3. Unmatched: if neither matches, do NOT silently create a new node or drop the record - flag it in an 'unmatched_import_records' list for manual reconciliation. New CDRLs discovered this way should go through the same DID-verification rigor as everything else in this model, not be auto-added."
+    ],
+    "field_merge_behavior": {
+      "raci": "TRUSTED OVERRIDE - Ron's schedule is authoritative for RACI, import directly.",
+      "maturity_states / at_event timing": "TRUSTED OVERRIDE - Ron's schedule is authoritative for SETR-event timing, import directly, but log a diff against whatever was previously in the model (many nodes here are still first-pass/interview-confirmed and may conflict).",
+      "did / title": "FLAG CONFLICTS - if the import's DID or title differs from what's already confirmed in this model, do NOT silently overwrite; surface both values for Ron to reconcile, since this model's DID numbers were individually verified against DLA ASSIST/EverySpec.",
+      "influences / influenced_by / decomposition_level / relationship_assessment": "PRESERVE - these are Claude-assessed and likely not present in Ron's schedule at all; the import should add RACI/timing on top of the existing model, not replace these fields."
+    },
+    "raci_schema": {
+      "responsible": "string - single role/org who does the work",
+      "accountable": "string - single role/org with sign-off authority",
+      "consulted": "array of strings - roles/orgs consulted during development",
+      "informed": "array of strings - roles/orgs kept informed of status"
+    },
+    "audit_trail_requirement": "Every import run should produce a log entry (timestamp, source filename, count of matched/unmatched/conflicting records) rather than silently merging - this model has already been hand-corrected many times today and needs a clear 'what changed and why' record, not a silent overwrite."
+  },
+  "update_pathways": {
+    "description": "Two supported ways to update this model: BATCH_IMPORT (Ron's authoritative CDRL schedule JSON, many records at once) and ATOMIC_EDIT (single field/node change made directly in the webapp UI). Both must converge on the same validation and audit mechanism so the model can't drift between the two paths.",
+    "shared_requirements": [
+      "Both pathways run the SAME validation function before committing - the consistency checks already proven out today (no dangling influences/influenced_by references, valid SETR event IDs, no duplicate DIDs, every node has maturity_states or is explicitly exempt). Do not implement two separate validation code paths that could drift apart.",
+      "Both pathways write an audit log entry: timestamp, source (batch-import filename OR 'atomic-edit'), which node(s)/field(s) changed, before/after values.",
+      "Both pathways update the SAME underlying JSON - there is only one reference model, not a separate copy per pathway."
+    ],
+    "BATCH_IMPORT": {
+      "trigger": "User uploads/pastes Ron's CDRL schedule JSON.",
+      "behavior": "See 'import_schema' section - matches by Key, applies trusted-override/flag-conflict/preserve rules per field, processes many nodes in one pass.",
+      "persistence": "Same open question as ATOMIC_EDIT below - see 'persistence_mechanism_decision_needed'."
+    },
+    "ATOMIC_EDIT": {
+      "trigger": "User clicks a station in the webapp (Zoom Level 3 detail panel) and edits a single field - e.g., correcting a DRAFT event, adding a RACI entry, adding a note.",
+      "behavior": "Single-node, single-field change, applied and validated immediately, with an inline undo option since there's no natural 'previous file version' to fall back to like batch import has.",
+      "persistence": "Same open question as BATCH_IMPORT above - see 'persistence_mechanism_decision_needed'."
+    },
+    "persistence_mechanism_decision_needed": {
+      "problem": "A browser-based React app cannot write directly to a file in your GitHub repo. This wasn't resolved when we originally decided on file-based JSON persistence, and it applies equally to atomic edits and batch imports.",
+      "options": [
+        {
+          "option": "Export/Download updated JSON, Ron manually commits",
+          "tradeoff": "Simplest to build, zero new infrastructure, but re-introduces a manual step and re-opens the door to the exact drift/sync problem we just fixed with the auto-regenerated station summary."
+        },
+        {
+          "option": "Local dev-only file-write via a small Node/Express backend running alongside the React app",
+          "tradeoff": "Real file persistence during local development, but adds a backend component to what was scoped as a standalone React app, and doesn't help once deployed anywhere off your dev machine."
+        },
+        {
+          "option": "GitHub API integration - webapp commits directly to the repo on save",
+          "tradeoff": "Cleanest long-term solution and keeps the repo as the single source of truth, but requires a GitHub token/auth flow and real write-access handling - meaningfully more scope than originally discussed."
+        }
+      ],
+      "recommendation": "Start with Export/Download for v1 (fastest to working software), explicitly flagged as a known limitation, with GitHub API integration as a fast-follow if atomic edits turn out to be frequent enough that manual re-commit becomes a real friction point.",
+      "status": "DECIDED - Export/Download for v1, confirmed by Ron 2026-08-08. GitHub API integration deferred as a fast-follow if atomic-edit frequency justifies it."
+    }
+  }
+}

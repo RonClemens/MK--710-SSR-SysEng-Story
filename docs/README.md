@@ -15,3 +15,9 @@ This app's own contributions to that exchange live at:
 ## `reference/`
 
 Internal reference material for contributors — original summaries of external standards, not reproductions of the source documents themselves. See `reference/INCOSE_SE_HANDBOOK_5TH_ED_SUMMARY.md` for a section-by-section map of the INCOSE SE Handbook (5th ed.), useful when checking a PKM entity or field against established SE terminology. The source Handbook PDF itself is licensed for personal use only and must never be added to this or any repo.
+
+## `cdrl-path/`
+
+Design-in-progress material for **CDRL Path**, a proposed module visualizing DID-defined CDRLs across the Navy
+SETR sequence and CM baselines as a zoomable subway map. Not built yet — see `cdrl-path/README.md` for read order
+and current content-confirmation status before treating anything in that folder as settled.
