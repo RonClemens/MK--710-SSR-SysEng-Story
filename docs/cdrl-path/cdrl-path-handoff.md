@@ -17,8 +17,9 @@ Load `cdrl-did-data-model.json`, render Level 1 (7 lines + interchange stations)
 **Phase 2 — Zoom tiers + station detail**
 Level 2 (line expansion) and Level 3 (station detail panel showing DID, maturity states, RACI, relationships, decomposition level). Decomposition-level filter/toggle for drilling into a specific CI.
 
-**Phase 3 — Validation engine + export**
+**Phase 3 — Validation engine + export + relationship edges**
 Port `validateModel()` per the architecture doc. Wire up `<ExportManager />` and the dirty-state indicator. This should work even with no import/edit UI yet — it's the safety net the next two phases depend on.
+**Scope extended 2026-08-11** (see `DECISIONS.md` #6): also render the cross-line `influences`/`influenced_by` edges when a line is expanded — the actual "back and forth across the whole team" the data model's own `purpose_statement` calls this app's primary goal, which the original 5-phase plan never explicitly assigned to a phase despite that framing. Folded in here rather than left for its own phase since `validateModel()`'s dangling-reference check covers the same edge data.
 
 **Phase 4 — Atomic edit**
 `<AtomicEditPanel />` in the Level 3 detail view. Every edit runs through `validateModel()` and writes an audit log entry before it's considered "saved" (in-memory — export is still the only durable save, per the v1 persistence decision).

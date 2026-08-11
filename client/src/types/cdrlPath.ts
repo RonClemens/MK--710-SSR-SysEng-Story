@@ -109,4 +109,8 @@ export interface CdrlPathModel {
     levels: CdrlPathDecompositionLevelDef[];
   };
   superseded_dids?: CdrlPathSupersededDid[];
+  // Derived FROM node maturity data, never hand-edited — see confirmed_patterns
+  // .station_summary_generation in the JSON itself. validateModel() regenerates this and
+  // flags drift rather than trusting the stored copy.
+  station_summary_by_setr_event?: Record<string, string[]>;
 }

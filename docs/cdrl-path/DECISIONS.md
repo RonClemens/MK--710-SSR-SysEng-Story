@@ -38,3 +38,20 @@ direct review. Design chat flagged nothing as a misdescription — see individua
    still pre-decision planning material (13/36 nodes unconfirmed). Planned fast-follow once confirmation is
    farther along: relocate `cdrl-did-data-model.json` to `/methodology/guidance/` and convert it from raw `.json`
    to a typed `.ts` module, consistent with this app's "types stay in `client/src/types`" convention.
+
+## 2026-08-11 — Scope gap: relationship-edge rendering folded into Phase 3
+
+Caught mid-build, not a design-chat round: the original 5-phase plan never assigned a phase to actually drawing the
+`influences`/`influenced_by` edges across lines — the cross-document "back and forth across the whole team" the
+data model's own `purpose_statement` names as this app's primary goal. Everything built through Phase 2 only
+showed those relationships as a text list in the Level 3 detail panel, not as connections on the map itself.
+
+6. **Resolution: fold it into Phase 3, not its own phase or a design-chat round-trip.** `validateModel()`'s first
+   check (no dangling `influences`/`influenced_by` references) covers the exact same edge data the drawing needs,
+   so building both together avoided doing the same edge-traversal twice. Implemented as edges only from the
+   currently expanded line's nodes outward — not a permanent full-graph overlay, since the data model's own
+   `confirmed_patterns.relationship_assessment_status` already flags that an always-on graph (with `SEMP`/
+   `IMP_IMS`/`RMP` all influencing `"ALL"`) would be an unreadable hairball. Edges to `"ALL"` targets are skipped
+   for the same reason. Targets on a currently-collapsed line get a small unfilled "ghost" endpoint dot at their
+   own anchor position (clickable, opens that node's own detail panel) rather than requiring their line to also
+   be expanded.

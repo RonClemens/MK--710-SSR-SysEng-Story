@@ -36,7 +36,7 @@ export function getMaturityMarkerStyle(state: CdrlPathMaturityState): MarkerVisu
 
 /** Resolves the node's own DRAFT/FINAL maturity point, used as the start of an UPDATE range
  * and as a better fallback position than "leftmost column" for otherwise-unresolvable markers. */
-function anchorEventIndex(node: CdrlPathNode, setrEvents: CdrlPathSetrEvent[]): number {
+export function anchorEventIndex(node: CdrlPathNode, setrEvents: CdrlPathSetrEvent[]): number {
   const finalState = node.maturity_states?.find((s) => s.state.toUpperCase() === "FINAL");
   const draftState = node.maturity_states?.find((s) => s.state.toUpperCase() === "DRAFT");
   const anchor = finalState ?? draftState;

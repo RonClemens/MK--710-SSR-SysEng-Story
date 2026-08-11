@@ -1,6 +1,6 @@
 import type { Edge, Node } from "@xyflow/react";
-import type { CdrlPathDecompositionLevel, CdrlPathModel } from "../types/cdrlPath";
-import { expandMaturityStateToMarkers, getMaturityMarkerStyle, maturityStatesForLevel } from "./cdrlPathMaturityMarkers";
+import type { CdrlPathDecompositionLevel, CdrlPathModel, CdrlPathNode } from "../types/cdrlPath";
+import { anchorEventIndex, expandMaturityStateToMarkers, getMaturityMarkerStyle, maturityStatesForLevel } from "./cdrlPathMaturityMarkers";
 
 // Manual, subway-line-style coordinate layout per the confirmed "React Flow, not
 // force-directed" decision — time axis (SETR event sequence) on X, one row per line on Y.
@@ -76,6 +76,10 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
 
   const nodes: Node[] = [];
   const edges: Edge[] = [];
+  // Center-point (not the top-left style offset used for `position`) of each CDRL node's
+  // single "primary" visual anchor, populated as markers are created — used below to draw
+  // relationship edges without needing a second traversal of the model.
+  const nodeAnchorCenter = new Map<string, { x: number; y: number }>();
 
   setr_events.forEach((event, index) => {
     nodes.push({
@@ -165,6 +169,7 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     const fractionalIndex = resolveMarkerEventIndex(marker, setr_events);
     const line = model.lines[lineIndex];
     const half = CONTEXT_MARKER_SIZE / 2;
+    nodeAnchorCenter.set(cdrlNode.id, { x: eventX(fractionalIndex), y: lineY(lineIndex) });
 
     nodes.push({
       id: `station-${cdrlNode.id}`,
@@ -213,6 +218,12 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
           const visual = getMaturityMarkerStyle(state);
           const size = visual.large ? 26 : 18;
           const half = size / 2;
+          // Relationship edges connect to one representative point per node — prefer FINAL
+          // (the "as-delivered" milestone) over whichever marker happened to be created first.
+          const isFinal = state.state.toUpperCase() === "FINAL";
+          if (isFinal || !nodeAnchorCenter.has(cdrlNode.id)) {
+            nodeAnchorCenter.set(cdrlNode.id, { x: eventX(eventIndex), y: rowY });
+          }
           nodes.push({
             id: `maturity-${cdrlNode.id}-${state.state}-${eventIndex}`,
             type: "default",
@@ -246,6 +257,109 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
         });
       });
     });
+
+    // Cross-line relationship edges — the actual "back and forth across the whole team"
+    // Ron described as this model's core value (see purpose_statement in the data model),
+    // distinct from the timeline markers above. Only drawn from the currently expanded
+    // line's qualifying nodes, not the whole graph at once: with 36 nodes many of them
+    // influencing "ALL", an always-on full relationship graph would be an unreadable
+    // hairball — the data model's own confirmed_patterns.relationship_assessment note makes
+    // this same point about the ECP node. Expanding a line to see how ITS documents connect
+    // outward matches the GPS zoom-tier metaphor already used for time/decomposition.
+    const nodeById = new Map(model.nodes.map((n) => [n.id, n]));
+    const ghostNodeIdsAdded = new Set<string>();
+    // Two related targets on the same collapsed line easily resolve to the same event
+    // column (e.g. SSDD and IDD both FINAL at PDR) — without an offset here they'd land on
+    // the exact same coordinate and become unclickable, same failure mode the sub-lane
+    // offset above fixes for the expanded line's own markers.
+    const ghostSlotsUsed = new Map<string, number>();
+
+    function ghostAnchorFor(target: CdrlPathNode): { x: number; y: number } | null {
+      const existing = nodeAnchorCenter.get(target.id);
+      if (existing) return existing;
+      const targetLineIndex = model.lines.findIndex((l) => l.id === target.line);
+      if (targetLineIndex === -1) return null;
+      const eventIndex = anchorEventIndex(target, setr_events);
+      const slotKey = `${targetLineIndex}:${eventIndex}`;
+      const slot = ghostSlotsUsed.get(slotKey) ?? 0;
+      ghostSlotsUsed.set(slotKey, slot + 1);
+      const x = eventX(eventIndex) + slot * 14;
+      const y = lineY(targetLineIndex);
+      nodeAnchorCenter.set(target.id, { x, y });
+      if (!ghostNodeIdsAdded.has(target.id)) {
+        ghostNodeIdsAdded.add(target.id);
+        const targetLine = model.lines[targetLineIndex];
+        nodes.push({
+          id: `related-${target.id}`,
+          type: "default",
+          position: { x: x - 5, y: y - 5 },
+          data: { label: "" },
+          draggable: false,
+          zIndex: 4,
+          style: {
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            background: "var(--card-bg, #fff)",
+            border: `2px solid ${targetLine.color_hint}`,
+            padding: 0,
+            cursor: "pointer",
+          },
+        });
+      }
+      return { x, y };
+    }
+
+    qualifyingNodes.forEach((cdrlNode) => {
+      const sourceAnchor = nodeAnchorCenter.get(cdrlNode.id);
+      if (!sourceAnchor) return;
+      const relationshipTargets: { targetId: string; direction: "influences" | "influenced_by" }[] = [
+        ...(cdrlNode.influences ?? []).map((targetId) => ({ targetId, direction: "influences" as const })),
+        ...(cdrlNode.influenced_by ?? []).map((targetId) => ({ targetId, direction: "influenced_by" as const })),
+      ];
+      relationshipTargets.forEach(({ targetId, direction }) => {
+        // "ALL" (SEMP, IMP_IMS, RMP) is explicitly flagged in the data model itself as too
+        // broad to chart usefully as point-to-point edges — see confirmed_patterns
+        // .relationship_assessment_status. Self-references can't happen structurally but
+        // are guarded anyway since they'd be a degenerate zero-length edge.
+        if (targetId === "ALL" || targetId === cdrlNode.id) return;
+        const target = nodeById.get(targetId);
+        if (!target) return; // dangling reference — already surfaced by validateModel()
+        const targetAnchor = ghostAnchorFor(target);
+        if (!targetAnchor) return;
+
+        const [sourceId, targetHandleId] = direction === "influences" ? [cdrlNode.id, targetId] : [targetId, cdrlNode.id];
+        edges.push({
+          id: `relationship-${cdrlNode.id}-${direction}-${targetId}`,
+          source: `relationship-anchor-${sourceId}`,
+          target: `relationship-anchor-${targetHandleId}`,
+          type: "straight",
+          selectable: false,
+          zIndex: 3,
+          style: { stroke: line.color_hint, strokeWidth: 1, strokeDasharray: "3 3", opacity: 0.45 },
+          markerEnd: { type: "arrow", color: line.color_hint, width: 12, height: 12 },
+        });
+      });
+    });
+
+    // React Flow edges need real source/target NODE ids to anchor to, but the actual visual
+    // anchor for a CDRL node is one of several markers/dots already pushed above under a
+    // different id scheme (`maturity-...`, `station-...`, `related-...`). Rather than thread
+    // the "which exact id represents this node's primary anchor" logic through three
+    // different creation sites, a single zero-size node per referenced CDRL node is added
+    // here at its already-resolved anchor center, and edges above connect to that instead.
+    for (const [nodeId, center] of nodeAnchorCenter) {
+      nodes.push({
+        id: `relationship-anchor-${nodeId}`,
+        type: "default",
+        position: center,
+        data: {},
+        draggable: false,
+        selectable: false,
+        zIndex: 3,
+        style: { width: 1, height: 1, opacity: 0, border: "none" },
+      });
+    }
   }
 
   return { nodes, edges };

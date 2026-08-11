@@ -5,6 +5,7 @@ import { useCdrlPathModel } from "../hooks/useCdrlPathModel";
 import { buildCdrlPathFlowElements } from "../utils/cdrlPathLayout";
 import { EditableText } from "../components/EditableText";
 import { CdrlPathStationDetailPanel } from "../components/CdrlPathStationDetailPanel";
+import { CdrlPathExportManager } from "../components/CdrlPathExportManager";
 import type { CdrlPathDecompositionLevel } from "../types/cdrlPath";
 
 const LINE_ELEMENT_PREFIXES = ["line-label-", "line-edge-"];
@@ -16,6 +17,7 @@ function lineIdFromElementId(id: string): string | null {
 
 function nodeIdFromElementId(id: string): string | null {
   if (id.startsWith("station-")) return id.slice("station-".length);
+  if (id.startsWith("related-")) return id.slice("related-".length);
   if (id.startsWith("maturity-")) return id.split("-")[1];
   return null;
 }
@@ -68,6 +70,8 @@ export function CdrlPathPage() {
         as="p"
         className="hint"
       />
+
+      <CdrlPathExportManager model={model} isDirty={false} />
 
       <div className="cdrl-badge-row" role="group" aria-label="Decomposition level">
         {model.decomposition_dimension.levels.map((level) => (
