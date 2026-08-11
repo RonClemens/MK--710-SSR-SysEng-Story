@@ -41,6 +41,7 @@ import { SempMigrationPage } from "./pages/SempMigrationPage";
 import { PromisesPage } from "./pages/PromisesPage";
 import { PhaseWorkbenchPage } from "./pages/PhaseWorkbenchPage";
 import { CiDetailPage } from "./pages/CiDetailPage";
+import { CdrlPathPage } from "./pages/CdrlPathPage";
 import { AiAssistantPanel } from "./components/AiAssistantPanel";
 import { EditableText } from "./components/EditableText";
 import { EditModeFab } from "./components/EditModeFab";
@@ -60,7 +61,8 @@ type Tab =
   | "recommendations"
   | "riskItems"
   | "sempMigration"
-  | "promises";
+  | "promises"
+  | "cdrlPath";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "subsystems", label: "Subsystems" },
@@ -76,6 +78,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "riskItems", label: "Risks & Issues" },
   { key: "sempMigration", label: "SEMP Migration" },
   { key: "promises", label: "PDKM Promises" },
+  { key: "cdrlPath", label: "CDRL Path" },
 ];
 
 export default function App() {
@@ -360,6 +363,7 @@ export default function App() {
                   planningDeliverables={planningDeliverables.rows}
                 />
               )}
+              {tab === "cdrlPath" && <CdrlPathPage />}
             </>
           )}
         </main>
