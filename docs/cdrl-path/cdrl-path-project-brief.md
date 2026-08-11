@@ -34,15 +34,16 @@ Decomposition level is a **filter/toggle**, not a separate stacked map — "dril
 | Topic | Decision |
 |---|---|
 | Build target | Standalone React app, module named "CDRL Path," part of SE Workbench |
-| Nav placement | Still open — earlier answers were inconsistent (sub-view vs. new module) |
-| Rendering | React Flow (not D3) — manual node coordinates for subway-line aesthetic, not force-directed |
+| Nav placement | **Confirmed 2026-08-11**: new top-level tab in the existing `allTabs` tab bar (`client/src/App.tsx`), not nested under another tab, not part of the phase wizard — the wizard shows one phase at a time, which would structurally block CDRL Path's core value (the cross-phase view at once). Precedent: the standalone N² Diagram tab. |
+| Naming | **Confirmed 2026-08-11**: page/component layer uses `CdrlPathPage` / `CdrlPath*`, not bare `Cdrl*` — this app already has an unrelated `CdrlPhasePanel` component (per-phase deliverable checklist in the wizard). Extend the same convention to the data layer: the model-loading hook is `useCdrlPathModel`, not a generic `useCdrl*` name, so it isn't confused with this app's existing `useEntity` pattern. |
+| Rendering | React Flow — specifically **`@xyflow/react`** (the current, maintained package; `react-flow-renderer` is deprecated, do not install it). Confirmed React 19–compatible as of early 2025 via its Zustand 5 upgrade, currently v12.11.2. Manual node coordinates for subway-line aesthetic, not force-directed. |
 | Data scope | Generic reference model + live per-program CDRL status tracking |
 | Multi-baseline | Fully separate data-file instances per baseline (Baseline A, Baseline B) — no simultaneous view, no toggle |
 | Status granularity | Status label (draft/submitted/approved) + free-text notes/evidence links. No date tracking. |
 | RACI | One set per CDRL (not per-event) |
-| Persistence | File-based JSON, **Export/Download for v1** (confirmed) — no auto-write to repo, no localStorage. GitHub API direct-commit is a possible fast-follow, not v1 scope. |
-| Repo placement | Public GitHub toolkit repo, including per-program status data — CUI/sensitivity flagged once, Ron's call to proceed as-is; revisit with ISSO if status data becomes more specific than labels |
-| Update pathways | Both BATCH_IMPORT and ATOMIC_EDIT, sharing one validation engine and one audit log format — see import/export architecture doc for full pipeline |
+| Persistence | **Revised 2026-08-11 — split by content type**, superseding the single Export/Download-for-everything answer below the "Update pathways" row was originally attached to (see architecture doc for the pre-revision pipeline this replaces for the status overlay only): <br>• **Reference model** (`cdrl-did-data-model.json` — DIDs, events, relationships): stays a **permanent** Export/Download-only exception. It's reusable, program-agnostic reference content, same category as `/methodology/guidance`, not per-session user data, and shouldn't behave like a mutable entity — especially once multiple programs may load the same reference model. <br>• **Per-program status overlay** (`program-status-{baseline_id}.json` — draft/submitted/approved + notes): folds into this app's **existing server-backed `useEntity`/entities API pattern** (and the static-build `localStorage` seed pattern), rather than a bespoke export/download path. It's per-program, mutable, changes over time — exactly what that pattern already exists for. |
+| Repo placement | Public GitHub toolkit repo, including per-program status data — CUI/sensitivity flagged once, Ron's call to proceed as-is; revisit with ISSO if status data becomes more specific than labels. Design docs currently live at `/docs/cdrl-path/` (pre-decision planning material). **Planned fast-follow**: once content confirmation is farther along, move the reference model to `/methodology/guidance/` (or a sibling) and convert it from raw `.json` to a typed `.ts` module, consistent with this app's "types stay in `client/src/types`" convention rather than fetching/parsing raw JSON at runtime. |
+| Update pathways | Both BATCH_IMPORT and ATOMIC_EDIT, sharing one validation engine and one audit log format — see import/export architecture doc for full pipeline. Note the Persistence revision above: this shared-pipeline description still holds for validation/audit-log behavior, but the *underlying storage* the two pathways write to now differs by target (reference model vs. status overlay), per the Persistence row. |
 
 ## Companion documents
 - `cdrl-did-data-model.json` — the reference model itself (authoritative content + all schema/architecture notes)
@@ -50,9 +51,10 @@ Decomposition level is a **filter/toggle**, not a separate stacked map — "dril
 - This file — status and scope summary
 
 ## Open items
-- Nav placement within SE Workbench (standalone top-level vs. nested — unresolved)
+- ~~Nav placement within SE Workbench~~ — **resolved 2026-08-11**, see Confirmed technical/scope decisions above.
 - 13 nodes still need DID/event confirmation (list above) — likely resolved by future schedule import rather than further interview
 - Every `influences`/`influenced_by` edge and `decomposition_level` tag needs review — currently Claude's first-pass assessment
 - Remaining `[VERIFY]`-flagged DID numbers (IMP/IMS, RMP, TDP level, provisioning DID series) not yet checked against DLA ASSIST directly
 - Visual conventions (line colors, bend angles, node coordinate layout algorithm) not yet designed — Code Chat will likely need to make an initial pass here
-- Export/Download persistence is a known limitation (manual re-commit step) — GitHub API integration is the scoped fast-follow if this becomes friction in practice
+- Reference-model Export/Download persistence is an accepted permanent tradeoff (see Persistence row), not a v1-only limitation — the earlier framing of it as a temporary gap applied to the status overlay, which now has a real fix (fold into `useEntity`).
+- Planned fast-follow: relocate `cdrl-did-data-model.json` from `/docs/cdrl-path/` to `/methodology/guidance/` and convert to a typed `.ts` module, once node/relationship confirmation is farther along.

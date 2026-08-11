@@ -58,22 +58,37 @@ Status-overlay-specific merge rule: `status` and `notes` fields are always **tru
 5. **Inline undo** — session-based undo for the last several atomic edits (not persisted across reloads — that's what the audit log and export are for).
 6. **Dirty-state indicator** — persistent visual cue ("unsaved changes — export to save") since there's no auto-save to a file.
 
-## Persistence (confirmed decision: Export/Download for v1)
+## Persistence — revised 2026-08-11, split by content type
 
-- App holds the full model in memory (React state/context), loaded at startup from a file picker or a bundled default copy.
+**Supersedes the single "Export/Download for everything" decision below for the status overlay only.** The
+reference model's persistence is unchanged. See the project brief's Persistence row for the full reasoning; summary:
+the reference model is reusable, program-agnostic reference content and shouldn't behave like a mutable entity,
+while the status overlay is per-program mutable data — exactly what this app's existing entity-persistence pattern
+already exists for. Reusing it instead of building a bespoke export/download path for the overlay avoids solving
+the same problem twice.
+
+**Reference model (`cdrl-did-data-model.json`) — unchanged, permanent Export/Download-only exception:**
+- App holds it in memory (React state/context), loaded at startup from a file picker or a bundled default copy.
 - All edits — import or atomic — mutate this in-memory state only. Nothing is durably saved until the user clicks **Export**.
 - **Export** produces a pretty-printed JSON matching the existing schema's key order/structure (keeps git diffs clean when Ron commits it back to the repo), plus optionally a human-readable markdown changelog of what changed since the last export — nice-to-have, not required for v1.
-- Known limitation, explicitly accepted: this reintroduces a manual "export then git-commit" step. GitHub API direct-commit is the scoped fast-follow if atomic-edit frequency makes this annoying in practice.
+- Dirty-state indicator and inline undo (see Atomic edit pipeline above) apply to this target only.
+
+**Per-program status overlay (`program-status-{baseline_id}.json`) — now server-backed, not export/download:**
+- Folds into this app's existing `useEntity`/entities API pattern (and the static-build `localStorage` seed pattern used elsewhere in this app), rather than a separate in-memory-plus-download path.
+- Status/notes edits from `AtomicEditPanel` persist immediately through the standard entity save flow — no "unsaved changes — export to save" banner needed for this target, unlike the reference model.
+- Batch import into the status overlay still runs the same shared match/diff/preview/validate pipeline described above; only the commit step differs — it writes through the entities API instead of only updating in-memory state.
+- **Open item, not yet resolved**: how audit-log entries for status-overlay changes get stored so they stay consistent with the reference model's embedded `audit_log` array — needs to be checked against how `server/src/db.ts` and `useEntity` actually persist entity changes before this is implementable as described. Flagged rather than assumed.
 
 ## Suggested component breakdown (React)
 
-- `<ImportManager target={referenceModel | statusOverlay} />` — file picker, matching/diff computation, three-bucket preview UI; reusable against either target file since both follow the same pipeline
-- `<AtomicEditPanel />` — per-node edit form, rendered inside the Level 3 station detail view
+- `<ImportManager target={referenceModel | statusOverlay} />` — file picker, matching/diff computation, three-bucket preview UI; reusable against either target since both follow the same match/diff/preview/validate pipeline, even though the reference-model and status-overlay targets now commit through different persistence paths (see Persistence above)
+- `<AtomicEditPanel />` — per-node edit form, rendered inside the Level 3 station detail view; its save behavior branches by target per the Persistence section (in-memory + dirty-state for the reference model, immediate entity-API save for the status overlay)
 - `validateModel()` — non-visual utility module, imported by both of the above
-- `<AuditLogViewer />` — displays the `audit_log` array, filterable by source/date/node
-- `<ExportManager />` — download button + dirty-state banner
+- `<AuditLogViewer />` — displays the `audit_log` array, filterable by source/date/node; source of truth for status-overlay entries is the open item above
+- `<ExportManager />` — download button + dirty-state banner; applies to the reference model only now that the status overlay persists through the entities API
 
 ## Open items carried from the data model
 
-- GitHub API direct-commit remains a possible fast-follow, not in v1 scope.
+- GitHub API direct-commit for the reference model remains a possible fast-follow, not in v1 scope. (No longer applicable to the status overlay, which now persists through the entities API instead of a downloaded file.)
 - RACI is confirmed as one-set-per-CDRL (not per-event), so the edit form needs only a single RACI block per node, not one per maturity state.
+- How the status overlay's audit-log entries are stored/retrieved through the entities API — see the open item under Persistence above.
