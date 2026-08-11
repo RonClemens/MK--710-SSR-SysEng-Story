@@ -22,3 +22,5 @@ Verbatim transcripts of design chat's interview-mode SEMP content sessions with 
 
 - `S4_INTERVIEW_TRANSCRIPT.md` — Session 4, running transcript across all sections covered so far (§2.1 Requirements Development, §2.2 Architectures and Interface Control; renamed from the §2.1-only `S4_REQUIREMENTS_DEVELOPMENT.md` once it started accumulating more sections).
 - `S4_OPTION_TAXONOMY.md` — companion tracker (started §2.2) for the generalized multiple-choice option menus these interviews surface, kept separate from the transcript's program-specific answers.
+- `S5_SPECIALTY_ENGINEERING.md` — Session 5, §2.3 Specialty Engineering (all ten topics: System Safety, RAM, HSI, EMI/EMC, ESOH, Cybersecurity, Production/Manufacturing & Supply Chain, Quality, Technical Manuals O&M, Training).
+- `S5_PKM_ARCH_GUIDANCE_CANDIDATE_UPDATES.md` — **interim staging copy only**, not authoritative: the PKM-safe (non-CUI) candidate entity/amendment proposals design chat drafted from the §2.3 interview, held here only until `udm-exchange` itself commits and self-verifies them. Not implemented in this app; delete or mark superseded once the real commit lands.
