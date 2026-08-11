@@ -85,3 +85,13 @@ and changed both the relationship-edge rendering and the underlying node schema.
    where Design Input and Design Output lines cross." **Open item:** which CDRLs actually span multiple domains is
    unconfirmed content, not something this app should assign unilaterally — a future interview/design-chat pass,
    same as the rest of the not-yet-confirmed content tracked in `cdrl-path-project-brief.md`.
+
+9. **Relationship hub must be a permanent map feature, not gated behind expanding a line.** Ron, after seeing #7
+   live: "I tapped a line and see a bullseye specific to that one colored line. We need to evolve this together as
+   this misses the mark for my request" — clarified the gap is that a bullseye only existing while inspecting one
+   specific line isn't a real subway interchange; real ones are always on the map. Reworked so every line's
+   relationship hub (if it has any cross-line relationships) renders simultaneously at Level 1, with no line
+   expanded — verified 4 hubs visible at once on the unmodified data with zero clicks. The per-node DRAFT/FINAL/
+   UPDATE maturity timeline (sub-lane offsets, per-state marker styling) stays gated behind expanding a line, as
+   the Level 2 detail layer; every full_station node otherwise shows a lightweight single-dot marker so hub edges
+   always have a visible origin/destination point regardless of zoom state.
