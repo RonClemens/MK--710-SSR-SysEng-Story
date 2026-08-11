@@ -17,3 +17,5 @@ open items.
 3. `cdrl-path-import-export-architecture.md` — how import/export/validation/persistence work
 4. `cdrl-did-data-model.json` — the actual reference data; read the `purpose_statement`, `confirmed_patterns`, and
    `ui_requirements` keys first, they carry as much implementation guidance as the node data itself
+5. `DECISIONS.md` — dated log of decisions confirmed since the handoff, superseding individual rows in the docs
+   above; check this first if something above looks stale
