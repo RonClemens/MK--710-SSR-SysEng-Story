@@ -61,7 +61,14 @@ export interface CdrlPathNode {
   id: string;
   did?: string;
   title: string;
-  line: string;
+  // Which line(s)/domains this CDRL participates in — domains[0] is the "primary" line for
+  // positioning (its own maturity timeline renders there); any additional domains render as
+  // a true subway interchange (small presence markers + connector stubs on those lines).
+  // Migrated 2026-08-11 from a single `line: string` field — see DECISIONS.md #7. The
+  // migration was structure-only (each node's domains array still holds just its one prior
+  // line value); which CDRLs actually span multiple domains is unconfirmed content for a
+  // future pass, not something this app invents.
+  domains: string[];
   drafted_at?: string;
   baselined_at?: string;
   notes?: string;

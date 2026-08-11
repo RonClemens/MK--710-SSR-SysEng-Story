@@ -54,4 +54,34 @@ showed those relationships as a text list in the Level 3 detail panel, not as co
    `IMP_IMS`/`RMP` all influencing `"ALL"`) would be an unreadable hairball. Edges to `"ALL"` targets are skipped
    for the same reason. Targets on a currently-collapsed line get a small unfilled "ghost" endpoint dot at their
    own anchor position (clickable, opens that node's own detail panel) rather than requiring their line to also
-   be expanded.
+   be expanded. **Superseded by #7 below** — the point-to-point diagonal edges this produced were replaced with
+   hub-and-spoke routing the same day, once Ron reacted to a screenshot.
+
+## 2026-08-11 — Relationship hub redesigned as a WMATA-style bullseye; schema reworked for multi-domain CDRLs
+
+Two rounds of direct visual feedback from Ron, referencing real WMATA subway maps, landed the same day as #6 above
+and changed both the relationship-edge rendering and the underlying node schema.
+
+7. **Relationship routing: hub-and-spoke through one bullseye, not point-to-point diagonals.** Ron: "dashed lines
+   should be cross routes to major subway hub stations combining all related lines together," then, with a WMATA
+   map legend screenshot showing its concentric-ring transfer-station icon: "outside to inside with each SETR
+   event being a circle down to a single bullseye for PRR." Replaced the per-relationship diagonal edges from #6
+   with ONE shared hub per line-expansion, positioned at the PRR column, rendered as concentric CSS `box-shadow`
+   rings (one per distinct SETR event the expanded line's own DRAFT/FINAL/UPDATE markers touch, capped at 6) —
+   every qualifying node's relationships route into that single bullseye and back out to each target, rather than
+   each drawing its own line across the map. PRR specifically because "every SETR through PRR" is this data
+   model's dominant recurring-update cadence (see `confirmed_patterns`), making it the natural convergence point.
+
+8. **Schema: `node.line: string` → `node.domains: string[]`.** Ron, sharing a larger multi-line WMATA map: "colors
+   could be aligned to various system development domains on a large program with CDRLs being the subway stops
+   involving one or more domains['] participation." A CDRL needing to serve more than one domain line
+   simultaneously (a real subway interchange, not a relationship edge to a different node) wasn't representable
+   under a single `line` field. Migrated `cdrl-did-data-model.json` structure-only — every node's `domains` array
+   still holds just its one prior `line` value, **no new multi-domain content was invented as part of this
+   change**. Rendering now treats `domains[0]` as primary (where the node's own timeline/context marker appears)
+   and draws any additional domains as a true interchange: small unfilled presence dots on those lines' rows at
+   the same column, joined by a thin vertical connector — verified against a synthetic (uncommitted) multi-domain
+   RVTM before reverting it, since RVTM's own notes already call it "the natural interchange station artifact...
+   where Design Input and Design Output lines cross." **Open item:** which CDRLs actually span multiple domains is
+   unconfirmed content, not something this app should assign unilaterally — a future interview/design-chat pass,
+   same as the rest of the not-yet-confirmed content tracked in `cdrl-path-project-brief.md`.

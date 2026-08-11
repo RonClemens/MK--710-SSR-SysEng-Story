@@ -134,7 +134,9 @@
       "id": "SEP",
       "did": "N/A - not a DID (OSD/PM-authored)",
       "title": "Systems Engineering Plan",
-      "line": "MGMT",
+      "domains": [
+        "MGMT"
+      ],
       "drafted_at": "MSA",
       "baselined_at": "each Milestone",
       "notes": "Government-authored; sets the SEMP's required content mapping. Include as a 'station marker' even though it's not a contractor CDRL.",
@@ -173,7 +175,9 @@
       "id": "SEMP",
       "did": "DI-SESS-81785A",
       "title": "Systems Engineering Management Plan",
-      "line": "MGMT",
+      "domains": [
+        "MGMT"
+      ],
       "drafted_at": "SRR (proposal)",
       "baselined_at": "SRR, updated at each SETR",
       "influences": [
@@ -212,7 +216,9 @@
       "id": "IMP_IMS",
       "did": "DI-MGMT-81650 [VERIFY]",
       "title": "Integrated Master Plan / Integrated Master Schedule",
-      "line": "MGMT",
+      "domains": [
+        "MGMT"
+      ],
       "drafted_at": "SRR",
       "baselined_at": "each SETR",
       "notes": "Event-driven IMP entry/exit criteria should mirror the SETR stations on this map.",
@@ -251,7 +257,9 @@
       "id": "RMP",
       "did": "DI-MGMT-81808 [VERIFY]",
       "title": "Risk/Issue/Opportunity Management Plan",
-      "line": "MGMT",
+      "domains": [
+        "MGMT"
+      ],
       "drafted_at": "SRR",
       "baselined_at": "SRR",
       "render_style": "full_station",
@@ -289,7 +297,9 @@
       "id": "CDD",
       "did": "N/A - JCIDS doc, not a DID",
       "title": "Capability Development Document",
-      "line": "DESIGN_INPUT",
+      "domains": [
+        "DESIGN_INPUT"
+      ],
       "drafted_at": "pre-MSA",
       "baselined_at": "Milestone A/B",
       "notes": "Government-provided top-level input; anchors the input line before SRR.",
@@ -315,7 +325,9 @@
       "id": "SSS",
       "did": "DI-IPSC-81431",
       "title": "System/Subsystem Specification",
-      "line": "DESIGN_INPUT",
+      "domains": [
+        "DESIGN_INPUT"
+      ],
       "drafted_at": "SRR",
       "baselined_at": "SFR (Functional Baseline)",
       "influences": [
@@ -365,7 +377,9 @@
       "id": "IRS",
       "did": "DI-IPSC-81434",
       "title": "Interface Requirements Specification",
-      "line": "DESIGN_INPUT",
+      "domains": [
+        "DESIGN_INPUT"
+      ],
       "drafted_at": "SRR",
       "baselined_at": "SFR",
       "influences": [
@@ -408,7 +422,9 @@
       "id": "ICD",
       "did": "DI-CMAN-81248 [VERIFY]",
       "title": "Interface Control Document",
-      "line": "DESIGN_INPUT",
+      "domains": [
+        "DESIGN_INPUT"
+      ],
       "drafted_at": "SFR",
       "baselined_at": "CDR",
       "influences": [
@@ -452,7 +468,9 @@
       "id": "SRS",
       "did": "DI-IPSC-81433",
       "title": "Software Requirements Specification",
-      "line": "DESIGN_INPUT",
+      "domains": [
+        "DESIGN_INPUT"
+      ],
       "drafted_at": "SSR",
       "baselined_at": "PDR",
       "verify_note": "Corrected - SRS baselines at SSR (Software Specification Review), not PDR. PDR baselines the hardware/system-level Allocated Baseline; SSR is the software-track equivalent milestone. If your program doesn't run SSR as a separate event, SRS baseline reverts to PDR by default.",
@@ -498,7 +516,9 @@
       "id": "SSDD",
       "did": "DI-IPSC-81432",
       "title": "System/Subsystem Design Description",
-      "line": "DESIGN_OUTPUT",
+      "domains": [
+        "DESIGN_OUTPUT"
+      ],
       "drafted_at": "SFR",
       "baselined_at": "PDR (Allocated Baseline)",
       "influenced_by": [
@@ -550,7 +570,9 @@
       "id": "IDD",
       "did": "DI-IPSC-81436",
       "title": "Interface Design Description",
-      "line": "DESIGN_OUTPUT",
+      "domains": [
+        "DESIGN_OUTPUT"
+      ],
       "drafted_at": "SFR",
       "baselined_at": "PDR",
       "influenced_by": [
@@ -597,7 +619,9 @@
       "id": "SDD",
       "did": "DI-IPSC-81435",
       "title": "Software Design Description",
-      "line": "DESIGN_OUTPUT",
+      "domains": [
+        "DESIGN_OUTPUT"
+      ],
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
@@ -643,7 +667,9 @@
       "id": "DBDD",
       "did": "DI-IPSC-81437",
       "title": "Database Design Description",
-      "line": "DESIGN_OUTPUT",
+      "domains": [
+        "DESIGN_OUTPUT"
+      ],
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
@@ -685,7 +711,9 @@
       "id": "ENG_DRAWINGS",
       "did": "DI-SESS-81000 series / MIL-STD-31000 TDP [VERIFY per level]",
       "title": "Engineering Drawings / Technical Data Package",
-      "line": "DESIGN_OUTPUT",
+      "domains": [
+        "DESIGN_OUTPUT"
+      ],
       "drafted_at": "PDR",
       "baselined_at": "CDR (FINAL), PCA (AS_BUILT/Product Baseline)",
       "influenced_by": [
@@ -732,7 +760,9 @@
       "id": "SVD",
       "did": "DI-IPSC-81442",
       "title": "Software Version Description",
-      "line": "DESIGN_OUTPUT",
+      "domains": [
+        "DESIGN_OUTPUT"
+      ],
       "drafted_at": "TRR",
       "baselined_at": "PRR",
       "influenced_by": [
@@ -776,7 +806,9 @@
       "id": "SPS",
       "did": "DI-IPSC-81441",
       "title": "Software Product Specification",
-      "line": "DESIGN_OUTPUT",
+      "domains": [
+        "DESIGN_OUTPUT"
+      ],
       "drafted_at": "CDR",
       "baselined_at": "PCA (software Product Baseline)",
       "influenced_by": [
@@ -817,7 +849,9 @@
       "id": "STP",
       "did": "DI-IPSC-81438",
       "title": "Software Test Plan",
-      "line": "TEST",
+      "domains": [
+        "TEST"
+      ],
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
@@ -857,7 +891,9 @@
       "id": "STD",
       "did": "DI-IPSC-81439",
       "title": "Software Test Description",
-      "line": "TEST",
+      "domains": [
+        "TEST"
+      ],
       "drafted_at": "CDR",
       "baselined_at": "TRR",
       "influenced_by": [
@@ -894,7 +930,9 @@
       "id": "STR",
       "did": "DI-IPSC-81440",
       "title": "Software Test Report",
-      "line": "TEST",
+      "domains": [
+        "TEST"
+      ],
       "drafted_at": "SVR_FCA",
       "baselined_at": "SVR_FCA",
       "influenced_by": [
@@ -930,7 +968,9 @@
       "id": "RVTM",
       "did": "No standard MIL-STD-963 DID number exists - RVTM is typically delivered as a program-tailored data item (locally-defined CDRL) or as an embedded appendix/deliverable under the SEMP, STP, or Requirements Management Plan CDRLs, not its own DD-1664 DID.",
       "title": "Requirements Verification Traceability Matrix",
-      "line": "TEST",
+      "domains": [
+        "TEST"
+      ],
       "drafted_at": "SRR",
       "baselined_at": "updated at every SETR through SVR_FCA",
       "influenced_by": [
@@ -998,7 +1038,9 @@
       "id": "TEMP",
       "did": "DoD 5000-series doc, often carried as a CDRL [VERIFY program-specific number]",
       "title": "Test & Evaluation Master Plan",
-      "line": "TEST",
+      "domains": [
+        "TEST"
+      ],
       "drafted_at": "MSA/SRR",
       "baselined_at": "each Milestone",
       "influenced_by": [
@@ -1042,7 +1084,9 @@
       "id": "SSPP",
       "did": "DI-SAFT-81626",
       "title": "System Safety Program Plan",
-      "line": "SAFETY_RELIABILITY",
+      "domains": [
+        "SAFETY_RELIABILITY"
+      ],
       "drafted_at": "SRR",
       "baselined_at": "SRR",
       "influences": [
@@ -1087,7 +1131,9 @@
       "id": "SAR",
       "did": "DI-SAFT-80102C",
       "title": "Safety Assessment Report",
-      "line": "SAFETY_RELIABILITY",
+      "domains": [
+        "SAFETY_RELIABILITY"
+      ],
       "drafted_at": "PDR",
       "baselined_at": "CDR, updated through PRR",
       "influenced_by": [
@@ -1132,7 +1178,9 @@
       "id": "SSHAR",
       "did": "DI-SAFT-80101C",
       "title": "System Safety Hazard Analysis Report (covers PHA/SSHA/SHA/O&SHA phases)",
-      "line": "SAFETY_RELIABILITY",
+      "domains": [
+        "SAFETY_RELIABILITY"
+      ],
       "drafted_at": "SRR (as PHA)",
       "baselined_at": "updated at each SETR through CDR (SHA), then O&SHA through PRR",
       "influences": [
@@ -1179,7 +1227,9 @@
       "id": "RPP",
       "did": "DI-SESS-81613A",
       "title": "Reliability & Maintainability (R&M) Program Plan",
-      "line": "SAFETY_RELIABILITY",
+      "domains": [
+        "SAFETY_RELIABILITY"
+      ],
       "drafted_at": "SRR",
       "baselined_at": "SRR",
       "verified": true,
@@ -1215,7 +1265,9 @@
       "id": "FMECA",
       "did": "DI-SESS-81495A",
       "title": "Failure Modes, Effects & Criticality Analysis",
-      "line": "SAFETY_RELIABILITY",
+      "domains": [
+        "SAFETY_RELIABILITY"
+      ],
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
@@ -1256,7 +1308,9 @@
       "id": "RM_PREDICTIONS",
       "did": "DI-SESS-81497A",
       "title": "Reliability & Maintainability Predictions",
-      "line": "SAFETY_RELIABILITY",
+      "domains": [
+        "SAFETY_RELIABILITY"
+      ],
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
@@ -1301,7 +1355,9 @@
       "id": "FAILURE_SUMMARY_REPORT",
       "did": "DI-SESS-80255A",
       "title": "Failure Summary and Analysis Report",
-      "line": "SAFETY_RELIABILITY",
+      "domains": [
+        "SAFETY_RELIABILITY"
+      ],
       "drafted_at": "TRR",
       "baselined_at": "SVR_FCA, updated in O&S",
       "influenced_by": [
@@ -1344,7 +1400,9 @@
       "id": "LCSP",
       "did": "N/A - PM-authored strategy doc, not a classic DID",
       "title": "Life Cycle Sustainment Plan",
-      "line": "LOGISTICS",
+      "domains": [
+        "LOGISTICS"
+      ],
       "drafted_at": "PDR",
       "baselined_at": "each Milestone",
       "influenced_by": [
@@ -1382,7 +1440,9 @@
       "id": "PROVISIONING",
       "did": "DI-SESS/DI-ALSS series [VERIFY]",
       "title": "Provisioning Technical Documentation",
-      "line": "LOGISTICS",
+      "domains": [
+        "LOGISTICS"
+      ],
       "drafted_at": "CDR",
       "baselined_at": "PCA",
       "influenced_by": [
@@ -1418,7 +1478,9 @@
       "id": "CMP",
       "did": "DI-CMAN-80858B (current confirmed) - some programs have migrated CM-series DIDs to DI-SESS numbers [VERIFY latest]",
       "title": "Contractor's Configuration Management Plan",
-      "line": "CM",
+      "domains": [
+        "CM"
+      ],
       "drafted_at": "SRR",
       "baselined_at": "SRR",
       "verified": true,
@@ -1453,7 +1515,9 @@
       "id": "FCA_PCA_evidence",
       "did": "N/A - audit record, not a single DID",
       "title": "FCA/PCA Audit Record",
-      "line": "CM",
+      "domains": [
+        "CM"
+      ],
       "drafted_at": "SVR_FCA / PCA",
       "baselined_at": "SVR_FCA (Functional), PCA (Product)",
       "notes": "This is the terminal interchange station - Design Input line (via RVTM) and Design Output line (via ENG_DRAWINGS/SPS) formally converge here.",
@@ -1494,7 +1558,9 @@
       "id": "HW_DEV_SPEC",
       "did": "DI-IPSC-82259",
       "title": "Software/Hardware Requirements Specification (SHRS)",
-      "line": "DESIGN_INPUT",
+      "domains": [
+        "DESIGN_INPUT"
+      ],
       "decomposition_level": "CONFIGURATION_ITEM",
       "drafted_at": "SFR",
       "baselined_at": "PDR",
@@ -1542,7 +1608,9 @@
       "id": "HW_PROD_SPEC",
       "did": "No confirmed generic DID number found this session - see HW_DEV_SPEC note. [VERIFY against your program's CDRL/AMSDL]",
       "title": "Prime/Critical Item Product Specification (MIL-STD-961E Type C)",
-      "line": "DESIGN_OUTPUT",
+      "domains": [
+        "DESIGN_OUTPUT"
+      ],
       "decomposition_level": "CONFIGURATION_ITEM",
       "drafted_at": "CDR",
       "baselined_at": "PRR",
@@ -1585,7 +1653,9 @@
       "id": "LORA",
       "did": "DI-SESS-81901",
       "title": "Level of Repair Analysis (LORA) Report",
-      "line": "LOGISTICS",
+      "domains": [
+        "LOGISTICS"
+      ],
       "decomposition_level": "CONFIGURATION_ITEM",
       "notes": "Companion input-data DID: DI-SESS-81873 (LORA Input Data), used when the government furnishes LORA data for contractor analysis rather than the contractor delivering the full report. SETR event placement not yet interviewed.",
       "confirmed_via_did_interview": true,
@@ -1626,7 +1696,9 @@
       "id": "CMRS",
       "did": "DI-QCIC-80278C",
       "title": "Calibration and Measurement Requirements Summary (CMRS)",
-      "line": "LOGISTICS",
+      "domains": [
+        "LOGISTICS"
+      ],
       "decomposition_level": "CONFIGURATION_ITEM",
       "notes": "Ties to MIL-STD-1839 - details TMDE and calibration standards required to support the system. SETR event placement not yet interviewed.",
       "confirmed_via_did_interview": true,

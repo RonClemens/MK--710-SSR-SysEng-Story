@@ -18,6 +18,7 @@ function lineIdFromElementId(id: string): string | null {
 function nodeIdFromElementId(id: string): string | null {
   if (id.startsWith("station-")) return id.slice("station-".length);
   if (id.startsWith("related-")) return id.slice("related-".length);
+  if (id.startsWith("interchange-presence-")) return id.split("--")[1] ?? null;
   if (id.startsWith("maturity-")) return id.split("-")[1];
   return null;
 }
