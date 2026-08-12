@@ -10,15 +10,17 @@ import type { CdrlPathDecompositionLevel } from "../types/cdrlPath";
 
 const LINE_ELEMENT_PREFIXES = ["line-label-", "line-edge-"];
 
+// A domain's track is drawn as several ring-to-ring segments now (so it can bend toward
+// other tracks), each id'd `line-edge-{lineId}--seg{n}` — split off the `--seg{n}` suffix to
+// recover the line id a click should expand/collapse.
 function lineIdFromElementId(id: string): string | null {
   const prefix = LINE_ELEMENT_PREFIXES.find((p) => id.startsWith(p));
-  return prefix ? id.slice(prefix.length) : null;
+  return prefix ? id.slice(prefix.length).split("--")[0] : null;
 }
 
 function nodeIdFromElementId(id: string): string | null {
   if (id.startsWith("station-")) return id.slice("station-".length);
   if (id.startsWith("related-")) return id.slice("related-".length);
-  if (id.startsWith("interchange-presence-")) return id.split("--")[1] ?? null;
   if (id.startsWith("maturity-")) return id.split("-")[1];
   return null;
 }

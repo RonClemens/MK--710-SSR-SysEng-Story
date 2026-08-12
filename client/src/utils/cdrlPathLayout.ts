@@ -4,12 +4,14 @@ import { anchorEventIndex, expandMaturityStateToMarkers, getMaturityMarkerStyle,
 
 // Polar "dartboard" coordinate system per Ron's steer: SETR events are concentric rings
 // (ASR outermost, PRR the center bullseye — PCA/ISR fall outside the ring system since PRR
-// is explicitly the terminus, not the literal end of the SETR sequence), and each domain
-// (line) is a radial spoke running from the outer ring inward to wherever that domain's own
-// latest active SETR event is — it does not have to reach the center. This replaced an
-// earlier Cartesian (x=time, y=line) layout with a bolted-on "relationship hub" once Ron
-// clarified the whole map should be radial, not just one feature of it — see
-// docs/cdrl-path/DECISIONS.md #10-#12 for the full history of how this shape was arrived at.
+// is explicitly the terminus, not the literal end of the SETR sequence). Each domain (line)
+// is a track running from the outer ring inward to wherever that domain's own latest active
+// SETR event is — it does not have to reach the center, and per Ron's follow-up steer, it
+// does not have to stay in its own fixed angular slice either: a track bends toward whatever
+// other domains it needs to run alongside to reach a CDRL that spans more than one of them,
+// meeting them at a single shared point rather than staying rigidly radial the whole way in.
+// See docs/cdrl-path/DECISIONS.md #10-#12 and #22 for the full history of how this shape was
+// arrived at.
 
 export const CENTER = { x: 700, y: 700 };
 export const OUTER_RADIUS = 640;
@@ -24,6 +26,25 @@ function toRadians(deg: number) {
 export function polarPoint(radius: number, angleDeg: number): { x: number; y: number } {
   const rad = toRadians(angleDeg);
   return { x: CENTER.x + radius * Math.cos(rad), y: CENTER.y + radius * Math.sin(rad) };
+}
+
+function circularMeanAngle(anglesDeg: number[]): number {
+  const meanSin = anglesDeg.reduce((sum, a) => sum + Math.sin(toRadians(a)), 0) / anglesDeg.length;
+  const meanCos = anglesDeg.reduce((sum, a) => sum + Math.cos(toRadians(a)), 0) / anglesDeg.length;
+  return (Math.atan2(meanSin, meanCos) * 180) / Math.PI;
+}
+
+/** Shortest signed angular distance from `a` to `b`, in (-180, 180], so interpolation always
+ * takes the short way around instead of potentially sweeping the long way through 0°/360°. */
+function shortestAngleDelta(a: number, b: number): number {
+  let delta = (b - a) % 360;
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
+  return delta;
+}
+
+function lerpAngle(a: number, b: number, t: number): number {
+  return a + shortestAngleDelta(a, b) * t;
 }
 
 /**
@@ -73,8 +94,8 @@ export interface CdrlPathFlowOptions {
 
 // "Train stop" icon per Ron's steer: a single-domain CDRL is a hollow ring sitting on its
 // one track; a multi-domain CDRL is a bigger concentric-ring interchange icon (the WMATA
-// transfer-station look) sitting between its tracks, with a short colored stub connecting
-// it to each one — not a marker glued onto its "primary" domain's line.
+// transfer-station look) sitting exactly where its tracks bend together and touch — no
+// separate stub connectors needed once the tracks themselves converge there.
 const STATION_MARKER_SIZE = 16;
 const HUB_MARKER_SIZE = 26;
 // Nodes sharing a domain fan out by a small angle rather than the flat pixel offset the
@@ -82,15 +103,27 @@ const HUB_MARKER_SIZE = 26;
 // spread into a neighboring domain's angular sector.
 const MAX_SUBLANE_SPREAD_DEG = 28;
 
+interface AngleKeyframe {
+  ring: number;
+  angle: number;
+}
+
+interface MultiDomainMeeting {
+  node: CdrlPathNode;
+  ring: number;
+  lineIndices: number[];
+  angle: number;
+  point: { x: number; y: number };
+}
+
 /** Builds the React Flow elements for the current zoom/filter state.
  *
  * Always rendered, regardless of zoom state: the concentric SETR-event rings, each domain's
- * radial spoke (stopping at its own latest active ring, not forced to the center), context
+ * track (stopping at its own latest active ring, not forced to the center — and bending
+ * toward whatever other domains it needs to run alongside to reach a shared multi-domain
+ * CDRL, rather than staying in its own fixed angular slice the whole way in), context
  * markers, a lightweight single-dot marker for every full_station node at its primary
- * anchor ring, and direct relationship connectors for every influences/influenced_by pair —
- * the real concentric rings and shared center (PRR) already do the "combining all related
- * lines together" work a separate constructed hub used to do, so relationships no longer
- * need one.
+ * anchor ring, and direct relationship connectors for every influences/influenced_by pair.
  *
  * Expansion-dependent: when a line is expanded (Level 2), that line's full_station nodes
  * additionally get their full DRAFT/FINAL/UPDATE maturity timeline (angular sub-lane
@@ -108,7 +141,7 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
 
   const domainCount = model.lines.length;
   const angleStep = 360 / domainCount;
-  const domainAngle = (domainIndex: number) => -90 + domainIndex * angleStep;
+  const domainHomeAngle = (domainIndex: number) => -90 + domainIndex * angleStep;
 
   const nodes: Node[] = [];
   const edges: Edge[] = [];
@@ -140,7 +173,7 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       },
     });
     // Ring labels along one reference spoke, offset from angle 0 so they don't sit on top
-    // of a domain's own spoke line.
+    // of a domain's own track.
     const labelAngle = -90 - angleStep / 2;
     const labelPoint = polarPoint(radius, labelAngle);
     nodes.push({
@@ -194,11 +227,11 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     return node.maturity_states ?? [];
   }
 
-  /** Highest ring index reached by any of a domain's own nodes (context markers and
-   * full_station maturity markers alike) — where that domain's spoke line stops. Domains
-   * with no resolvable activity default to the outermost ring only (a stub spoke) rather
-   * than guessing a length. */
-  function domainMaxActiveIndex(lineId: string): number {
+  /** Highest ring index reached by a domain's OWN nodes (context markers and full_station
+   * maturity markers where this is their primary/only domain) — ignores any ring it might
+   * additionally reach by bending toward a shared multi-domain CDRL, which domainTrackExtent
+   * (below) adds on top. */
+  function domainOwnContentMaxIndex(lineId: string): number {
     let max = 0;
     model.nodes.forEach((n) => {
       if (n.domains[0] !== lineId) return;
@@ -216,13 +249,93 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     return Math.min(max, prrIndex);
   }
 
+  /** Every CDRL spanning 2+ domains gets exactly one shared meeting point — the ring is that
+   * node's own resolved anchor (same logic as a single-domain station's position), and the
+   * angle is the circular mean of its domains' home angles. Every domain that node touches
+   * bends its track to pass through this exact point, which is what replaces the old
+   * separate hub-icon-plus-stub-connectors construct: the tracks themselves now converge. */
+  const meetings: MultiDomainMeeting[] = model.nodes
+    .filter((n) => n.domains.length > 1)
+    .map((n) => {
+      const lineIndices = n.domains.map((d) => model.lines.findIndex((l) => l.id === d)).filter((idx) => idx !== -1);
+      if (lineIndices.length < 2) return null;
+      const ring = Math.max(
+        0,
+        Math.min(
+          Math.round(
+            n.render_style === "context_marker"
+              ? resolveMarkerEventIndex(n.drafted_at ?? n.baselined_at ?? "", setr_events)
+              : anchorEventIndex(n, setr_events),
+          ),
+          prrIndex,
+        ),
+      );
+      const angle = circularMeanAngle(lineIndices.map((idx) => domainHomeAngle(idx)));
+      return { node: n, ring, lineIndices, angle, point: polarPoint(ringRadius(ring), angle) };
+    })
+    .filter((m): m is MultiDomainMeeting => m !== null);
+  const meetingByNodeId = new Map(meetings.map((m) => [m.node.id, m]));
+
+  /** A domain's full track extent: its own content, extended further inward if it needs to
+   * reach a shared meeting point deeper than its own content goes — e.g. a domain whose own
+   * deliverables stop at CDR but that also co-owns an interface doc recurring through PRR
+   * keeps its track running (bent toward that doc) all the way to PRR. */
+  function domainTrackExtent(lineIndex: number): number {
+    let max = domainOwnContentMaxIndex(model.lines[lineIndex].id);
+    meetings.forEach((m) => {
+      if (m.lineIndices.includes(lineIndex)) max = Math.max(max, m.ring);
+    });
+    return Math.min(max, prrIndex);
+  }
+
+  /** A domain's angle keyframes: home angle at ring 0 and at its own track extent, plus one
+   * keyframe per shared meeting it participates in — angleAtRing interpolates between them
+   * (shortest-path) so the track eases toward a meeting and back rather than snapping. */
+  function computeKeyframes(lineIndex: number, maxRing: number): AngleKeyframe[] {
+    const home = domainHomeAngle(lineIndex);
+    const byRing = new Map<number, number[]>();
+    meetings.forEach((m) => {
+      if (!m.lineIndices.includes(lineIndex)) return;
+      const ring = Math.min(m.ring, maxRing);
+      const angles = byRing.get(ring) ?? [];
+      angles.push(m.angle);
+      byRing.set(ring, angles);
+    });
+    if (!byRing.has(0)) byRing.set(0, [home]);
+    if (!byRing.has(maxRing)) byRing.set(maxRing, [home]);
+    return Array.from(byRing.entries())
+      .map(([ring, angles]) => ({ ring, angle: circularMeanAngle(angles) }))
+      .sort((a, b) => a.ring - b.ring);
+  }
+
+  function angleAtRing(keyframes: AngleKeyframe[], ring: number): number {
+    if (ring <= keyframes[0].ring) return keyframes[0].angle;
+    const last = keyframes[keyframes.length - 1];
+    if (ring >= last.ring) return last.angle;
+    for (let i = 0; i < keyframes.length - 1; i++) {
+      const a = keyframes[i];
+      const b = keyframes[i + 1];
+      if (ring >= a.ring && ring <= b.ring) {
+        const t = b.ring === a.ring ? 0 : (ring - a.ring) / (b.ring - a.ring);
+        return lerpAngle(a.angle, b.angle, t);
+      }
+    }
+    return last.angle;
+  }
+
+  const trackExtentByLine = model.lines.map((_, lineIndex) => domainTrackExtent(lineIndex));
+  const keyframesByLine = model.lines.map((_, lineIndex) => computeKeyframes(lineIndex, trackExtentByLine[lineIndex]));
+  const trackAngleAt = (lineIndex: number, ring: number) => angleAtRing(keyframesByLine[lineIndex], ring);
+
+  /** Zero-size anchor node a straight edge can source/target from, at an already-resolved point. */
+  function pushAnchor(id: string, point: { x: number; y: number }) {
+    nodes.push({ id, type: "default", position: point, data: {}, draggable: false, selectable: false, style: { width: 1, height: 1, opacity: 0, border: "none" } });
+  }
+
   model.lines.forEach((line, lineIndex) => {
-    const angle = domainAngle(lineIndex);
     const isExpanded = line.id === expandedLineId;
-    const maxIndex = domainMaxActiveIndex(line.id);
-    const outerPoint = polarPoint(ringRadius(0), angle);
-    const innerPoint = polarPoint(ringRadius(maxIndex), angle);
-    const labelPoint = polarPoint(ringRadius(0) + 36, angle);
+    const maxRing = trackExtentByLine[lineIndex];
+    const labelPoint = polarPoint(ringRadius(0) + 36, trackAngleAt(lineIndex, 0));
 
     nodes.push({
       id: `line-label-${line.id}`,
@@ -244,30 +357,39 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       },
     });
 
-    const startId = `line-start-${line.id}`;
-    const endId = `line-end-${line.id}`;
-    nodes.push(
-      { id: startId, type: "default", position: outerPoint, data: {}, draggable: false, selectable: false, style: { width: 1, height: 1, opacity: 0, border: "none" } },
-      { id: endId, type: "default", position: innerPoint, data: {}, draggable: false, selectable: false, style: { width: 1, height: 1, opacity: 0, border: "none" } },
-    );
-    edges.push({
-      id: `line-edge-${line.id}`,
-      source: startId,
-      target: endId,
-      type: "straight",
-      selectable: false,
-      style: { stroke: line.color_hint, strokeWidth: isExpanded ? 12 : 9, cursor: "pointer" },
-    });
+    // The track itself: one ring-to-ring straight segment per hop, its angle interpolated
+    // from the domain's keyframes — a polyline that bends toward shared meeting points
+    // instead of a single rigid radial line. Segment ids carry a `--seg{n}` suffix so
+    // CdrlPathPage's click routing (which only needs the line id) can still parse them.
+    const ringPointId = (r: number) => `line-pt-${line.id}--${r}`;
+    for (let r = 0; r <= maxRing; r++) {
+      pushAnchor(ringPointId(r), polarPoint(ringRadius(r), trackAngleAt(lineIndex, r)));
+    }
+    for (let r = 0; r < maxRing; r++) {
+      edges.push({
+        id: `line-edge-${line.id}--seg${r}`,
+        source: ringPointId(r),
+        target: ringPointId(r + 1),
+        type: "straight",
+        selectable: false,
+        style: { stroke: line.color_hint, strokeWidth: isExpanded ? 12 : 9, cursor: "pointer" },
+      });
+    }
+    if (maxRing === 0) {
+      // No resolvable activity at all: a visible stub at the outer ring rather than nothing.
+      edges.push({
+        id: `line-edge-${line.id}--seg0`,
+        source: ringPointId(0),
+        target: ringPointId(0),
+        type: "straight",
+        selectable: false,
+        style: { stroke: line.color_hint, strokeWidth: isExpanded ? 12 : 9, cursor: "pointer" },
+      });
+    }
   });
 
-  /** Zero-size anchor node a straight edge can source/target from, at an already-resolved point. */
-  function pushAnchor(id: string, point: { x: number; y: number }) {
-    nodes.push({ id, type: "default", position: point, data: {}, draggable: false, selectable: false, style: { width: 1, height: 1, opacity: 0, border: "none" } });
-  }
-
   /** A single subway "train stop": a hollow ring in the line's own color, sitting directly
-   * on that line. Used both for a single-domain CDRL's only marker and for the small
-   * presence tick a multi-domain CDRL leaves on each of its other tracks. */
+   * on that line. */
   function pushTrainStop(id: string, point: { x: number; y: number }, size: number, color: string, zIndex: number) {
     const half = size / 2;
     nodes.push({
@@ -289,47 +411,24 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     });
   }
 
-  /** Renders a CDRL's station marker at ring `radiusIndex`: a plain train-stop icon if it
-   * belongs to one domain, or an interchange hub (see renderInterchangeHub) if it spans
-   * two or more. Per Ron's steer: a single-domain CDRL "belongs on one single track"; a
-   * multi-domain one "should be a hub for those related tracks," not a marker glued onto
-   * whichever domain happens to be listed first. */
+  /** Renders a CDRL's station marker: a plain train-stop icon sitting on its one (possibly
+   * bent) track if it belongs to a single domain, or the bigger concentric-ring interchange
+   * icon at its precomputed meeting point if it spans two or more — where every one of its
+   * domains' tracks already bends to meet it, so no separate stub connectors are needed. */
   function renderStation(cdrlNode: CdrlPathNode, radiusIndex: number, primaryLineIndex: number) {
-    const lineIndices = cdrlNode.domains
-      .map((domainId) => model.lines.findIndex((l) => l.id === domainId))
-      .filter((idx) => idx !== -1);
-
-    if (lineIndices.length <= 1) {
-      const point = polarPoint(ringRadius(radiusIndex), domainAngle(primaryLineIndex));
+    const meeting = meetingByNodeId.get(cdrlNode.id);
+    if (!meeting) {
+      const point = polarPoint(ringRadius(radiusIndex), trackAngleAt(primaryLineIndex, radiusIndex));
       nodeAnchorCenter.set(cdrlNode.id, point);
       pushTrainStop(`station-${cdrlNode.id}`, point, STATION_MARKER_SIZE, model.lines[primaryLineIndex].color_hint, 6);
       return;
     }
-    renderInterchangeHub(cdrlNode, radiusIndex, lineIndices);
-  }
-
-  /**
-   * True subway interchange: for a node spanning 2+ domains, the station itself sits at the
-   * circular-mean angle of its domains (at their shared ring) rather than on any one line —
-   * a bigger concentric-ring icon (the WMATA transfer-station look), with a short colored
-   * stub running out to a train-stop tick on each involved track. Per Ron's steer: CDRLs
-   * are "the subway stops involving one or more domains' participation," and a multi-domain
-   * one "should be a hub for those related tracks."
-   */
-  function renderInterchangeHub(cdrlNode: CdrlPathNode, radiusIndex: number, lineIndices: number[]) {
-    const radius = ringRadius(radiusIndex);
-    const angles = lineIndices.map((idx) => toRadians(domainAngle(idx)));
-    const meanSin = angles.reduce((sum, a) => sum + Math.sin(a), 0) / angles.length;
-    const meanCos = angles.reduce((sum, a) => sum + Math.cos(a), 0) / angles.length;
-    const hubAngleDeg = (Math.atan2(meanSin, meanCos) * 180) / Math.PI;
-    const hubPoint = polarPoint(radius, hubAngleDeg);
-    nodeAnchorCenter.set(cdrlNode.id, hubPoint);
-
+    nodeAnchorCenter.set(cdrlNode.id, meeting.point);
     const half = HUB_MARKER_SIZE / 2;
     nodes.push({
       id: `station-${cdrlNode.id}`,
       type: "default",
-      position: { x: hubPoint.x - half, y: hubPoint.y - half },
+      position: { x: meeting.point.x - half, y: meeting.point.y - half },
       data: { label: "" },
       draggable: false,
       zIndex: 7,
@@ -343,54 +442,6 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
         padding: 0,
         cursor: "pointer",
       },
-    });
-
-    lineIndices.forEach((lineIndex) => {
-      const domainLine = model.lines[lineIndex];
-      const trackPoint = polarPoint(radius, domainAngle(lineIndex));
-      const stubId = `interchange-stub-${cdrlNode.id}-${domainLine.id}`;
-      pushAnchor(`${stubId}-a`, hubPoint);
-      pushAnchor(`${stubId}-b`, trackPoint);
-      edges.push({
-        id: stubId,
-        source: `${stubId}-a`,
-        target: `${stubId}-b`,
-        type: "straight",
-        selectable: false,
-        zIndex: 2,
-        style: { stroke: domainLine.color_hint, strokeWidth: 3 },
-      });
-      pushTrainStop(`interchange-presence-${domainLine.id}--${cdrlNode.id}`, trackPoint, STATION_MARKER_SIZE, domainLine.color_hint, 6);
-    });
-  }
-
-  /** Connects an already-placed marker (e.g. a maturity marker on the currently expanded
-   * line) out to a train-stop tick on each of the node's OTHER domains — used when the
-   * node's primary position isn't the interchange hub itself (Level 2's rich timeline keeps
-   * that marker on the expanded line), so the interchange still needs its stubs drawn from
-   * that fixed point instead of a freshly computed hub. */
-  function renderInterchangeStubsFrom(cdrlNode: CdrlPathNode, fromPoint: { x: number; y: number }, radiusIndex: number, shownOnLineIndex: number) {
-    const radius = ringRadius(radiusIndex);
-    const otherLineIndices = cdrlNode.domains
-      .map((domainId) => model.lines.findIndex((l) => l.id === domainId))
-      .filter((idx) => idx !== -1 && idx !== shownOnLineIndex);
-
-    otherLineIndices.forEach((lineIndex) => {
-      const domainLine = model.lines[lineIndex];
-      const trackPoint = polarPoint(radius, domainAngle(lineIndex));
-      const stubId = `interchange-stub-${cdrlNode.id}-${domainLine.id}`;
-      pushAnchor(`${stubId}-a`, fromPoint);
-      pushAnchor(`${stubId}-b`, trackPoint);
-      edges.push({
-        id: stubId,
-        source: `${stubId}-a`,
-        target: `${stubId}-b`,
-        type: "straight",
-        selectable: false,
-        zIndex: 2,
-        style: { stroke: domainLine.color_hint, strokeWidth: 3 },
-      });
-      pushTrainStop(`interchange-presence-${domainLine.id}--${cdrlNode.id}`, trackPoint, STATION_MARKER_SIZE, domainLine.color_hint, 6);
     });
   }
 
@@ -440,7 +491,7 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
           const visual = getMaturityMarkerStyle(state);
           const size = visual.large ? 26 : 18;
           const half = size / 2;
-          const point = polarPoint(ringRadius(clampedIndex), domainAngle(lineIndex) + angleOffset);
+          const point = polarPoint(ringRadius(clampedIndex), trackAngleAt(lineIndex, clampedIndex) + angleOffset);
           // Relationship connectors point to one representative point per node — prefer
           // FINAL (the "as-delivered" milestone) over whichever marker happened to be
           // created first, and over the lightweight anchor set above.
@@ -480,39 +531,35 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
           });
         });
       });
-      if (cdrlNode.domains.length > 1) {
-        const anchor = nodeAnchorCenter.get(cdrlNode.id);
-        if (anchor) {
-          const anchorIndex = Math.round(
-            (Math.hypot(anchor.x - CENTER.x, anchor.y - CENTER.y) - OUTER_RADIUS) / ((INNER_RADIUS - OUTER_RADIUS) / prrIndex),
-          );
-          renderInterchangeStubsFrom(cdrlNode, anchor, anchorIndex, lineIndex);
-        }
-      }
+      // No separate interchange-stub step needed here: if cdrlNode spans multiple domains,
+      // every one of those domains' tracks already bends through its shared meeting point
+      // (see `meetings` above), so the expanded line's own track already runs through it.
     });
   }
 
   // Relationship connectors — the actual "back and forth across the whole team" Ron
   // described as this model's core value (see purpose_statement in the data model). Drawn
-  // directly between each pair's actual anchor points rather than through a constructed
-  // hub: on the dartboard, the concentric rings and shared center are already the visual
-  // structure that makes multiple domains' activity converge, so relationships don't need
-  // a separate bullseye of their own the way they did under the old Cartesian layout (see
-  // docs/cdrl-path/DECISIONS.md #10-#12). "ALL" targets (SEMP/IMP_IMS/RMP) are skipped per
-  // confirmed_patterns.relationship_assessment_status flagging them as too broad to chart.
+  // directly between each pair's actual anchor points. "ALL" targets (SEMP/IMP_IMS/RMP) are
+  // skipped per confirmed_patterns.relationship_assessment_status flagging them as too broad
+  // to chart.
   const ghostNodeIdsAdded = new Set<string>();
   const ghostSlotsUsed = new Map<string, number>();
 
   function ghostAnchorFor(target: CdrlPathNode): { x: number; y: number } | null {
     const existing = nodeAnchorCenter.get(target.id);
     if (existing) return existing;
+    const meeting = meetingByNodeId.get(target.id);
+    if (meeting) {
+      nodeAnchorCenter.set(target.id, meeting.point);
+      return meeting.point;
+    }
     const targetLineIndex = model.lines.findIndex((l) => l.id === target.domains[0]);
     if (targetLineIndex === -1) return null;
     const eventIndex = Math.min(anchorEventIndex(target, setr_events), prrIndex);
     const slotKey = `${targetLineIndex}:${eventIndex}`;
     const slot = ghostSlotsUsed.get(slotKey) ?? 0;
     ghostSlotsUsed.set(slotKey, slot + 1);
-    const point = polarPoint(ringRadius(eventIndex), domainAngle(targetLineIndex) + slot * 6);
+    const point = polarPoint(ringRadius(eventIndex), trackAngleAt(targetLineIndex, eventIndex) + slot * 6);
     nodeAnchorCenter.set(target.id, point);
     if (!ghostNodeIdsAdded.has(target.id)) {
       ghostNodeIdsAdded.add(target.id);
@@ -547,7 +594,7 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       if (targetId === "ALL" || targetId === cdrlNode.id) return;
       const target = nodeById.get(targetId);
       if (!target) return; // dangling reference — already surfaced by validateModel()
-      if (target.domains[0] === cdrlNode.domains[0]) return; // same-domain, already visually adjacent on the shared spoke
+      if (target.domains[0] === cdrlNode.domains[0]) return; // same-domain, already visually adjacent on the shared track
       const targetAnchor = ghostAnchorFor(target);
       if (!targetAnchor) return;
       edges.push({

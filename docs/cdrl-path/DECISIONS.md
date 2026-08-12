@@ -258,3 +258,50 @@ decomposition-level filtering was breaking it.
     not just the one coincidentally-SYSTEM-tagged interchange node (IRS) that happens to also
     touch that track. `tsc -b` clean; zero console/page errors across Level 1, Level 2 (SW
     expanded), and Level 3 (detail panel).
+
+## 2026-08-12 — Tracks bend to meet each other; interchange stubs removed
+
+Ron, looking at the live map: "the colors don't have to stay in their pie piece if they need to
+traverse alongside another domain color track to get to their finish state. there are too many
+criss-crossing dashed lines in addition to the large route line for each color. how do we
+establish a meandering single track for each color?" This was explicitly flagged as deferred
+scope back in #16-19 ("whether domains should ever have angularly bent/curved spokes... deferred
+per stated v1 scope") — Ron asked for it to be built now.
+
+22. **Domain tracks are now bent polylines, not rigid radial spokes.** Each domain still has a
+    home angle (the equal-division pie-slice angle from #10), but a track only sits exactly on
+    that angle where it has no reason to move. For every CDRL spanning 2+ domains, Code Chat
+    computes one shared "meeting point" — the circular mean of its domains' home angles, at that
+    CDRL's own resolved ring — and every domain touching that CDRL gets an angle keyframe pulling
+    its track toward that exact point at that ring. Between keyframes (ring 0 at home angle, each
+    meeting ring, and the track's own end back at home angle), the angle is linearly interpolated
+    (shortest angular path) so the track eases toward a meeting and back rather than snapping.
+    Rendered as one straight ring-to-ring segment per hop (reusing the zero-size-anchor-node +
+    `type: "straight"` pattern already used throughout this file) rather than a single edge, so
+    it reads as a continuous bending line without needing a custom multi-point edge component.
+
+23. **The separate interchange-hub-plus-stub-connectors construct from #17-19 is gone.** Since
+    every domain a multi-domain CDRL touches now bends its own track through that CDRL's exact
+    meeting point, the tracks themselves visually converge there — no separate thin stub edges
+    or per-domain presence dots are needed to fake the connection anymore. `renderInterchangeHub`
+    and `renderInterchangeStubsFrom` collapsed into one path: the concentric-ring hub icon still
+    renders (unchanged look), but sits exactly where the bent tracks already meet.
+
+24. **A domain's track extent now includes anywhere it needs to bend to, not just its own
+    content.** `domainTrackExtent` takes the deeper of a domain's own maturity data and any
+    shared-meeting ring it participates in — so a domain whose own deliverables stop early but
+    that co-owns a CDRL recurring much further inward keeps running (bent toward that CDRL) all
+    the way to it, per Ron's "traverse alongside another domain color track to get to their
+    finish state."
+
+    Click-routing impact: a domain's track edge id changed from one `line-edge-{lineId}` edge to
+    several `line-edge-{lineId}--seg{n}` segments: updated `lineIdFromElementId` in
+    `CdrlPathPage.tsx` to split off the `--seg{n}` suffix rather than change the click-handling
+    contract. The now-dead `interchange-presence-` id branch in `nodeIdFromElementId` was removed
+    since nothing produces that id anymore.
+
+    Verified: `tsc -b` clean; Playwright screenshots show tracks visibly curving toward shared
+    meeting points (e.g. SE/SW/HW bending together near their shared interface-doc stations)
+    with no separate stub lines, and Level 2 (SE expanded — the rich timeline follows the same
+    bent track) and Level 3 (detail panel) still work, clicking anywhere along a segmented track
+    still expands/collapses it — zero console/page errors in all three states.
