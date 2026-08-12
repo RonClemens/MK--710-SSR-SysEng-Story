@@ -1,5 +1,5 @@
 import type { Edge, Node } from "@xyflow/react";
-import type { CdrlPathDecompositionLevel, CdrlPathModel, CdrlPathNode } from "../types/cdrlPath";
+import type { CdrlPathDecompositionLevel, CdrlPathMaturityState, CdrlPathModel, CdrlPathNode } from "../types/cdrlPath";
 import { anchorEventIndex, expandMaturityStateToMarkers, getMaturityMarkerStyle, maturityStatesForLevel } from "./cdrlPathMaturityMarkers";
 
 // Polar "dartboard" coordinate system per Ron's steer: SETR events are concentric rings
@@ -181,6 +181,19 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
   const fullStationNodes = model.nodes.filter((n) => n.render_style !== "context_marker");
   const contextMarkers = model.nodes.filter((n) => n.render_style === "context_marker");
 
+  /** A node's own maturity states regardless of the currently selected decomposition level —
+   * every level's states when they're split via maturity_states_by_level (e.g. RVTM),
+   * otherwise the flat maturity_states array. Deliberately NOT filtered by decompositionLevel:
+   * per the project brief, decomposition level is "a filter/toggle, not a separate stacked
+   * map," so it should change which detail Level 2 shows, not whether a domain's backbone
+   * track exists at Level 1. Most CDRLs (all of SW's and HW's among them) are tagged a single
+   * decomposition_level like CONFIGURATION_ITEM simply because that's the only level they're
+   * ever produced at — not because they should vanish from the System-level view. */
+  function allMaturityStates(node: CdrlPathNode): CdrlPathMaturityState[] {
+    if (node.maturity_states_by_level) return Object.values(node.maturity_states_by_level).flat();
+    return node.maturity_states ?? [];
+  }
+
   /** Highest ring index reached by any of a domain's own nodes (context markers and
    * full_station maturity markers alike) — where that domain's spoke line stops. Domains
    * with no resolvable activity default to the outermost ring only (a stub spoke) rather
@@ -194,7 +207,7 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
         max = Math.max(max, Math.round(resolveMarkerEventIndex(marker, setr_events)));
         return;
       }
-      maturityStatesForLevel(n, decompositionLevel).forEach((state) => {
+      allMaturityStates(n).forEach((state) => {
         expandMaturityStateToMarkers(n, state, setr_events).forEach(({ eventIndex }) => {
           max = Math.max(max, Math.round(eventIndex));
         });

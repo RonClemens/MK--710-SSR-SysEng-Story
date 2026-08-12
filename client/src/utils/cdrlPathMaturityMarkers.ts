@@ -86,16 +86,16 @@ export function expandMaturityStateToMarkers(
 }
 
 /** All marker points for a node at a given decomposition level — from maturity_states_by_level
- * when the node defines it (e.g. RVTM), otherwise the flat maturity_states array. Returns an
- * empty array when the node doesn't apply at the requested level (e.g. RVTM at COMPONENT). */
+ * when the node defines it (e.g. RVTM), otherwise the flat maturity_states array regardless of
+ * the node's own single `decomposition_level` tag. That tag is descriptive ("this CDRL is
+ * produced per-CI, not per-system") rather than a visibility switch: most real deliverables
+ * (all of SW's and HW's among them) are tagged CONFIGURATION_ITEM simply because that's the
+ * only level they're ever produced at, not because they should disappear whenever "System" is
+ * selected — see docs/cdrl-path/DECISIONS.md #20 for the bug this caused (whole domains going
+ * empty at the default view) and CdrlPathStationDetailPanel, which already got this right. */
 export function maturityStatesForLevel(node: CdrlPathNode, level: string): CdrlPathMaturityState[] {
   if (node.maturity_states_by_level) {
     return node.maturity_states_by_level[level as keyof typeof node.maturity_states_by_level] ?? [];
   }
-  const nodeLevels = Array.isArray(node.decomposition_level)
-    ? node.decomposition_level
-    : node.decomposition_level
-      ? [node.decomposition_level]
-      : ["SYSTEM"]; // undeclared decomposition_level defaults to SYSTEM, per the data model's own framing
-  return nodeLevels.includes(level as never) ? (node.maturity_states ?? []) : [];
+  return node.maturity_states ?? [];
 }

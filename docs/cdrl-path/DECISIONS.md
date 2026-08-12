@@ -215,3 +215,46 @@ tracks." Two changes to `cdrlPathLayout.ts`.
     from the expanded-line anchor), and Level 3 (detail panel opens on click) — zero console/page
     errors in all three states, no click-routing changes needed since `station-`/
     `interchange-presence-` id schemes were preserved.
+
+## 2026-08-12 — Bug: decomposition level was silently hiding whole domains
+
+Ron, looking at the live map: "I think the data model might be too detailed or complex to align
+CDRLs using railroad track colors. I am seeing Software Engineering CDRLs (orange) and Hardware
+Engineering CDRLs (red) not evolving through the SETR process on one single track." Traced to a
+real bug, not a modeling-complexity problem — the "single track per domain" concept was fine,
+decomposition-level filtering was breaking it.
+
+20. **Root cause: two code paths disagreed about whether a node's own `decomposition_level` tag
+    should gate its visibility.** A station's lightweight dot (`anchorEventIndex`) reads a
+    node's maturity data directly, ignoring decomposition level entirely — same as
+    `CdrlPathStationDetailPanel`, which only branches on `maturity_states_by_level` when a node
+    actually defines it (e.g. RVTM), never on the node's own single-level tag. But
+    `maturityStatesForLevel` (used for both the domain spoke's length and the Level 2 rich
+    timeline) treated that single-level tag as an all-or-nothing visibility switch: since every
+    one of SW's and HW's real deliverables (SRS, SDD, DBDD, ENG_DRAWINGS, HW_DEV_SPEC, etc.) is
+    tagged `CONFIGURATION_ITEM` — because that's the only level a CSCI/HWCI-specific document is
+    ever produced at, not a partial/incomplete tagging — the default "System" view computed
+    their domain's spoke length as zero and, one layer deeper, hid their entire Level 2
+    timeline too, while unrelated nodes tagged `SYSTEM` (like IRS) kept showing normally on the
+    same track. The result: orphaned station dots past a stub track, and an almost-empty
+    expanded view for two of seven domains — reading exactly like "not evolving on one single
+    track."
+
+21. **Fix: a node's own `decomposition_level` tag is descriptive, not a visibility gate.**
+    `maturityStatesForLevel` (`cdrlPathMaturityMarkers.ts`) now matches
+    `CdrlPathStationDetailPanel`'s already-correct behavior — branch on
+    `maturity_states_by_level` only when a node defines it, otherwise always return the flat
+    `maturity_states` regardless of which decomposition-level button is selected. A domain's
+    spoke length (`domainMaxActiveIndex` in `cdrlPathLayout.ts`) goes a step further via a new
+    `allMaturityStates` helper: for a level-split node, it takes the union across ALL levels
+    rather than just the currently selected one, so a domain's backbone track stays stable as
+    you toggle decomposition level — per the project brief, that toggle is "a filter/toggle,
+    not a separate stacked map," and shouldn't make whole tracks appear or disappear.
+
+    Verified: SW and HW spokes now reach the center at the default System view without needing
+    to switch decomposition level, matching every other domain (previously confirmed by
+    comparison against the CI-level view, where they already looked correct). Expanding SW at
+    System level now shows all 5 of its real deliverables' full DRAFT/FINAL/UPDATE timelines,
+    not just the one coincidentally-SYSTEM-tagged interchange node (IRS) that happens to also
+    touch that track. `tsc -b` clean; zero console/page errors across Level 1, Level 2 (SW
+    expanded), and Level 3 (detail panel).
