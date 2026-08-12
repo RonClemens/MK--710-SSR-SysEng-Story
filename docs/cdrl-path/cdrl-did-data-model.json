@@ -87,46 +87,46 @@
   },
   "lines": [
     {
-      "id": "DESIGN_INPUT",
-      "label": "Design Input CDRLs",
+      "id": "SE",
+      "label": "Systems Engineering CDRLs",
       "color_hint": "blue",
-      "description": "Requirements-flow artifacts: what the system must do/interface with, drafted before or during a review and baselined as the basis for the next design activity."
+      "description": "System-level requirements and design artifacts — the systems engineering discipline's own deliverables, not specific to software or hardware."
     },
     {
-      "id": "DESIGN_OUTPUT",
-      "label": "Design Output CDRLs",
+      "id": "SW",
+      "label": "Software Engineering CDRLs",
       "color_hint": "orange",
-      "description": "Design-description artifacts: how the system satisfies the input requirements, produced in response to a Design Input baseline."
+      "description": "Software Configuration Item (CSCI) requirements, design, and build artifacts."
     },
     {
-      "id": "MGMT",
-      "label": "Program/SE Management CDRLs",
-      "color_hint": "gray",
-      "description": "Governs how the whole effort is planned and controlled; runs the full length of the map."
+      "id": "HW",
+      "label": "Hardware Engineering CDRLs",
+      "color_hint": "brown",
+      "description": "Hardware Configuration Item (HWCI) requirements, design, and production artifacts."
     },
     {
-      "id": "TEST",
-      "label": "Verification & Validation CDRLs",
+      "id": "TE",
+      "label": "Test & Evaluation CDRLs",
       "color_hint": "green",
-      "description": "Plans and records that verify Design Output against Design Input."
-    },
-    {
-      "id": "LOGISTICS",
-      "label": "Product Support / ILS CDRLs",
-      "color_hint": "purple",
-      "description": "Sustainment-facing artifacts derived from design and reliability data."
+      "description": "Verification planning, procedures, and results — including the software-numbered (IPSC) test DIDs, since their purpose is testing, not building."
     },
     {
       "id": "SAFETY_RELIABILITY",
       "label": "Safety & Reliability CDRLs",
       "color_hint": "red",
-      "description": "Cross-cutting specialty engineering artifacts that both constrain design input and validate design output."
+      "description": "RAM and system-safety specialty engineering artifacts."
     },
     {
-      "id": "CM",
-      "label": "Configuration Management CDRLs",
-      "color_hint": "black",
-      "description": "The baseline-control artifacts themselves; these are the 'interchange stations' where lines merge."
+      "id": "ILS",
+      "label": "Integrated Logistics Support CDRLs",
+      "color_hint": "purple",
+      "description": "Sustainment-facing artifacts derived from design and reliability data."
+    },
+    {
+      "id": "PM_CM",
+      "label": "Program Management / CM CDRLs",
+      "color_hint": "gray",
+      "description": "Schedule, risk, and configuration-management administration — governs how the whole effort is planned and controlled."
     }
   ],
   "nodes": [
@@ -135,7 +135,7 @@
       "did": "N/A - not a DID (OSD/PM-authored)",
       "title": "Systems Engineering Plan",
       "domains": [
-        "MGMT"
+        "PM_CM"
       ],
       "drafted_at": "MSA",
       "baselined_at": "each Milestone",
@@ -176,7 +176,7 @@
       "did": "DI-SESS-81785A",
       "title": "Systems Engineering Management Plan",
       "domains": [
-        "MGMT"
+        "SE"
       ],
       "drafted_at": "SRR (proposal)",
       "baselined_at": "SRR, updated at each SETR",
@@ -217,7 +217,7 @@
       "did": "DI-MGMT-81650 [VERIFY]",
       "title": "Integrated Master Plan / Integrated Master Schedule",
       "domains": [
-        "MGMT"
+        "PM_CM"
       ],
       "drafted_at": "SRR",
       "baselined_at": "each SETR",
@@ -258,7 +258,7 @@
       "did": "DI-MGMT-81808 [VERIFY]",
       "title": "Risk/Issue/Opportunity Management Plan",
       "domains": [
-        "MGMT"
+        "PM_CM"
       ],
       "drafted_at": "SRR",
       "baselined_at": "SRR",
@@ -298,7 +298,7 @@
       "did": "N/A - JCIDS doc, not a DID",
       "title": "Capability Development Document",
       "domains": [
-        "DESIGN_INPUT"
+        "SE"
       ],
       "drafted_at": "pre-MSA",
       "baselined_at": "Milestone A/B",
@@ -326,7 +326,7 @@
       "did": "DI-IPSC-81431",
       "title": "System/Subsystem Specification",
       "domains": [
-        "DESIGN_INPUT"
+        "SE"
       ],
       "drafted_at": "SRR",
       "baselined_at": "SFR (Functional Baseline)",
@@ -378,7 +378,9 @@
       "did": "DI-IPSC-81434",
       "title": "Interface Requirements Specification",
       "domains": [
-        "DESIGN_INPUT"
+        "SE",
+        "SW",
+        "HW"
       ],
       "drafted_at": "SRR",
       "baselined_at": "SFR",
@@ -423,7 +425,9 @@
       "did": "DI-CMAN-81248 [VERIFY]",
       "title": "Interface Control Document",
       "domains": [
-        "DESIGN_INPUT"
+        "SE",
+        "SW",
+        "HW"
       ],
       "drafted_at": "SFR",
       "baselined_at": "CDR",
@@ -469,7 +473,7 @@
       "did": "DI-IPSC-81433",
       "title": "Software Requirements Specification",
       "domains": [
-        "DESIGN_INPUT"
+        "SW"
       ],
       "drafted_at": "SSR",
       "baselined_at": "PDR",
@@ -517,7 +521,7 @@
       "did": "DI-IPSC-81432",
       "title": "System/Subsystem Design Description",
       "domains": [
-        "DESIGN_OUTPUT"
+        "SE"
       ],
       "drafted_at": "SFR",
       "baselined_at": "PDR (Allocated Baseline)",
@@ -571,7 +575,9 @@
       "did": "DI-IPSC-81436",
       "title": "Interface Design Description",
       "domains": [
-        "DESIGN_OUTPUT"
+        "SE",
+        "SW",
+        "HW"
       ],
       "drafted_at": "SFR",
       "baselined_at": "PDR",
@@ -620,7 +626,7 @@
       "did": "DI-IPSC-81435",
       "title": "Software Design Description",
       "domains": [
-        "DESIGN_OUTPUT"
+        "SW"
       ],
       "drafted_at": "PDR",
       "baselined_at": "CDR",
@@ -668,7 +674,7 @@
       "did": "DI-IPSC-81437",
       "title": "Database Design Description",
       "domains": [
-        "DESIGN_OUTPUT"
+        "SW"
       ],
       "drafted_at": "PDR",
       "baselined_at": "CDR",
@@ -712,7 +718,7 @@
       "did": "DI-SESS-81000 series / MIL-STD-31000 TDP [VERIFY per level]",
       "title": "Engineering Drawings / Technical Data Package",
       "domains": [
-        "DESIGN_OUTPUT"
+        "HW"
       ],
       "drafted_at": "PDR",
       "baselined_at": "CDR (FINAL), PCA (AS_BUILT/Product Baseline)",
@@ -761,7 +767,7 @@
       "did": "DI-IPSC-81442",
       "title": "Software Version Description",
       "domains": [
-        "DESIGN_OUTPUT"
+        "SW"
       ],
       "drafted_at": "TRR",
       "baselined_at": "PRR",
@@ -807,7 +813,7 @@
       "did": "DI-IPSC-81441",
       "title": "Software Product Specification",
       "domains": [
-        "DESIGN_OUTPUT"
+        "SW"
       ],
       "drafted_at": "CDR",
       "baselined_at": "PCA (software Product Baseline)",
@@ -850,7 +856,7 @@
       "did": "DI-IPSC-81438",
       "title": "Software Test Plan",
       "domains": [
-        "TEST"
+        "TE"
       ],
       "drafted_at": "PDR",
       "baselined_at": "CDR",
@@ -892,7 +898,7 @@
       "did": "DI-IPSC-81439",
       "title": "Software Test Description",
       "domains": [
-        "TEST"
+        "TE"
       ],
       "drafted_at": "CDR",
       "baselined_at": "TRR",
@@ -931,7 +937,7 @@
       "did": "DI-IPSC-81440",
       "title": "Software Test Report",
       "domains": [
-        "TEST"
+        "TE"
       ],
       "drafted_at": "SVR_FCA",
       "baselined_at": "SVR_FCA",
@@ -969,7 +975,8 @@
       "did": "No standard MIL-STD-963 DID number exists - RVTM is typically delivered as a program-tailored data item (locally-defined CDRL) or as an embedded appendix/deliverable under the SEMP, STP, or Requirements Management Plan CDRLs, not its own DD-1664 DID.",
       "title": "Requirements Verification Traceability Matrix",
       "domains": [
-        "TEST"
+        "TE",
+        "SE"
       ],
       "drafted_at": "SRR",
       "baselined_at": "updated at every SETR through SVR_FCA",
@@ -1039,7 +1046,7 @@
       "did": "DoD 5000-series doc, often carried as a CDRL [VERIFY program-specific number]",
       "title": "Test & Evaluation Master Plan",
       "domains": [
-        "TEST"
+        "TE"
       ],
       "drafted_at": "MSA/SRR",
       "baselined_at": "each Milestone",
@@ -1401,7 +1408,7 @@
       "did": "N/A - PM-authored strategy doc, not a classic DID",
       "title": "Life Cycle Sustainment Plan",
       "domains": [
-        "LOGISTICS"
+        "ILS"
       ],
       "drafted_at": "PDR",
       "baselined_at": "each Milestone",
@@ -1441,7 +1448,7 @@
       "did": "DI-SESS/DI-ALSS series [VERIFY]",
       "title": "Provisioning Technical Documentation",
       "domains": [
-        "LOGISTICS"
+        "ILS"
       ],
       "drafted_at": "CDR",
       "baselined_at": "PCA",
@@ -1479,7 +1486,7 @@
       "did": "DI-CMAN-80858B (current confirmed) - some programs have migrated CM-series DIDs to DI-SESS numbers [VERIFY latest]",
       "title": "Contractor's Configuration Management Plan",
       "domains": [
-        "CM"
+        "PM_CM"
       ],
       "drafted_at": "SRR",
       "baselined_at": "SRR",
@@ -1516,7 +1523,10 @@
       "did": "N/A - audit record, not a single DID",
       "title": "FCA/PCA Audit Record",
       "domains": [
-        "CM"
+        "PM_CM",
+        "SE",
+        "SW",
+        "HW"
       ],
       "drafted_at": "SVR_FCA / PCA",
       "baselined_at": "SVR_FCA (Functional), PCA (Product)",
@@ -1559,7 +1569,8 @@
       "did": "DI-IPSC-82259",
       "title": "Software/Hardware Requirements Specification (SHRS)",
       "domains": [
-        "DESIGN_INPUT"
+        "HW",
+        "SW"
       ],
       "decomposition_level": "CONFIGURATION_ITEM",
       "drafted_at": "SFR",
@@ -1609,7 +1620,7 @@
       "did": "No confirmed generic DID number found this session - see HW_DEV_SPEC note. [VERIFY against your program's CDRL/AMSDL]",
       "title": "Prime/Critical Item Product Specification (MIL-STD-961E Type C)",
       "domains": [
-        "DESIGN_OUTPUT"
+        "HW"
       ],
       "decomposition_level": "CONFIGURATION_ITEM",
       "drafted_at": "CDR",
@@ -1654,7 +1665,7 @@
       "did": "DI-SESS-81901",
       "title": "Level of Repair Analysis (LORA) Report",
       "domains": [
-        "LOGISTICS"
+        "ILS"
       ],
       "decomposition_level": "CONFIGURATION_ITEM",
       "notes": "Companion input-data DID: DI-SESS-81873 (LORA Input Data), used when the government furnishes LORA data for contractor analysis rather than the contractor delivering the full report. SETR event placement not yet interviewed.",
@@ -1697,7 +1708,7 @@
       "did": "DI-QCIC-80278C",
       "title": "Calibration and Measurement Requirements Summary (CMRS)",
       "domains": [
-        "LOGISTICS"
+        "ILS"
       ],
       "decomposition_level": "CONFIGURATION_ITEM",
       "notes": "Ties to MIL-STD-1839 - details TMDE and calibration standards required to support the system. SETR event placement not yet interviewed.",

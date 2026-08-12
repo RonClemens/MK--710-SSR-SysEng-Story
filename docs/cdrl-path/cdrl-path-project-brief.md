@@ -12,6 +12,7 @@ A module within the SE Workbench, named **"CDRL Path,"** that visualizes how DID
 - **CM baselines**: Functional (SFR), Allocated (PDR), Product (PCA).
 - **Decomposition dimension**: SYSTEM → ELEMENT/SUBSYSTEM → CONFIGURATION_ITEM (HWCI/CSCI) → COMPONENT (CSC) → UNIT (CSU). No Segment level on this program. Some documents (confirmed: RVTM) need level-specific maturity timing via `maturity_states_by_level` rather than one flat timeline — check other multi-level candidates (ICD, FMECA, drawings) against this pattern as they're confirmed.
 - **Change-request objects are explicitly OUT of scope for the graph**: ECP, RFV, NOR, SCN, ERR are change-request mechanisms, not process/product artifacts. They render only as a lightweight badge on artifacts requiring one before a given SETR event — never as a station or edge-bearing node. See `change_request_mechanisms` in the data model.
+- **Lines are engineering disciplines, not input/output stage** (**revised 2026-08-12**, see DECISIONS.md #11): SE, SW, HW, TE, SAFETY_RELIABILITY, ILS, PM_CM — replacing the original DESIGN_INPUT/DESIGN_OUTPUT/MGMT/TEST/LOGISTICS/SAFETY_RELIABILITY/CM. Ron-approved as a starting point, not a final confirmation. Six CDRLs are genuinely multi-domain under this taxonomy (IRS, ICD, IDD, RVTM, HW_DEV_SPEC, FCA_PCA_evidence) — see the `domains[]` field on each node.
 
 ## Content status (as of handoff — NOT fully confirmed)
 

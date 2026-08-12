@@ -95,3 +95,45 @@ and changed both the relationship-edge rendering and the underlying node schema.
    UPDATE maturity timeline (sub-lane offsets, per-state marker styling) stays gated behind expanding a line, as
    the Level 2 detail layer; every full_station node otherwise shows a lightweight single-dot marker so hub edges
    always have a visible origin/destination point regardless of zoom state.
+
+## 2026-08-12 — Domain taxonomy redefined; polar/dartboard layout scoped as the next rewrite
+
+Ron, reacting to a bigger multi-line WMATA reference map: the layout itself should be polar, not Cartesian — SETR
+events as concentric rings (ASR outermost, PRR the center bullseye), each line spiraling inward and stopping at its
+own latest active ring rather than a left-to-right timeline with a hub bolted on. That's a full coordinate-system
+rewrite (`x=time, y=line` → `radius=time, angle=line`), and Ron flagged the prerequisite himself: "each train route
+is a grouping of types of CDRLs, which we should probably refine the definition together" — i.e. settle what the
+*lines* represent before building geometry around them.
+
+10. **Sequencing confirmed: domains before geometry.** Agreed not to build polar layout code around groupings
+    that were about to change. Code Chat proposed a discipline-based draft taxonomy for Ron to react to rather
+    than asking Ron to author one from scratch, since the existing 36-node data model already had enough signal
+    (DIDs, RACI-adjacent content, current line categories) to draft a reasonable first pass.
+
+11. **New domain taxonomy — Ron: "looks good for start."** Replaced the original 7 lines (grouped by
+    input/output *stage*) with 7 domains grouped by engineering *discipline*, matching how programs actually
+    organize into IPTs:
+    | Domain | Was (old line) | Rationale |
+    |---|---|---|
+    | `SE` (Systems Engineering) | mostly `DESIGN_INPUT`/`DESIGN_OUTPUT` | System-level requirements/design, not discipline-specific |
+    | `SW` (Software Engineering) | `DESIGN_OUTPUT` (IPSC docs) | CSCI design/build artifacts |
+    | `HW` (Hardware Engineering) | `DESIGN_OUTPUT` (HWCI docs) | HWCI design/production artifacts — new line, didn't exist before |
+    | `TE` (Test & Evaluation) | `TEST` | Verification purpose, not artifact numbering — the IPSC-numbered test docs (STP/STD/STR) live here, not SW |
+    | `SAFETY_RELIABILITY` | `SAFETY_RELIABILITY` | Unchanged |
+    | `ILS` (Integrated Logistics Support) | `LOGISTICS` | Renamed only |
+    | `PM_CM` | `MGMT` + `CM` merged | One program-administration line instead of two |
+
+    This is a **real content change**, not structure-only like the domains[] migration in #8 — it reassigns which
+    domain(s) each of the 36 nodes belongs to, based on Code Chat's draft proposal, approved by Ron as a starting
+    point (not a final confirmation — same provisional status as the rest of this model's unconfirmed content).
+    Six nodes came out as genuinely multi-domain rather than single-line, which is the whole point of the #8
+    schema change paying off: `IRS`/`ICD`/`IDD` (interface docs — SE+SW+HW), `RVTM` (TE+SE, already described in
+    its own notes as an interchange artifact), `HW_DEV_SPEC` (HW+SW, its own notes say it covers "combined SW/HW
+    requirements"), and `FCA_PCA_evidence` (PM_CM+SE+SW+HW, already described as "the terminal interchange
+    station" where Design Input and Design Output converge). Verified `validateModel()` still returns 0 issues and
+    the existing (still-Cartesian) rendering shows real interchange connectors at these nodes — no synthetic test
+    data needed this time, since the migration itself produced genuine multi-domain content.
+
+    **Open/next:** the polar/dartboard geometry itself (#10's actual deliverable) hasn't been built yet — this
+    entry only covers the prerequisite domain redefinition. Also open: whether `CDD` belongs in `SE` or `PM_CM`
+    (flagged as a coin flip in the draft proposal, not specifically confirmed either way).
