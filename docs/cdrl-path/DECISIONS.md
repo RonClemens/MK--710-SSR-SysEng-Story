@@ -305,3 +305,48 @@ per stated v1 scope") — Ron asked for it to be built now.
     with no separate stub lines, and Level 2 (SE expanded — the rich timeline follows the same
     bent track) and Level 3 (detail panel) still work, clicking anywhere along a segmented track
     still expands/collapses it — zero console/page errors in all three states.
+
+## 2026-08-12 — Track routing reformulated as a graph + Dijkstra shortest path
+
+Ron: "I'd like to employ dijkstra's algorithm to this entire network. We need to figure out how
+to describe the 'network' in the data structure feeding the diagram as an optimization / linear
+programming representation." Follow-up, clarifying scope: "The 'shortest path' should be
+calculated for every color, not just the overall shortest path. this is meant to minimize
+distance between all the lines constrained at each SETR Event." #22's bent tracks were computed
+via hand-interpolation between waypoints (a reasonable heuristic, but not an actual graph or
+algorithm) — this replaces that with a literal graph representation solved by Dijkstra, one per
+domain, per Ron's explicit ask.
+
+25. **New module `cdrlPathGraph.ts`**: a generic, reusable `Graph` (nodes + weighted directed
+    adjacency) and a textbook Dijkstra (`dijkstraShortestPath`) — linear-scan "extract min"
+    rather than a binary heap, since these graphs are tiny (a handful of candidate angles per
+    ring, at most ~11 rings), so O(V²) is negligible and the implementation stays easy to verify
+    by inspection.
+
+26. **The network, formalized**: for each domain, one graph. A node is a `(ring, candidate
+    angle)` pair; an edge connects ring `r` to `r+1`, weighted by the angular distance between
+    the two nodes' angles. A ring where that domain has a mandatory multi-domain meeting (from
+    #22's `meetings`) offers exactly ONE candidate node — that meeting's angle — so the shortest
+    path is forced through it; this is the literal graph expression of "constrained at each SETR
+    event." Every other ring offers the domain's home angle plus every meeting angle it
+    participates in anywhere along its track, so the solver is free to start easing toward a
+    meeting before the ring that actually requires it. Total path weight is exactly "distance
+    between the lines" — minimizing it (Dijkstra's whole job) is precisely Ron's stated
+    objective, and it's computed independently "for every color," not one shared/overall
+    shortest path.
+
+27. **`cdrlPathLayout.ts`'s `solveDomainTrackAngles` replaces the old keyframe/lerp pair.**
+    Builds each domain's graph, runs Dijkstra from its ring-0 home-angle node to its terminal
+    ring's home-angle node, and reads the angle off each node in the returned path — `trackAngleAt`
+    becomes a simple array lookup. Because the cost function (sum of angular distance per hop)
+    obeys the triangle inequality, the shortest path between two required points is always the
+    direct one — so for the common one-meeting-per-domain case, results are numerically
+    equivalent to #22's heuristic; the real gain is for domains touching multiple meetings at
+    different rings (a genuine multi-stop shortest-path problem, which Dijkstra solves correctly
+    by construction rather than by hoping keyframe interpolation happened to get it right) and
+    having an explicit, inspectable, extensible graph rather than an ad hoc formula.
+
+    Verified: `tsc -b` clean; Playwright screenshots at Level 1 (bent tracks visually unchanged
+    from #22 — expected, confirming the solver reproduces the same optimum), Level 2 (SE
+    expanded, rich timeline follows the Dijkstra-solved track), and Level 3 (detail panel) —
+    zero console/page errors in all three states.

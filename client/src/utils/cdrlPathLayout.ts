@@ -1,6 +1,7 @@
 import type { Edge, Node } from "@xyflow/react";
 import type { CdrlPathDecompositionLevel, CdrlPathMaturityState, CdrlPathModel, CdrlPathNode } from "../types/cdrlPath";
 import { anchorEventIndex, expandMaturityStateToMarkers, getMaturityMarkerStyle, maturityStatesForLevel } from "./cdrlPathMaturityMarkers";
+import { buildGraph, dijkstraShortestPath, type GraphEdge, type GraphNode } from "./cdrlPathGraph";
 
 // Polar "dartboard" coordinate system per Ron's steer: SETR events are concentric rings
 // (ASR outermost, PRR the center bullseye — PCA/ISR fall outside the ring system since PRR
@@ -41,10 +42,6 @@ function shortestAngleDelta(a: number, b: number): number {
   if (delta > 180) delta -= 360;
   if (delta < -180) delta += 360;
   return delta;
-}
-
-function lerpAngle(a: number, b: number, t: number): number {
-  return a + shortestAngleDelta(a, b) * t;
 }
 
 /**
@@ -102,11 +99,6 @@ const HUB_MARKER_SIZE = 26;
 // old Cartesian sub-lane used — capped so even a domain with many nodes doesn't bleed its
 // spread into a neighboring domain's angular sector.
 const MAX_SUBLANE_SPREAD_DEG = 28;
-
-interface AngleKeyframe {
-  ring: number;
-  angle: number;
-}
 
 interface MultiDomainMeeting {
   node: CdrlPathNode;
@@ -288,44 +280,61 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     return Math.min(max, prrIndex);
   }
 
-  /** A domain's angle keyframes: home angle at ring 0 and at its own track extent, plus one
-   * keyframe per shared meeting it participates in — angleAtRing interpolates between them
-   * (shortest-path) so the track eases toward a meeting and back rather than snapping. */
-  function computeKeyframes(lineIndex: number, maxRing: number): AngleKeyframe[] {
+  /**
+   * A domain's track as a shortest-path problem, per Ron's steer: describe the network as a
+   * graph and solve it with Dijkstra rather than hand-interpolating between waypoints. One
+   * node per (ring, candidate angle); one edge per ring-to-ring hop, weighted by the angular
+   * distance moved — so total path weight is exactly "distance between the lines," and
+   * minimizing it is the whole objective. A ring where this domain has a mandatory meeting
+   * (see `meetings` above) only offers ONE candidate node — that meeting's angle — which is
+   * what "constrained at each SETR event" becomes here: Dijkstra is forced through it, and
+   * finds the least-total-movement way to link every required ring in order, easing toward
+   * home angle everywhere else. Candidate angles otherwise are the domain's home angle plus
+   * every meeting angle it participates in anywhere along its track, so the shortest path is
+   * free to start drifting toward a meeting before the ring that actually requires it.
+   */
+  function solveDomainTrackAngles(lineIndex: number, maxRing: number): number[] {
     const home = domainHomeAngle(lineIndex);
-    const byRing = new Map<number, number[]>();
-    meetings.forEach((m) => {
-      if (!m.lineIndices.includes(lineIndex)) return;
-      const ring = Math.min(m.ring, maxRing);
-      const angles = byRing.get(ring) ?? [];
-      angles.push(m.angle);
-      byRing.set(ring, angles);
-    });
-    if (!byRing.has(0)) byRing.set(0, [home]);
-    if (!byRing.has(maxRing)) byRing.set(maxRing, [home]);
-    return Array.from(byRing.entries())
-      .map(([ring, angles]) => ({ ring, angle: circularMeanAngle(angles) }))
-      .sort((a, b) => a.ring - b.ring);
-  }
+    const ownMeetings = meetings.filter((m) => m.lineIndices.includes(lineIndex));
+    const requiredAngleByRing = new Map<number, number>();
+    ownMeetings.forEach((m) => requiredAngleByRing.set(Math.min(m.ring, maxRing), m.angle));
+    const candidateAngles = Array.from(new Set([home, ...ownMeetings.map((m) => m.angle)]));
 
-  function angleAtRing(keyframes: AngleKeyframe[], ring: number): number {
-    if (ring <= keyframes[0].ring) return keyframes[0].angle;
-    const last = keyframes[keyframes.length - 1];
-    if (ring >= last.ring) return last.angle;
-    for (let i = 0; i < keyframes.length - 1; i++) {
-      const a = keyframes[i];
-      const b = keyframes[i + 1];
-      if (ring >= a.ring && ring <= b.ring) {
-        const t = b.ring === a.ring ? 0 : (ring - a.ring) / (b.ring - a.ring);
-        return lerpAngle(a.angle, b.angle, t);
-      }
+    const nodesByRing: GraphNode[][] = [];
+    const allNodes: GraphNode[] = [];
+    for (let ring = 0; ring <= maxRing; ring++) {
+      const required = requiredAngleByRing.get(ring);
+      const angles = required !== undefined ? [required] : candidateAngles;
+      const ringNodes = angles.map((angle, i) => ({ id: `L${lineIndex}-r${ring}-${i}`, ring, angle }));
+      nodesByRing.push(ringNodes);
+      allNodes.push(...ringNodes);
     }
-    return last.angle;
+
+    const edges: GraphEdge[] = [];
+    for (let ring = 0; ring < maxRing; ring++) {
+      nodesByRing[ring].forEach((from) => {
+        nodesByRing[ring + 1].forEach((to) => {
+          edges.push({ from: from.id, to: to.id, weight: Math.abs(shortestAngleDelta(from.angle, to.angle)) });
+        });
+      });
+    }
+
+    const graph = buildGraph(allNodes, edges);
+    const startNode = nodesByRing[0].find((n) => n.angle === home) ?? nodesByRing[0][0];
+    const endRingNodes = nodesByRing[maxRing];
+    const endNode = endRingNodes.find((n) => n.angle === home) ?? endRingNodes[0];
+    const path = dijkstraShortestPath(graph, startNode.id, endNode.id);
+
+    if (!path) return nodesByRing.map(() => home); // unreachable shouldn't happen (fully connected DAG); safe fallback
+    return path.map((id) => graph.nodes.get(id)!.angle);
   }
 
   const trackExtentByLine = model.lines.map((_, lineIndex) => domainTrackExtent(lineIndex));
-  const keyframesByLine = model.lines.map((_, lineIndex) => computeKeyframes(lineIndex, trackExtentByLine[lineIndex]));
-  const trackAngleAt = (lineIndex: number, ring: number) => angleAtRing(keyframesByLine[lineIndex], ring);
+  const anglesByLine = model.lines.map((_, lineIndex) => solveDomainTrackAngles(lineIndex, trackExtentByLine[lineIndex]));
+  const trackAngleAt = (lineIndex: number, ring: number) => {
+    const clamped = Math.max(0, Math.min(ring, trackExtentByLine[lineIndex]));
+    return anglesByLine[lineIndex][clamped];
+  };
 
   /** Zero-size anchor node a straight edge can source/target from, at an already-resolved point. */
   function pushAnchor(id: string, point: { x: number; y: number }) {
