@@ -336,7 +336,9 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     return anglesByLine[lineIndex][clamped];
   };
 
-  /** Zero-size anchor node a straight edge can source/target from, at an already-resolved point. */
+  /** Zero-size anchor node an edge can source/target from, at an already-resolved point. Only
+   * needs to exist for React Flow's own bookkeeping (every edge needs valid source/target node
+   * ids) — the actual drawn path never depends on this node's rendered position or boundary. */
   function pushAnchor(id: string, point: { x: number; y: number }) {
     nodes.push({ id, type: "default", position: point, data: {}, draggable: false, selectable: false, style: { width: 1, height: 1, opacity: 0, border: "none" } });
   }
@@ -366,35 +368,30 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       },
     });
 
-    // The track itself: one ring-to-ring straight segment per hop, its angle interpolated
-    // from the domain's keyframes — a polyline that bends toward shared meeting points
-    // instead of a single rigid radial line. Segment ids carry a `--seg{n}` suffix so
-    // CdrlPathPage's click routing (which only needs the line id) can still parse them.
-    const ringPointId = (r: number) => `line-pt-${line.id}--${r}`;
-    for (let r = 0; r <= maxRing; r++) {
-      pushAnchor(ringPointId(r), polarPoint(ringRadius(r), trackAngleAt(lineIndex, r)));
-    }
-    for (let r = 0; r < maxRing; r++) {
-      edges.push({
-        id: `line-edge-${line.id}--seg${r}`,
-        source: ringPointId(r),
-        target: ringPointId(r + 1),
-        type: "straight",
-        selectable: false,
-        style: { stroke: line.color_hint, strokeWidth: isExpanded ? 12 : 9, cursor: "pointer" },
-      });
-    }
-    if (maxRing === 0) {
-      // No resolvable activity at all: a visible stub at the outer ring rather than nothing.
-      edges.push({
-        id: `line-edge-${line.id}--seg0`,
-        source: ringPointId(0),
-        target: ringPointId(0),
-        type: "straight",
-        selectable: false,
-        style: { stroke: line.color_hint, strokeWidth: isExpanded ? 12 : 9, cursor: "pointer" },
-      });
-    }
+    // The track itself: ONE edge, its path a polyline through every ring's angle-solved point
+    // (see solveDomainTrackAngles) — drawn as a single custom SVG path (CdrlPathTrackEdge)
+    // rather than a chain of React Flow's own node-to-node edges. React Flow's built-in edge
+    // types connect via "floating" boundary-intersection geometry that shrinks each segment
+    // slightly at both ends; chaining many short ring-to-ring segments compounded that
+    // shrinkage into a visible gap at every joint. A single custom path sidesteps that
+    // entirely — it draws exactly where computed, with no seams.
+    const points: { x: number; y: number }[] = [];
+    for (let r = 0; r <= maxRing; r++) points.push(polarPoint(ringRadius(r), trackAngleAt(lineIndex, r)));
+    if (points.length === 1) points.push(polarPoint(ringRadius(0) - 5, trackAngleAt(lineIndex, 0))); // stub for a domain with no resolvable activity at all
+
+    const startId = `line-pt-${line.id}--start`;
+    const endId = `line-pt-${line.id}--end`;
+    pushAnchor(startId, points[0]);
+    pushAnchor(endId, points[points.length - 1]);
+    edges.push({
+      id: `line-edge-${line.id}`,
+      source: startId,
+      target: endId,
+      type: "cdrlPathTrack",
+      data: { points },
+      selectable: false,
+      style: { stroke: line.color_hint, strokeWidth: isExpanded ? 12 : 9, cursor: "pointer" },
+    });
   });
 
   /** A single subway "train stop": a hollow ring in the line's own color, sitting directly

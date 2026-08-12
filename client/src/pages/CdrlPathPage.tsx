@@ -1,21 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
-import { ReactFlow, ReactFlowProvider, Background, Controls, useNodesState, useEdgesState, type Node, type Edge } from "@xyflow/react";
+import { ReactFlow, ReactFlowProvider, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, type EdgeTypes } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCdrlPathModel } from "../hooks/useCdrlPathModel";
 import { buildCdrlPathFlowElements } from "../utils/cdrlPathLayout";
 import { EditableText } from "../components/EditableText";
 import { CdrlPathStationDetailPanel } from "../components/CdrlPathStationDetailPanel";
 import { CdrlPathExportManager } from "../components/CdrlPathExportManager";
+import { CdrlPathTrackEdge } from "../components/CdrlPathTrackEdge";
 import type { CdrlPathDecompositionLevel } from "../types/cdrlPath";
+
+const EDGE_TYPES: EdgeTypes = { cdrlPathTrack: CdrlPathTrackEdge };
 
 const LINE_ELEMENT_PREFIXES = ["line-label-", "line-edge-"];
 
-// A domain's track is drawn as several ring-to-ring segments now (so it can bend toward
-// other tracks), each id'd `line-edge-{lineId}--seg{n}` — split off the `--seg{n}` suffix to
-// recover the line id a click should expand/collapse.
 function lineIdFromElementId(id: string): string | null {
   const prefix = LINE_ELEMENT_PREFIXES.find((p) => id.startsWith(p));
-  return prefix ? id.slice(prefix.length).split("--")[0] : null;
+  return prefix ? id.slice(prefix.length) : null;
 }
 
 function nodeIdFromElementId(id: string): string | null {
@@ -95,6 +95,7 @@ export function CdrlPathPage() {
           <ReactFlow
             nodes={nodes}
             edges={edges}
+            edgeTypes={EDGE_TYPES}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             nodesConnectable={false}

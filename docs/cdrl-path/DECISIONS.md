@@ -350,3 +350,37 @@ domain, per Ron's explicit ask.
     from #22 — expected, confirming the solver reproduces the same optimum), Level 2 (SE
     expanded, rich timeline follows the Dijkstra-solved track), and Level 3 (detail panel) —
     zero console/page errors in all three states.
+
+## 2026-08-12 — Bug: visible gaps in bent tracks, fixed with a custom polyline edge
+
+Ron, from a phone screenshot of the live map: "why are these lines not connected?" — PM_CM and
+ILS (the tracks with the most ring-to-ring bending) showed a visible staircase of gaps between
+segments instead of one continuous line.
+
+28. **Root cause: React Flow's floating-edge geometry, not the angle math.** #22-24 chained a
+    domain's track as one straight `Edge` per ring-to-ring hop, connecting tiny "anchor" utility
+    nodes. Without explicit handles, React Flow's built-in edge types connect via "floating"
+    boundary-intersection geometry — each edge's endpoint is computed as where the line between
+    the two nodes' centers crosses the *node's own bounding box*, not the exact center. For a
+    single edge that shrink is a fraction of a pixel, invisible. Chaining many short segments
+    compounds it into a real, visible gap at every joint — confirmed by inspecting the actual
+    rendered SVG path data in the browser: two consecutive segments meant to share one point
+    landed 26px apart. A same-size investigation also surfaced that `.react-flow__node-default`'s
+    stylesheet applies a `min-width`/`min-height` that silently overrides a plain `style: {width:
+    0}` (min-* always wins over width/height in the CSS box model) — a dead end worth recording
+    since it's exactly the kind of thing that looks like it should have worked.
+
+29. **Fix: one custom-drawn polyline edge per domain, not a chain of React Flow edges.** New
+    `client/src/components/CdrlPathTrackEdge.tsx` renders an arbitrary multi-point SVG `<path>`
+    directly from an explicit `data.points` array via `BaseEdge`, sidestepping node-boundary
+    math entirely — the line renders exactly where `solveDomainTrackAngles` computed it, with no
+    seams regardless of how many rings it bends through. `cdrlPathLayout.ts` now emits exactly
+    one `line-edge-{lineId}` edge per domain (reverting the `--seg{n}` id scheme from #22), with
+    two lightweight anchor nodes existing only so React Flow has valid source/target ids to
+    satisfy its bookkeeping — their own rendered position/size no longer matters, since the
+    custom edge ignores it.
+
+    Verified: `tsc -b` clean; inspected actual rendered SVG path coordinates confirming
+    consecutive points now align exactly (no gap); Playwright screenshots across Level 1 (all 7
+    tracks single continuous bent lines), Level 2 (SE expanded, still clickable to
+    collapse), and Level 3 (detail panel) — zero console/page errors in all three states.
