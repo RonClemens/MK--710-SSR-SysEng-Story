@@ -178,3 +178,40 @@ angle=domain`) coordinates, delivering #10's actual geometry against the #11 dom
     interchange chords rendering with zero clicks), Level 2 (SE line expanded, full maturity
     timeline fanning correctly by ring), and Level 3 (station detail panel opens on click) with
     zero console/page errors in all three states.
+
+## 2026-08-12 — Train-stop iconography; interchanges are a hub between tracks, not on one
+
+Ron, reacting to the polar layout live: "thicken each line, make each CDRL look like the
+trainstop icon. if the CDRL is only one domain area to develop, it belongs on one single track.
+If two or more domain areas are needed to develop, the CDRL should be a hub for those related
+tracks." Two changes to `cdrlPathLayout.ts`.
+
+17. **Domain spokes thickened** (5/7px unexpanded/expanded → 9/12px) for better visual weight
+    against the rest of the map, matching how prominently a WMATA line reads against its
+    background.
+
+18. **Every CDRL now renders as a hollow "train stop" ring in its line's color**, not a solid
+    filled dot — `STATION_MARKER_SIZE` (16px, up from 12px) with a 3px colored border and a
+    light fill, replacing the old solid-fill-with-white-border look. A single-domain CDRL gets
+    exactly one of these, sitting directly on its one track, per Ron's "it belongs on one single
+    track."
+
+19. **Multi-domain CDRLs are now a hub between their tracks, not a marker on their "primary"
+    one.** Replaced the old chord-between-two-points approximation (drawn from the primary
+    domain's own marker out to a presence dot on each other domain) with `renderInterchangeHub`:
+    the station itself sits at the circular-mean angle of all its domains (at their shared
+    ring) — genuinely *between* the tracks rather than glued to whichever domain happened to be
+    `domains[0]` — rendered as a bigger (26px) concentric-ring icon (double border, the WMATA
+    transfer-station look Ron referenced back in #7's original bullseye feedback), with a short
+    colored stub running from the hub out to a train-stop tick on each involved track. The
+    Level 2 rich-timeline case (a multi-domain node whose primary domain is the currently
+    expanded line) keeps its maturity marker on that line as before, but now extracts the same
+    stub-drawing logic (`renderInterchangeStubsFrom`) so the interchange still reads consistently
+    whether or not a line is expanded.
+
+    Verified: `tsc -b` clean; Playwright screenshots at Level 1 (7 thickened spokes, all 6
+    multi-domain nodes rendering as concentric-ring hubs with colored stubs to 2-4 tracks
+    depending on the node), Level 2 (SE expanded, interchange stubs still branching correctly
+    from the expanded-line anchor), and Level 3 (detail panel opens on click) — zero console/page
+    errors in all three states, no click-routing changes needed since `station-`/
+    `interchange-presence-` id schemes were preserved.

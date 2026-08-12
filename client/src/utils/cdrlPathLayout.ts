@@ -71,7 +71,12 @@ export interface CdrlPathFlowOptions {
   decompositionLevel?: CdrlPathDecompositionLevel;
 }
 
-const CONTEXT_MARKER_SIZE = 12;
+// "Train stop" icon per Ron's steer: a single-domain CDRL is a hollow ring sitting on its
+// one track; a multi-domain CDRL is a bigger concentric-ring interchange icon (the WMATA
+// transfer-station look) sitting between its tracks, with a short colored stub connecting
+// it to each one — not a marker glued onto its "primary" domain's line.
+const STATION_MARKER_SIZE = 16;
+const HUB_MARKER_SIZE = 26;
 // Nodes sharing a domain fan out by a small angle rather than the flat pixel offset the
 // old Cartesian sub-lane used — capped so even a domain with many nodes doesn't bleed its
 // spread into a neighboring domain's angular sector.
@@ -238,94 +243,141 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       target: endId,
       type: "straight",
       selectable: false,
-      style: { stroke: line.color_hint, strokeWidth: isExpanded ? 7 : 5, cursor: "pointer" },
+      style: { stroke: line.color_hint, strokeWidth: isExpanded ? 12 : 9, cursor: "pointer" },
     });
   });
 
-  /** Renders a node's primary marker on `primaryLineIndex`'s spoke at ring `radiusIndex`,
-   * then hands off to renderInterchangeStubs for any additional domains. */
-  function renderStationMarker(cdrlNode: CdrlPathNode, radiusIndex: number, primaryLineIndex: number, angleOffsetDeg = 0) {
-    const primaryLine = model.lines[primaryLineIndex];
-    const half = CONTEXT_MARKER_SIZE / 2;
-    const point = polarPoint(ringRadius(radiusIndex), domainAngle(primaryLineIndex) + angleOffsetDeg);
-    nodeAnchorCenter.set(cdrlNode.id, point);
+  /** Zero-size anchor node a straight edge can source/target from, at an already-resolved point. */
+  function pushAnchor(id: string, point: { x: number; y: number }) {
+    nodes.push({ id, type: "default", position: point, data: {}, draggable: false, selectable: false, style: { width: 1, height: 1, opacity: 0, border: "none" } });
+  }
 
+  /** A single subway "train stop": a hollow ring in the line's own color, sitting directly
+   * on that line. Used both for a single-domain CDRL's only marker and for the small
+   * presence tick a multi-domain CDRL leaves on each of its other tracks. */
+  function pushTrainStop(id: string, point: { x: number; y: number }, size: number, color: string, zIndex: number) {
+    const half = size / 2;
     nodes.push({
-      id: `station-${cdrlNode.id}`,
+      id,
       type: "default",
       position: { x: point.x - half, y: point.y - half },
       data: { label: "" },
       draggable: false,
-      zIndex: 6,
+      zIndex,
       style: {
-        width: CONTEXT_MARKER_SIZE,
-        height: CONTEXT_MARKER_SIZE,
+        width: size,
+        height: size,
         borderRadius: "50%",
-        background: primaryLine.color_hint,
-        border: "2px solid var(--card-bg, #fff)",
+        background: "var(--card-bg, #fff)",
+        border: `3px solid ${color}`,
+        padding: 0,
+        cursor: "pointer",
+      },
+    });
+  }
+
+  /** Renders a CDRL's station marker at ring `radiusIndex`: a plain train-stop icon if it
+   * belongs to one domain, or an interchange hub (see renderInterchangeHub) if it spans
+   * two or more. Per Ron's steer: a single-domain CDRL "belongs on one single track"; a
+   * multi-domain one "should be a hub for those related tracks," not a marker glued onto
+   * whichever domain happens to be listed first. */
+  function renderStation(cdrlNode: CdrlPathNode, radiusIndex: number, primaryLineIndex: number) {
+    const lineIndices = cdrlNode.domains
+      .map((domainId) => model.lines.findIndex((l) => l.id === domainId))
+      .filter((idx) => idx !== -1);
+
+    if (lineIndices.length <= 1) {
+      const point = polarPoint(ringRadius(radiusIndex), domainAngle(primaryLineIndex));
+      nodeAnchorCenter.set(cdrlNode.id, point);
+      pushTrainStop(`station-${cdrlNode.id}`, point, STATION_MARKER_SIZE, model.lines[primaryLineIndex].color_hint, 6);
+      return;
+    }
+    renderInterchangeHub(cdrlNode, radiusIndex, lineIndices);
+  }
+
+  /**
+   * True subway interchange: for a node spanning 2+ domains, the station itself sits at the
+   * circular-mean angle of its domains (at their shared ring) rather than on any one line —
+   * a bigger concentric-ring icon (the WMATA transfer-station look), with a short colored
+   * stub running out to a train-stop tick on each involved track. Per Ron's steer: CDRLs
+   * are "the subway stops involving one or more domains' participation," and a multi-domain
+   * one "should be a hub for those related tracks."
+   */
+  function renderInterchangeHub(cdrlNode: CdrlPathNode, radiusIndex: number, lineIndices: number[]) {
+    const radius = ringRadius(radiusIndex);
+    const angles = lineIndices.map((idx) => toRadians(domainAngle(idx)));
+    const meanSin = angles.reduce((sum, a) => sum + Math.sin(a), 0) / angles.length;
+    const meanCos = angles.reduce((sum, a) => sum + Math.cos(a), 0) / angles.length;
+    const hubAngleDeg = (Math.atan2(meanSin, meanCos) * 180) / Math.PI;
+    const hubPoint = polarPoint(radius, hubAngleDeg);
+    nodeAnchorCenter.set(cdrlNode.id, hubPoint);
+
+    const half = HUB_MARKER_SIZE / 2;
+    nodes.push({
+      id: `station-${cdrlNode.id}`,
+      type: "default",
+      position: { x: hubPoint.x - half, y: hubPoint.y - half },
+      data: { label: "" },
+      draggable: false,
+      zIndex: 7,
+      style: {
+        width: HUB_MARKER_SIZE,
+        height: HUB_MARKER_SIZE,
+        borderRadius: "50%",
+        background: "var(--card-bg, #fff)",
+        border: "3px solid #333",
+        boxShadow: "0 0 0 2px var(--card-bg, #fff), 0 0 0 4px #333",
         padding: 0,
         cursor: "pointer",
       },
     });
 
-    renderInterchangeStubs(cdrlNode, radiusIndex, primaryLineIndex);
+    lineIndices.forEach((lineIndex) => {
+      const domainLine = model.lines[lineIndex];
+      const trackPoint = polarPoint(radius, domainAngle(lineIndex));
+      const stubId = `interchange-stub-${cdrlNode.id}-${domainLine.id}`;
+      pushAnchor(`${stubId}-a`, hubPoint);
+      pushAnchor(`${stubId}-b`, trackPoint);
+      edges.push({
+        id: stubId,
+        source: `${stubId}-a`,
+        target: `${stubId}-b`,
+        type: "straight",
+        selectable: false,
+        zIndex: 2,
+        style: { stroke: domainLine.color_hint, strokeWidth: 3 },
+      });
+      pushTrainStop(`interchange-presence-${domainLine.id}--${cdrlNode.id}`, trackPoint, STATION_MARKER_SIZE, domainLine.color_hint, 6);
+    });
   }
 
-  /**
-   * True subway interchange: for a node spanning 2+ domains, draws small unfilled presence
-   * dots on every domain OTHER than `shownOnLineIndex`, at the same ring, joined to the
-   * primary marker by a chord (a straight line between two points on the same ring —
-   * geometrically an approximation of a true arc, simpler to render and, for the angular
-   * spans involved here, visually close enough for a first pass). Per Ron's steer: CDRLs
-   * are "the subway stops involving one or more domains' participation," not necessarily
-   * owned by a single line.
-   */
-  function renderInterchangeStubs(cdrlNode: CdrlPathNode, radiusIndex: number, shownOnLineIndex: number) {
+  /** Connects an already-placed marker (e.g. a maturity marker on the currently expanded
+   * line) out to a train-stop tick on each of the node's OTHER domains — used when the
+   * node's primary position isn't the interchange hub itself (Level 2's rich timeline keeps
+   * that marker on the expanded line), so the interchange still needs its stubs drawn from
+   * that fixed point instead of a freshly computed hub. */
+  function renderInterchangeStubsFrom(cdrlNode: CdrlPathNode, fromPoint: { x: number; y: number }, radiusIndex: number, shownOnLineIndex: number) {
+    const radius = ringRadius(radiusIndex);
     const otherLineIndices = cdrlNode.domains
       .map((domainId) => model.lines.findIndex((l) => l.id === domainId))
       .filter((idx) => idx !== -1 && idx !== shownOnLineIndex);
-    if (otherLineIndices.length === 0) return;
 
-    const half = CONTEXT_MARKER_SIZE / 2;
-    const radius = ringRadius(radiusIndex);
-    const shownPoint = polarPoint(radius, domainAngle(shownOnLineIndex));
-
-    otherLineIndices.forEach((domainLineIndex) => {
-      const domainLine = model.lines[domainLineIndex];
-      const otherPoint = polarPoint(radius, domainAngle(domainLineIndex));
-      const chordId = `interchange-chord-${cdrlNode.id}-${domainLine.id}`;
-      const chordStartId = `${chordId}-a`;
-      const chordEndId = `${chordId}-b`;
-      nodes.push(
-        { id: chordStartId, type: "default", position: shownPoint, data: {}, draggable: false, selectable: false, style: { width: 1, height: 1, opacity: 0, border: "none" } },
-        { id: chordEndId, type: "default", position: otherPoint, data: {}, draggable: false, selectable: false, style: { width: 1, height: 1, opacity: 0, border: "none" } },
-      );
+    otherLineIndices.forEach((lineIndex) => {
+      const domainLine = model.lines[lineIndex];
+      const trackPoint = polarPoint(radius, domainAngle(lineIndex));
+      const stubId = `interchange-stub-${cdrlNode.id}-${domainLine.id}`;
+      pushAnchor(`${stubId}-a`, fromPoint);
+      pushAnchor(`${stubId}-b`, trackPoint);
       edges.push({
-        id: chordId,
-        source: chordStartId,
-        target: chordEndId,
+        id: stubId,
+        source: `${stubId}-a`,
+        target: `${stubId}-b`,
         type: "straight",
         selectable: false,
-        zIndex: 1,
-        style: { stroke: "#888", strokeWidth: 2 },
+        zIndex: 2,
+        style: { stroke: domainLine.color_hint, strokeWidth: 3 },
       });
-      nodes.push({
-        id: `interchange-presence-${domainLine.id}--${cdrlNode.id}`,
-        type: "default",
-        position: { x: otherPoint.x - half, y: otherPoint.y - half },
-        data: { label: "" },
-        draggable: false,
-        zIndex: 6,
-        style: {
-          width: CONTEXT_MARKER_SIZE,
-          height: CONTEXT_MARKER_SIZE,
-          borderRadius: "50%",
-          background: "var(--card-bg, #fff)",
-          border: `2px solid ${domainLine.color_hint}`,
-          padding: 0,
-          cursor: "pointer",
-        },
-      });
+      pushTrainStop(`interchange-presence-${domainLine.id}--${cdrlNode.id}`, trackPoint, STATION_MARKER_SIZE, domainLine.color_hint, 6);
     });
   }
 
@@ -336,7 +388,7 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       return;
     }
     const marker = cdrlNode.drafted_at ?? cdrlNode.baselined_at ?? "";
-    renderStationMarker(cdrlNode, resolveMarkerEventIndex(marker, setr_events), primaryLineIndex);
+    renderStation(cdrlNode, resolveMarkerEventIndex(marker, setr_events), primaryLineIndex);
   });
 
   // Lightweight marker + anchor for EVERY full_station node, regardless of which (if any)
@@ -351,7 +403,7 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       return;
     }
     if (cdrlNode.domains.includes(expandedLineId ?? "")) return; // gets the rich timeline below instead
-    renderStationMarker(cdrlNode, anchorEventIndex(cdrlNode, setr_events), primaryLineIndex);
+    renderStation(cdrlNode, anchorEventIndex(cdrlNode, setr_events), primaryLineIndex);
   });
 
   if (expandedLineId) {
@@ -421,7 +473,7 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
           const anchorIndex = Math.round(
             (Math.hypot(anchor.x - CENTER.x, anchor.y - CENTER.y) - OUTER_RADIUS) / ((INNER_RADIUS - OUTER_RADIUS) / prrIndex),
           );
-          renderInterchangeStubs(cdrlNode, anchorIndex, lineIndex);
+          renderInterchangeStubsFrom(cdrlNode, anchor, anchorIndex, lineIndex);
         }
       }
     });
