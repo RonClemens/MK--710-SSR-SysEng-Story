@@ -137,3 +137,44 @@ is a grouping of types of CDRLs, which we should probably refine the definition 
     **Open/next:** the polar/dartboard geometry itself (#10's actual deliverable) hasn't been built yet — this
     entry only covers the prerequisite domain redefinition. Also open: whether `CDD` belongs in `SE` or `PM_CM`
     (flagged as a coin flip in the draft proposal, not specifically confirmed either way).
+
+## 2026-08-12 — Polar/dartboard layout built
+
+`cdrlPathLayout.ts` rewritten from Cartesian (`x=time, y=line`) to polar (`radius=SETR event,
+angle=domain`) coordinates, delivering #10's actual geometry against the #11 domain taxonomy.
+
+12. **Rings, not columns: SETR events become concentric circles, ASR outermost, PRR the
+    center.** `ringRadius(index)` maps event index 0..prrIndex onto `OUTER_RADIUS..INNER_RADIUS`
+    linearly. PCA and ISR fall outside this ring system (PRR is the modeled terminus, not the
+    literal last SETR event) — CM baselines at PCA are skipped with a console warning rather than
+    stretching the ring system or silently mispositioning them.
+
+13. **Domain spokes stop at each domain's own latest active ring — not forced to center.**
+    `domainMaxActiveIndex(lineId)` scans every node primarily on that domain (context markers and
+    full-station maturity markers alike) for the highest SETR event actually reached, and the
+    spoke is drawn from the outer ring (ASR) to exactly that ring. In the current data most
+    domains' spokes do reach the center, because most CDRLs recur through PRR (the data model's
+    own dominant confirmed pattern) — that's real content, not a bug forcing convergence.
+
+14. **The constructed bullseye hub from #7 is gone — the real rings do that job now.**
+    Relationship edges (`influences`/`influenced_by`) are drawn as direct dashed connectors
+    between each pair's actual anchor points, skipping same-domain pairs (already visually
+    adjacent on one spoke) and `"ALL"` targets (per `confirmed_patterns
+    .relationship_assessment_status`, same reasoning as #6). With real concentric rings and a
+    shared center, routing relationships through a separately-constructed hub was redundant once
+    the geometry itself did the converging.
+
+15. **Multi-domain interchanges render as a chord + presence dot, not a true arc.** For a node
+    spanning 2+ domains, a straight line between its two positions on the same ring approximates
+    the arc a real subway map would draw — deliberately simpler for a first pass; flagged in code
+    as a candidate for a true SVG arc if it reads poorly in practice.
+
+16. **Sub-lane collision fix re-expressed as an angular offset.** Multiple nodes landing on the
+    same domain + ring (Level 2 expanded timeline) now fan out by degrees
+    (`MAX_SUBLANE_SPREAD_DEG`, capped at 4°/node) instead of the old Cartesian pixel offset —
+    same fix, same failure mode, adapted to the new coordinate system.
+
+    Verified: `tsc -b` clean; Playwright screenshots of Level 1 (all 7 spokes, rings, and
+    interchange chords rendering with zero clicks), Level 2 (SE line expanded, full maturity
+    timeline fanning correctly by ring), and Level 3 (station detail panel opens on click) with
+    zero console/page errors in all three states.
