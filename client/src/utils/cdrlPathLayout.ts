@@ -142,27 +142,32 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
   const nodeAnchorCenter = new Map<string, { x: number; y: number }>();
   const nodeById = new Map(model.nodes.map((n) => [n.id, n]));
 
-  // Concentric SETR-event rings — the dartboard itself.
+  // Concentric SETR-event rings — the dartboard itself. PRR's own ring circle is skipped
+  // entirely (label kept) — the explicit hub icon added below is its marker now, and drawing
+  // both a ring boundary AND a hub icon at the same radius read as a redundant "circle within
+  // a circle" rather than one clear transfer-station indicator.
   for (let index = 0; index < ringCount; index++) {
     const event = setr_events[index];
     const radius = ringRadius(index);
-    nodes.push({
-      id: `ring-${event.id}`,
-      type: "default",
-      position: { x: CENTER.x - radius, y: CENTER.y - radius },
-      data: { label: "" },
-      draggable: false,
-      selectable: false,
-      zIndex: 0,
-      style: {
-        width: radius * 2,
-        height: radius * 2,
-        borderRadius: "50%",
-        border: index === prrIndex ? "2px solid #999" : "1px dashed #ccc",
-        background: "transparent",
-        padding: 0,
-      },
-    });
+    if (index !== prrIndex) {
+      nodes.push({
+        id: `ring-${event.id}`,
+        type: "default",
+        position: { x: CENTER.x - radius, y: CENTER.y - radius },
+        data: { label: "" },
+        draggable: false,
+        selectable: false,
+        zIndex: 0,
+        style: {
+          width: radius * 2,
+          height: radius * 2,
+          borderRadius: "50%",
+          border: "1px dashed #ccc",
+          background: "transparent",
+          padding: 0,
+        },
+      });
+    }
     // Ring labels along one reference spoke, offset from angle 0 so they don't sit on top
     // of a domain's own track.
     const labelAngle = -90 - angleStep / 2;
@@ -379,11 +384,13 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
   // letting it blow up — which also reads correctly on its own terms: PRR is the map's actual
   // hub, so lines drawing tightly together as they approach it is the right visual, not a bug
   // to route around.
-  const LANE_OFFSET_PX = 9;
-  const LANE_FADE_START_RADIUS = 250;
+  const LANE_OFFSET_PX = 7;
+  const LANE_FADE_START_RADIUS = 400;
   function laneOffsetDeg(lineIndex: number, radius: number): number {
     if (radius <= INNER_RADIUS) return 0;
-    const fade = Math.min(1, (radius - INNER_RADIUS) / (LANE_FADE_START_RADIUS - INNER_RADIUS));
+    const t = Math.min(1, (radius - INNER_RADIUS) / (LANE_FADE_START_RADIUS - INNER_RADIUS));
+    const fade = t * t * (3 - 2 * t); // smoothstep — zero slope at both ends, so the fade
+    // neither kinks in sharply where it starts nor snaps abruptly right at the center.
     const laneSign = lineIndex - (domainCount - 1) / 2;
     return ((laneSign * LANE_OFFSET_PX * fade) / radius) * (180 / Math.PI);
   }

@@ -507,3 +507,29 @@ Two related fixes.
     Verified: `tsc -b` clean; Playwright screenshot confirms the gray (PM_CM) track is now a
     clean line with no zigzag near the center, and a clear hub icon sits at PRR; Level 2 (SE
     expanded) and Level 3 (detail panel) still work — zero console/page errors.
+
+## 2026-08-13 — PRR's ring circle removed; lane fade smoothed further
+
+Ron, from another phone screenshot: "still looks a bit jagged and sloppy. Also, remove the
+concentric circle for PRR entirely (or hide it behind the transfer hub icon)." Two follow-on
+refinements to #36-37.
+
+38. **PRR's ring boundary circle is gone, not just restyled.** #37 added a hub icon at PRR but
+    left the ring's own circle (radius `INNER_RADIUS`, same border every other ring gets) drawn
+    around it, so the map showed a visibly separate thin circle boxing in the hub icon — a
+    "circle within a circle" rather than one clean transfer-station indicator. The ring loop now
+    skips PRR's boundary entirely (its `PRR` text label is unaffected); the hub icon alone marks
+    the location.
+
+39. **Lane-offset fade smoothed and spread over more rings.** #36's fade was linear over a
+    fairly short radius range (down to 0 by 250px), so the last couple of rings before the
+    center still showed a visible, fairly abrupt taper for domains with a large lane number.
+    Switched to a smoothstep curve (zero slope at both ends, not just linear) over a wider range
+    (`LANE_FADE_START_RADIUS` 250→400px) so lanes converge gradually across several rings rather
+    than easing in only right at the finish; `LANE_OFFSET_PX` also trimmed slightly (9→7) for an
+    overall calmer look.
+
+    Verified: `tsc -b` clean; Playwright screenshot confirms PRR now shows a single hub icon
+    with no surrounding ring circle, and tracks (PM_CM especially) read as smooth curves rather
+    than a jagged polyline; Level 2 (SE expanded) and Level 3 (detail panel) still work — zero
+    console/page errors.
