@@ -439,3 +439,44 @@ merge into one point.
     consistently parallel channels all the way through their shared interchange (no pinch
     point), with the hub icon sitting among them and short stubs to each; Level 2 (SE expanded)
     and Level 3 (detail panel) still work — zero console/page errors.
+
+## 2026-08-13 — Relationship lines become "handoff hub" stops between rings
+
+Ron: "the next step is to establish the 'in-between' hub stops between SETR Events that
+represent the 'influence / influenced by' faint dotted lines. The purpose is to depict the
+handoffs / working sessions needed between any two (or more) domain groups to complete their
+CDRLs properly and to right level of maturity by the general SETR Event (represented by the
+ring)." Replaces the direct point-to-point dashed relationship edges (one long diagonal per
+`influences`/`influenced_by` pair, criss-crossing the whole map) with shared hub stops.
+
+33. **Every cross-domain relationship pair is bucketed into a shared handoff hub by (unordered
+    domain pair, nearest half-ring), not drawn as its own line.** A quick census of the current
+    data: 59 unique cross-domain node pairs across only 16 distinct domain-pairs (e.g.
+    SAFETY_RELIABILITY↔SE alone accounts for 9) — exactly the kind of repetition a shared stop
+    consolidates. For each pair, `nodeRingIndex()` resolves each node's own ring (reusing the
+    same anchor logic as its station marker, or its multi-domain meeting's ring if it has one);
+    the pair's ring is their average, bucketed to the nearest half-ring so nearby relationships
+    between the same two domains land on one hub instead of scattering across near-identical
+    rings.
+
+34. **The hub sits genuinely "in between" two SETR rings, not snapped onto one.** New
+    `trackAngleAtFractional()` interpolates a domain's angle at a fractional ring (shortest
+    angular path between its two neighboring integer-ring angles), and `ringRadius()` already
+    supports fractional input — so a hub at ring 2.5 sits radially halfway between rings 2 and
+    3, angularly positioned at the circular mean of its two domains' angles there. Rendered as
+    a small (18px) dashed gray diamond — deliberately distinct from the solid-bordered white
+    circle used for a CDRL that itself spans multiple domains (#17-19), since this marks a
+    *process* handoff between two separate CDRLs, not one artifact's domain membership. Each
+    relationship in the hub's group gets a short, thin dashed stub (its own domain's color) from
+    the hub to that CDRL's actual anchor point — replacing the single long diagonal.
+
+35. **The old direct point-to-point relationship edges and their `relationship-anchor-*` node
+    scaffolding are gone.** Every cross-domain relationship now routes through its group's hub
+    instead; the anchor-node emission loop that existed solely to give those direct edges valid
+    React Flow source/target ids was dead code once nothing referenced it, so it was removed.
+
+    Verified: `tsc -b` clean; Playwright screenshot shows the dashed-line hairball meaningfully
+    thinned — shorter local stub segments radiating from clustered hub points rather than long
+    diagonals crossing the whole map; DOM inspection confirms 33 handoff hubs and 114 stub edges
+    rendering with correct geometry; Level 2 (SE expanded) and Level 3 (detail panel) still work
+    — zero console/page errors.

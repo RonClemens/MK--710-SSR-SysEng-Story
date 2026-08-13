@@ -640,49 +640,143 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     return point;
   }
 
+  /** A node's own ring, independent of pixel position — the ring its multi-domain meeting
+   * sits at if it has one, otherwise its resolved context-marker/full-station anchor ring. */
+  function nodeRingIndex(node: CdrlPathNode): number {
+    const meeting = meetingByNodeId.get(node.id);
+    if (meeting) return meeting.ring;
+    const raw =
+      node.render_style === "context_marker"
+        ? resolveMarkerEventIndex(node.drafted_at ?? node.baselined_at ?? "", setr_events)
+        : anchorEventIndex(node, setr_events);
+    return Math.max(0, Math.min(Math.round(raw), prrIndex));
+  }
+
+  /** A domain's angle at a possibly-fractional ring, interpolating (shortest angular path)
+   * between its two neighboring integer-ring angles — used to place a handoff hub genuinely
+   * "in between" two SETR rings rather than snapped onto one of them. */
+  function trackAngleAtFractional(lineIndex: number, ring: number): number {
+    const maxRing = trackExtentByLine[lineIndex];
+    const clamped = Math.max(0, Math.min(ring, maxRing));
+    const floorRing = Math.floor(clamped);
+    const ceilRing = Math.min(Math.ceil(clamped), maxRing);
+    const angleFloor = trackAngleAt(lineIndex, floorRing);
+    if (floorRing === ceilRing) return angleFloor;
+    const angleCeil = trackAngleAt(lineIndex, ceilRing);
+    return angleFloor + shortestAngleDelta(angleFloor, angleCeil) * (clamped - floorRing);
+  }
+
+  // Handoff hubs — per Ron's steer: the faint dashed influences/influenced_by lines should
+  // become "in-between" hub stops, sitting radially between two SETR rings, that depict the
+  // working sessions/handoffs a pair of domains needs to complete their CDRLs to the right
+  // maturity by roughly that point in the sequence — not raw point-to-point diagonals. Every
+  // cross-domain relationship pair is bucketed by (unordered domain pair, nearest half-ring)
+  // so multiple relationships between the same two domains around the same point in the
+  // sequence share ONE hub instead of each drawing its own long line across the map — the
+  // same decluttering goal as #22's track-bending, applied to relationships instead of
+  // domain membership. "ALL" targets (SEMP/IMP_IMS/RMP) are skipped per
+  // confirmed_patterns.relationship_assessment_status flagging them as too broad to chart.
+  interface HandoffPair {
+    a: CdrlPathNode;
+    b: CdrlPathNode;
+    domainAIndex: number;
+    domainBIndex: number;
+    avgRing: number;
+  }
+  const seenPairKeys = new Set<string>();
+  const handoffPairs: HandoffPair[] = [];
   fullStationNodes.forEach((cdrlNode) => {
-    const sourceAnchor = nodeAnchorCenter.get(cdrlNode.id);
-    if (!sourceAnchor) return;
-    const sourceLine = model.lines[model.lines.findIndex((l) => l.id === cdrlNode.domains[0])];
     const relationshipTargets = [...(cdrlNode.influences ?? []), ...(cdrlNode.influenced_by ?? [])];
     relationshipTargets.forEach((targetId) => {
       if (targetId === "ALL" || targetId === cdrlNode.id) return;
       const target = nodeById.get(targetId);
       if (!target) return; // dangling reference — already surfaced by validateModel()
-      if (target.domains[0] === cdrlNode.domains[0]) return; // same-domain, already visually adjacent on the shared track
-      const targetAnchor = ghostAnchorFor(target);
-      if (!targetAnchor) return;
-      edges.push({
-        id: `relationship-${cdrlNode.id}--${targetId}`,
-        source: `relationship-anchor-${cdrlNode.id}`,
-        target: `relationship-anchor-${targetId}`,
-        type: "straight",
-        selectable: false,
-        zIndex: 2,
-        style: { stroke: sourceLine?.color_hint ?? "#888", strokeWidth: 1, strokeDasharray: "3 3", opacity: 0.4 },
-        markerEnd: { type: "arrow", color: sourceLine?.color_hint ?? "#888", width: 9, height: 9 },
-      });
+      const domainAIndex = model.lines.findIndex((l) => l.id === cdrlNode.domains[0]);
+      const domainBIndex = model.lines.findIndex((l) => l.id === target.domains[0]);
+      if (domainAIndex === -1 || domainBIndex === -1 || domainAIndex === domainBIndex) return; // same-domain, already visually adjacent on the shared track
+      const pairKey = [cdrlNode.id, targetId].sort().join("--");
+      if (seenPairKeys.has(pairKey)) return;
+      seenPairKeys.add(pairKey);
+      const avgRing = (nodeRingIndex(cdrlNode) + nodeRingIndex(target)) / 2;
+      handoffPairs.push({ a: cdrlNode, b: target, domainAIndex, domainBIndex, avgRing });
     });
   });
 
-  // React Flow edges need real source/target NODE ids to anchor to, but the actual visual
-  // anchor for a CDRL node is one of several markers/dots already pushed above under a
-  // different id scheme (`maturity-...`, `station-...`, `related-...`). Rather than thread
-  // the "which exact id represents this node's primary anchor" logic through several
-  // different creation sites, a single zero-size node per referenced CDRL node is added
-  // here at its already-resolved anchor center, and edges above connect to that instead.
-  for (const [nodeId, center] of nodeAnchorCenter) {
+  const handoffGroups = new Map<string, HandoffPair[]>();
+  handoffPairs.forEach((pair) => {
+    const domainKey = [pair.domainAIndex, pair.domainBIndex].sort((x, y) => x - y).join(":");
+    const ringBucket = Math.round(pair.avgRing * 2) / 2; // nearest half-ring
+    const groupKey = `${domainKey}--${ringBucket}`;
+    const group = handoffGroups.get(groupKey) ?? [];
+    group.push(pair);
+    handoffGroups.set(groupKey, group);
+  });
+
+  const HANDOFF_HUB_SIZE = 18;
+  let handoffHubIndex = 0;
+  handoffGroups.forEach((group) => {
+    const { domainAIndex, domainBIndex } = group[0];
+    const ring = group.reduce((sum, p) => sum + p.avgRing, 0) / group.length;
+    const radius = ringRadius(ring);
+    const angle = circularMeanAngle([trackAngleAtFractional(domainAIndex, ring), trackAngleAtFractional(domainBIndex, ring)]);
+    const hubPoint = polarPoint(radius, angle);
+    const hubId = `handoff-hub-${handoffHubIndex++}`;
+    const half = HANDOFF_HUB_SIZE / 2;
+
     nodes.push({
-      id: `relationship-anchor-${nodeId}`,
+      id: hubId,
       type: "default",
-      position: center,
-      data: {},
+      position: { x: hubPoint.x - half, y: hubPoint.y - half },
+      data: { label: "" },
       draggable: false,
       selectable: false,
-      zIndex: 3,
-      style: { width: 1, height: 1, opacity: 0, border: "none" },
+      zIndex: 4,
+      style: {
+        width: HANDOFF_HUB_SIZE,
+        height: HANDOFF_HUB_SIZE,
+        borderRadius: 3,
+        transform: "rotate(45deg)",
+        background: "var(--card-bg, #fff)",
+        border: "2px dashed #888",
+        padding: 0,
+      },
     });
-  }
+
+    group.forEach((pair) => {
+      const aAnchor = ghostAnchorFor(pair.a);
+      const bAnchor = ghostAnchorFor(pair.b);
+      const aLine = model.lines[pair.domainAIndex];
+      const bLine = model.lines[pair.domainBIndex];
+      if (aAnchor) {
+        const stubId = `handoff-stub-${hubId}-${pair.a.id}`;
+        pushAnchor(`${stubId}-a`, hubPoint);
+        pushAnchor(`${stubId}-b`, aAnchor);
+        edges.push({
+          id: stubId,
+          source: `${stubId}-a`,
+          target: `${stubId}-b`,
+          type: "straight",
+          selectable: false,
+          zIndex: 2,
+          style: { stroke: aLine.color_hint, strokeWidth: 1, strokeDasharray: "3 3", opacity: 0.5 },
+        });
+      }
+      if (bAnchor) {
+        const stubId = `handoff-stub-${hubId}-${pair.b.id}`;
+        pushAnchor(`${stubId}-a`, hubPoint);
+        pushAnchor(`${stubId}-b`, bAnchor);
+        edges.push({
+          id: stubId,
+          source: `${stubId}-a`,
+          target: `${stubId}-b`,
+          type: "straight",
+          selectable: false,
+          zIndex: 2,
+          style: { stroke: bLine.color_hint, strokeWidth: 1, strokeDasharray: "3 3", opacity: 0.5 },
+        });
+      }
+    });
+  });
 
   return { nodes, edges };
 }
