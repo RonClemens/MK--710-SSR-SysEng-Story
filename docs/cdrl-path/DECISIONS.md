@@ -480,3 +480,30 @@ ring)." Replaces the direct point-to-point dashed relationship edges (one long d
     diagonals crossing the whole map; DOM inspection confirms 33 handoff hubs and 114 stub edges
     rendering with correct geometry; Level 2 (SE expanded) and Level 3 (detail panel) still work
     — zero console/page errors.
+
+## 2026-08-13 — Bug: jagged gray track near center; PRR given its own hub icon
+
+Ron, from a phone screenshot: "PRR should be a hub transfer station. Gray line is jagged. why?"
+Two related fixes.
+
+36. **Root cause of the jaggedness: #30's lane offset scales as 1/radius with no floor.** A
+    constant on-screen pixel gap between lanes needs a growing angular offset as radius shrinks
+    — correct everywhere except near the center, where a few ring-to-ring radius steps cover a
+    large relative change in 1/radius, producing a visibly jagged, near-spiraling track. PM_CM
+    showed it worst because it sits at the end of the 7-line order and so has the largest
+    `|laneSign|` (its lane offset is 3x HW's at every ring). Fixed with `LANE_FADE_START_RADIUS`:
+    the lane offset now fades linearly to exactly 0 by `INNER_RADIUS` instead of blowing up —
+    which is also the visually correct behavior on its own terms, not just a bug workaround:
+    lines should draw together as they approach the map's actual hub, not fan out.
+
+37. **PRR gets an explicit transfer-station icon, not just a thicker ring border.** Nearly
+    every domain's track terminates at or passes near PRR (the data model's own dominant
+    recurring-update cadence, see `confirmed_patterns`), making it the map's real hub — but
+    Level 1 only ever showed that via a slightly bolder ring border, easy to miss. Added a
+    concentric-ring icon (`prr-hub`, 40px — bigger than any single CDRL's own interchange hub
+    at 26px, since this is the map's single biggest convergence point) at the exact center,
+    same visual language as a CDRL interchange hub for immediate recognizability.
+
+    Verified: `tsc -b` clean; Playwright screenshot confirms the gray (PM_CM) track is now a
+    clean line with no zigzag near the center, and a clear hub icon sits at PRR; Level 2 (SE
+    expanded) and Level 3 (detail panel) still work — zero console/page errors.

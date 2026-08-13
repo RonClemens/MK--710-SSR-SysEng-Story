@@ -179,6 +179,34 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     });
   }
 
+  // PRR is the map's actual hub — nearly every domain's track terminates there or passes
+  // close by it (see #22-24's meandering-track history and the lane-fade above) — so it gets
+  // its own explicit transfer-station icon at the center, not just an implicitly-thicker ring
+  // border. Same concentric-ring visual language as a CDRL interchange hub, sized larger since
+  // this is the map's single biggest convergence point rather than one CDRL's own domains.
+  const PRR_HUB_SIZE = 40;
+  {
+    const half = PRR_HUB_SIZE / 2;
+    nodes.push({
+      id: "prr-hub",
+      type: "default",
+      position: { x: CENTER.x - half, y: CENTER.y - half },
+      data: { label: "" },
+      draggable: false,
+      selectable: false,
+      zIndex: 7,
+      style: {
+        width: PRR_HUB_SIZE,
+        height: PRR_HUB_SIZE,
+        borderRadius: "50%",
+        background: "var(--card-bg, #fff)",
+        border: "3px solid #333",
+        boxShadow: "0 0 0 2px var(--card-bg, #fff), 0 0 0 5px #333",
+        padding: 0,
+      },
+    });
+  }
+
   // CM baselines highlight a ring rather than a separate vertical marker. PRODUCT (PCA)
   // doesn't fit — PCA falls outside the ASR..PRR ring range this dartboard models (PRR is
   // explicitly the innermost ring/terminus, not simply "wherever the SETR sequence ends") —
@@ -342,11 +370,22 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
   // distinct all the way through an interchange instead of merging into a single pixel.
   // renderInterchangeHub (below) places the transfer icon at the centroid of the
   // still-separated lines it connects, with a short stub to each — not by forcing convergence.
+  // A constant PIXEL gap needs a GROWING angular offset as radius shrinks (offsetDeg ∝
+  // 1/radius) — fine everywhere except near the center, where a few ring-to-ring radius steps
+  // cover a large relative change in 1/radius, producing a visibly jagged, almost spiraling
+  // track for whichever domain has the largest lane number (farthest from the middle of the
+  // line order — PM_CM, at the end of a 7-line order, has the biggest |laneSign| and so shows
+  // it worst). LANE_FADE_START_RADIUS fades the offset to exactly 0 by INNER_RADIUS instead of
+  // letting it blow up — which also reads correctly on its own terms: PRR is the map's actual
+  // hub, so lines drawing tightly together as they approach it is the right visual, not a bug
+  // to route around.
   const LANE_OFFSET_PX = 9;
+  const LANE_FADE_START_RADIUS = 250;
   function laneOffsetDeg(lineIndex: number, radius: number): number {
-    if (radius === 0) return 0;
+    if (radius <= INNER_RADIUS) return 0;
+    const fade = Math.min(1, (radius - INNER_RADIUS) / (LANE_FADE_START_RADIUS - INNER_RADIUS));
     const laneSign = lineIndex - (domainCount - 1) / 2;
-    return ((laneSign * LANE_OFFSET_PX) / radius) * (180 / Math.PI);
+    return ((laneSign * LANE_OFFSET_PX * fade) / radius) * (180 / Math.PI);
   }
   const trackAngleAt = (lineIndex: number, ring: number) => {
     const clamped = Math.max(0, Math.min(ring, trackExtentByLine[lineIndex]));
