@@ -533,3 +533,55 @@ refinements to #36-37.
     with no surrounding ring circle, and tracks (PM_CM especially) read as smooth curves rather
     than a jagged polyline; Level 2 (SE expanded) and Level 3 (detail panel) still work — zero
     console/page errors.
+
+## 2026-08-13 — Model editor: atomic edit and batch import land, consolidated into one tool
+
+Ron: "let's provide a CDRL path model edit tool in the webapp just above the subway chart that
+can publish and execute a script to update the subway map. I also want the ability to edit the
+JSON CDRL path model offline, then batch import for Subway map update, too." This is Phase 4
+(atomic edit) and Phase 5 (batch import) from the original handoff doc, previously unbuilt.
+
+40. **Both pathways consolidated into one JSON-level editor, not two separate UIs.**
+    `cdrl-path-import-export-architecture.md` already calls for `AtomicEditPanel` and
+    `ImportManager` to share one `validateModel()` gate and never diverge into two validation
+    code paths — new `CdrlPathModelEditor.tsx` takes that a step further for v1 and gives them
+    one shared UI too: a textarea pre-filled with the current model (edit a field directly for
+    an atomic-style change) that also accepts a **Load JSON File** upload (an offline-edited
+    file, for batch import), both going through the same **Validate** → **Apply to Map** flow.
+    Positioned directly above the subway chart in `CdrlPathPage.tsx`, collapsed by default
+    behind an "Edit Model" button so it doesn't compete with the map when not in use.
+
+41. **`useCdrlPathModel` became real state, not a fixed derived value.** Previously returned a
+    `useMemo` of the bundled JSON with no way to change it. Now returns `{ model, setModel,
+    isDirty, resetToDefault }` — `setModel` is what `CdrlPathModelEditor`'s Apply calls, and
+    every consumer downstream (the layout builder, the detail panel, `CdrlPathExportManager`)
+    already re-renders reactively off `model` with no changes needed elsewhere.
+    `CdrlPathExportManager`'s `isDirty` prop, hardcoded `false` since Phase 3, now reflects
+    real edit state — the "Unsaved changes — export to save" banner finally means something.
+
+42. **Applying an edit never writes to disk or the repo — only the in-browser working copy.**
+    Consistent with the reference model's permanent Export/Download-only persistence decision
+    (#5): "Apply to Map" updates React state so the chart re-renders immediately, and Export
+    JSON (already built in Phase 3) is how a session's edits actually get saved, for Ron to
+    review and commit back to `cdrl-did-data-model.json` himself — no GitHub-API write-back,
+    per the architecture doc's own open item marking that a possible fast-follow, not v1 scope.
+
+43. **Diff preview is a documented v1 simplification of the architecture doc's fuller spec.**
+    The full batch-import pipeline described there (exact/alias matching, per-field
+    trusted-override-vs-conflict rules, three-bucket Matched/Conflicts/Unmatched review UI) is
+    real reconciliation logic meant for Ron's eventual live CDRL-schedule import against
+    partial records. What ships now is simpler and correct for its actual use case (a
+    wholesale replacement or direct edit of the same JSON document, not reconciling a
+    third-party schedule extract against it): node-level added/removed/changed-by-id, plus a
+    coarser "these other top-level sections differ" flag for anything outside `nodes` (lines,
+    lifecycle_lanes, decomposition_dimension, etc. — e.g. a line's `color_hint`). Caught in
+    testing: the diff originally checked only `nodes` and silently missed a `lines` edit even
+    though Apply correctly updated the map — fixed before shipping.
+
+    Verified end-to-end via Playwright: opened the editor, edited a line's `color_hint`
+    in-place, Validate showed "Other sections changed: lines," Apply updated the actual
+    rendered track color and set the dirty banner; separately, invalid JSON produces a clear
+    parse error with Apply disabled; separately, loading a file (a different line's color
+    changed) through **Load JSON File** validated and applied correctly, confirmed via the
+    rendered SVG stroke color. `tsc -b` clean; Level 1/2/3 regression-checked on a fresh page
+    load with zero console/page errors.

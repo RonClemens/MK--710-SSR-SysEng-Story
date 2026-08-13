@@ -1257,3 +1257,40 @@ button {
   border-color: var(--navy);
   color: white;
 }
+
+.cdrl-path-model-editor-open {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.cdrl-path-model-editor-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  padding: 0.5rem;
+  background: var(--card-bg, #fff);
+  color: inherit;
+  resize: vertical;
+}
+
+.cdrl-path-model-editor-error {
+  color: var(--amber);
+  font-size: 0.85rem;
+}
+
+.cdrl-path-model-editor-result,
+.cdrl-path-model-editor-diff {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.cdrl-path-model-editor-diff ul {
+  margin: 0.3rem 0 0;
+  padding-left: 1.2rem;
+}
