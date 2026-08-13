@@ -585,3 +585,25 @@ JSON CDRL path model offline, then batch import for Subway map update, too." Thi
     changed) through **Load JSON File** validated and applied correctly, confirmed via the
     rendered SVG stroke color. `tsc -b` clean; Level 1/2/3 regression-checked on a fresh page
     load with zero console/page errors.
+
+## 2026-08-13 — Bug: tracks that reach PRR stopped short of the bullseye, not on it
+
+Ron, from a phone screenshot: "make sure any paths that end up at PRR map directly on the
+bullseye." #37 added a hub icon at the map's exact center, but tracks whose own content
+genuinely reaches PRR were still stopping at `ringRadius(prrIndex)` — which was `INNER_RADIUS`
+(50px), not 0 — leaving a small but visible gap between a track's tip and the icon it was
+supposed to terminate at.
+
+44. **`ringRadius()` now maps PRR to radius exactly 0.** The old formula reserved
+    `INNER_RADIUS` as an inner floor the innermost ring's circle sat on — sensible back when
+    PRR's ring boundary was actually drawn (#37 removed that boundary entirely, leaving only
+    the hub icon at dead center). Rings now space evenly across the full `OUTER_RADIUS..0`
+    span with no reserved inner buffer, so a domain track whose `trackExtentByLine` reaches
+    `prrIndex` has its literal final point at `CENTER` — exactly where the hub icon sits — not
+    a fixed 50px short of it. `INNER_RADIUS` is unchanged as the lane-offset fade floor (#36),
+    which was never about the ring geometry itself.
+
+    Verified: `tsc -b` clean; Playwright screenshot confirms SE, PM_CM, and ILS tracks (the
+    domains currently reaching PRR) now terminate with their tip flush against the bullseye
+    icon rather than stopping short of it; Level 2 (SE expanded) and Level 3 (detail panel)
+    still work — zero console/page errors.

@@ -125,9 +125,14 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
   const prrIndex = Math.max(0, setr_events.findIndex((e) => e.id === "PRR"));
   const ringCount = prrIndex + 1; // ASR(0)..PRR(prrIndex) inclusive
 
+  // PRR (the last ring) maps to radius exactly 0 — the literal center point the hub icon
+  // sits at — not INNER_RADIUS short of it. Rings are spaced evenly across the full
+  // OUTER_RADIUS..0 span rather than reserving INNER_RADIUS as an unused inner buffer, so
+  // any domain track whose own content actually reaches PRR lands its final point exactly
+  // on the bullseye instead of stopping visibly short of it.
   const ringRadius = (index: number) => {
     const clamped = Math.max(0, Math.min(index, prrIndex));
-    return OUTER_RADIUS - (clamped / prrIndex) * (OUTER_RADIUS - INNER_RADIUS);
+    return OUTER_RADIUS * (1 - clamped / prrIndex);
   };
 
   const domainCount = model.lines.length;
