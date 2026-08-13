@@ -409,3 +409,33 @@ real subway map's shared trunk corridor before this was addressed.
     separate parallel channels on approach to their shared interchange, converging to one exact
     point at the hub icon rather than overlapping the whole way; Level 2 (SE expanded) and
     Level 3 (detail panel) still work — zero console/page errors.
+
+## 2026-08-13 — Interchange hub no longer pinches parallel tracks to one pixel
+
+Ron, sharing a real WMATA map for comparison: "the tracks are still not running completely
+parallel like the true subway maps show... the convergence at each hub transfer station is
+forcing edges to converge unnecessarily at the exact same XY coordinate. that is not necessary
+for visual purposes." Correct call — real transfer stations keep shared-corridor lines visibly
+parallel the whole way through; the icon marks the transfer, it doesn't require the lines to
+merge into one point.
+
+31. **#30's lane offset now applies unconditionally, including at meeting rings.**
+    `trackAngleAt` previously special-cased a domain's own required meeting ring to skip the
+    lane nudge (so tracks would touch exactly there) — that exemption is gone. A domain's lane
+    offset is now constant everywhere along its track, so lines stay visibly separate and
+    parallel straight through an interchange instead of pinching to a shared pixel and
+    re-diverging.
+
+32. **The interchange hub sits at the centroid of the (now-parallel, still separate) points its
+    domains actually render at, with a short colored stub to each** — not a point every domain
+    is forced to touch. `renderStation`'s multi-domain branch computes each participating
+    domain's real (lane-offset) position at the meeting ring via `trackAngleAt`, averages them
+    for the hub icon's placement, and draws a thin 3px stub from the hub to each track — small
+    when domains are lanes apart, near-zero when they're adjacent, same visual language as a
+    WMATA transfer icon sitting among (not merging) the lines it connects. The `MultiDomainMeeting`
+    interface dropped its now-unused precomputed `point` field accordingly.
+
+    Verified: `tsc -b` clean; Playwright screenshot confirms SE/SW/HW now run as three
+    consistently parallel channels all the way through their shared interchange (no pinch
+    point), with the hub icon sitting among them and short stubs to each; Level 2 (SE expanded)
+    and Level 3 (detail panel) still work — zero console/page errors.

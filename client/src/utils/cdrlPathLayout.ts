@@ -105,7 +105,6 @@ interface MultiDomainMeeting {
   ring: number;
   lineIndices: number[];
   angle: number;
-  point: { x: number; y: number };
 }
 
 /** Builds the React Flow elements for the current zoom/filter state.
@@ -263,7 +262,7 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
         ),
       );
       const angle = circularMeanAngle(lineIndices.map((idx) => domainHomeAngle(idx)));
-      return { node: n, ring, lineIndices, angle, point: polarPoint(ringRadius(ring), angle) };
+      return { node: n, ring, lineIndices, angle };
     })
     .filter((m): m is MultiDomainMeeting => m !== null);
   const meetingByNodeId = new Map(meetings.map((m) => [m.node.id, m]));
@@ -333,29 +332,25 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
   const anglesByLine = model.lines.map((_, lineIndex) => solveDomainTrackAngles(lineIndex, trackExtentByLine[lineIndex]));
 
   // Two domains easing toward (or away from) the same meeting can end up running nearly
-  // parallel for a stretch, overlapping visually even though they're logically distinct
-  // tracks. Real subway maps give each line sharing a corridor its own thin channel rather
-  // than drawing them on top of each other — same fix here: every domain gets a fixed lane
-  // number (its position in the line order, centered on zero) and is nudged sideways by
-  // LANE_OFFSET_PX, scaled by 1/radius so the on-screen gap stays a constant pixel width
-  // regardless of how close to the center that ring is. The exemption is deliberate: at a
-  // ring that's an actual required meeting for this domain, no offset is applied, so tracks
-  // still converge to touch exactly at the interchange icon rather than passing near it.
+  // parallel for a stretch — real subway maps give each line sharing a corridor its own thin
+  // channel the whole way through (see e.g. WMATA's Blue/Orange/Silver trunk), rather than
+  // pinching every line to one exact point at the transfer station itself. Every domain gets
+  // a fixed lane number (its position in the line order, centered on zero) and is nudged
+  // sideways by LANE_OFFSET_PX, scaled by 1/radius so the on-screen gap stays a constant pixel
+  // width regardless of how close to the center that ring is — applied unconditionally,
+  // including at a domain's own required meeting ring, so lines stay visibly parallel and
+  // distinct all the way through an interchange instead of merging into a single pixel.
+  // renderInterchangeHub (below) places the transfer icon at the centroid of the
+  // still-separated lines it connects, with a short stub to each — not by forcing convergence.
   const LANE_OFFSET_PX = 9;
-  function isRequiredMeetingRing(lineIndex: number, ring: number): boolean {
-    const maxRing = trackExtentByLine[lineIndex];
-    return meetings.some((m) => m.lineIndices.includes(lineIndex) && Math.min(m.ring, maxRing) === ring);
+  function laneOffsetDeg(lineIndex: number, radius: number): number {
+    if (radius === 0) return 0;
+    const laneSign = lineIndex - (domainCount - 1) / 2;
+    return ((laneSign * LANE_OFFSET_PX) / radius) * (180 / Math.PI);
   }
   const trackAngleAt = (lineIndex: number, ring: number) => {
-    const maxRing = trackExtentByLine[lineIndex];
-    const clamped = Math.max(0, Math.min(ring, maxRing));
-    const baseAngle = anglesByLine[lineIndex][clamped];
-    if (isRequiredMeetingRing(lineIndex, clamped)) return baseAngle;
-    const radius = ringRadius(clamped);
-    if (radius === 0) return baseAngle;
-    const laneSign = lineIndex - (domainCount - 1) / 2;
-    const offsetDeg = ((laneSign * LANE_OFFSET_PX) / radius) * (180 / Math.PI);
-    return baseAngle + offsetDeg;
+    const clamped = Math.max(0, Math.min(ring, trackExtentByLine[lineIndex]));
+    return anglesByLine[lineIndex][clamped] + laneOffsetDeg(lineIndex, ringRadius(clamped));
   };
 
   /** Zero-size anchor node an edge can source/target from, at an already-resolved point. Only
@@ -441,8 +436,10 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
 
   /** Renders a CDRL's station marker: a plain train-stop icon sitting on its one (possibly
    * bent) track if it belongs to a single domain, or the bigger concentric-ring interchange
-   * icon at its precomputed meeting point if it spans two or more — where every one of its
-   * domains' tracks already bends to meet it, so no separate stub connectors are needed. */
+   * icon if it spans two or more. The hub sits at the CENTROID of its domains' actual
+   * (lane-offset, still-parallel) points at that ring — not a point they're forced to share —
+   * with a short stub to each, the way a real transfer station icon sits among separate
+   * parallel lines rather than pinching them together (see docs/cdrl-path/DECISIONS.md #31). */
   function renderStation(cdrlNode: CdrlPathNode, radiusIndex: number, primaryLineIndex: number) {
     const meeting = meetingByNodeId.get(cdrlNode.id);
     if (!meeting) {
@@ -451,12 +448,20 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       pushTrainStop(`station-${cdrlNode.id}`, point, STATION_MARKER_SIZE, model.lines[primaryLineIndex].color_hint, 6);
       return;
     }
-    nodeAnchorCenter.set(cdrlNode.id, meeting.point);
+
+    const radius = ringRadius(meeting.ring);
+    const trackPoints = meeting.lineIndices.map((idx) => ({ idx, point: polarPoint(radius, trackAngleAt(idx, meeting.ring)) }));
+    const hubPoint = {
+      x: trackPoints.reduce((sum, t) => sum + t.point.x, 0) / trackPoints.length,
+      y: trackPoints.reduce((sum, t) => sum + t.point.y, 0) / trackPoints.length,
+    };
+    nodeAnchorCenter.set(cdrlNode.id, hubPoint);
+
     const half = HUB_MARKER_SIZE / 2;
     nodes.push({
       id: `station-${cdrlNode.id}`,
       type: "default",
-      position: { x: meeting.point.x - half, y: meeting.point.y - half },
+      position: { x: hubPoint.x - half, y: hubPoint.y - half },
       data: { label: "" },
       draggable: false,
       zIndex: 7,
@@ -470,6 +475,21 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
         padding: 0,
         cursor: "pointer",
       },
+    });
+
+    trackPoints.forEach(({ idx, point }) => {
+      const stubId = `interchange-stub-${cdrlNode.id}-${model.lines[idx].id}`;
+      pushAnchor(`${stubId}-a`, hubPoint);
+      pushAnchor(`${stubId}-b`, point);
+      edges.push({
+        id: stubId,
+        source: `${stubId}-a`,
+        target: `${stubId}-b`,
+        type: "straight",
+        selectable: false,
+        zIndex: 2,
+        style: { stroke: model.lines[idx].color_hint, strokeWidth: 3 },
+      });
     });
   }
 
@@ -578,8 +598,15 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     if (existing) return existing;
     const meeting = meetingByNodeId.get(target.id);
     if (meeting) {
-      nodeAnchorCenter.set(target.id, meeting.point);
-      return meeting.point;
+      // Same centroid-of-offset-points logic as renderStation's hub placement — this path
+      // only runs for a target that somehow wasn't already rendered by the unconditional
+      // context-marker/full-station passes (renderStation runs for every node), a defensive
+      // fallback rather than a normally-hit case.
+      const radius = ringRadius(meeting.ring);
+      const points = meeting.lineIndices.map((idx) => polarPoint(radius, trackAngleAt(idx, meeting.ring)));
+      const centroid = { x: points.reduce((s, p) => s + p.x, 0) / points.length, y: points.reduce((s, p) => s + p.y, 0) / points.length };
+      nodeAnchorCenter.set(target.id, centroid);
+      return centroid;
     }
     const targetLineIndex = model.lines.findIndex((l) => l.id === target.domains[0]);
     if (targetLineIndex === -1) return null;
