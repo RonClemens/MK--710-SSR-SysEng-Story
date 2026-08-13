@@ -384,3 +384,28 @@ segments instead of one continuous line.
     consecutive points now align exactly (no gap); Playwright screenshots across Level 1 (all 7
     tracks single continuous bent lines), Level 2 (SE expanded, still clickable to
     collapse), and Level 3 (detail panel) — zero console/page errors in all three states.
+
+## 2026-08-12 — Parallel tracks given their own lane, per-domain
+
+Ron, from the live map: "can each path have it's own channel, or slight offset, so none overlap
+and align next to each other when necessary?" — domains easing toward the same meeting (or
+running the same general direction for a stretch) were landing on top of each other, same as a
+real subway map's shared trunk corridor before this was addressed.
+
+30. **Every domain gets a fixed lane, offset perpendicular to its own path.** `trackAngleAt`
+    (`cdrlPathLayout.ts`) now nudges each domain's angle sideways by `LANE_OFFSET_PX` (9px)
+    times its lane number — the domain's position in the line order, centered on zero (e.g. for
+    7 domains: -3..+3) — scaled by `1/radius` so the on-screen gap stays a constant pixel width
+    regardless of how close to the center that ring is (a bigger angular nudge is needed near
+    the center to hold the same physical gap). The one exemption: at a ring that's an actual
+    required meeting for that domain, no offset is applied, so tracks still converge to touch
+    exactly at the interchange icon rather than passing near it and missing. Because every
+    caller (the track polyline, single-domain station markers, expanded-line maturity markers,
+    relationship ghost anchors) reads through the same `trackAngleAt`, the lane offset applies
+    consistently everywhere a domain's position is computed — no marker ends up off its own
+    rendered track.
+
+    Verified: `tsc -b` clean; Playwright screenshot shows SE/SW/HW running as three visibly
+    separate parallel channels on approach to their shared interchange, converging to one exact
+    point at the hub icon rather than overlapping the whole way; Level 2 (SE expanded) and
+    Level 3 (detail panel) still work — zero console/page errors.

@@ -331,9 +331,31 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
 
   const trackExtentByLine = model.lines.map((_, lineIndex) => domainTrackExtent(lineIndex));
   const anglesByLine = model.lines.map((_, lineIndex) => solveDomainTrackAngles(lineIndex, trackExtentByLine[lineIndex]));
+
+  // Two domains easing toward (or away from) the same meeting can end up running nearly
+  // parallel for a stretch, overlapping visually even though they're logically distinct
+  // tracks. Real subway maps give each line sharing a corridor its own thin channel rather
+  // than drawing them on top of each other — same fix here: every domain gets a fixed lane
+  // number (its position in the line order, centered on zero) and is nudged sideways by
+  // LANE_OFFSET_PX, scaled by 1/radius so the on-screen gap stays a constant pixel width
+  // regardless of how close to the center that ring is. The exemption is deliberate: at a
+  // ring that's an actual required meeting for this domain, no offset is applied, so tracks
+  // still converge to touch exactly at the interchange icon rather than passing near it.
+  const LANE_OFFSET_PX = 9;
+  function isRequiredMeetingRing(lineIndex: number, ring: number): boolean {
+    const maxRing = trackExtentByLine[lineIndex];
+    return meetings.some((m) => m.lineIndices.includes(lineIndex) && Math.min(m.ring, maxRing) === ring);
+  }
   const trackAngleAt = (lineIndex: number, ring: number) => {
-    const clamped = Math.max(0, Math.min(ring, trackExtentByLine[lineIndex]));
-    return anglesByLine[lineIndex][clamped];
+    const maxRing = trackExtentByLine[lineIndex];
+    const clamped = Math.max(0, Math.min(ring, maxRing));
+    const baseAngle = anglesByLine[lineIndex][clamped];
+    if (isRequiredMeetingRing(lineIndex, clamped)) return baseAngle;
+    const radius = ringRadius(clamped);
+    if (radius === 0) return baseAngle;
+    const laneSign = lineIndex - (domainCount - 1) / 2;
+    const offsetDeg = ((laneSign * LANE_OFFSET_PX) / radius) * (180 / Math.PI);
+    return baseAngle + offsetDeg;
   };
 
   /** Zero-size anchor node an edge can source/target from, at an already-resolved point. Only
