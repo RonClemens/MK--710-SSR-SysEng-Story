@@ -879,3 +879,35 @@ separate tab, not a full replacement of the subway map), matrix as the default.
     read of a compressed full-page screenshot looked like a layout bug (chip clusters
     misread as stray extra rows) but was a screenshot-legibility artifact, not an actual
     rendering issue.
+
+## 2026-08-14 — Matrix Stage 2: heat-map density toggle
+
+Ron confirmed continuing with the Subway Design chat's Stage 2 recommendation ("add two
+lightweight companion views over the same grid: a heat-map toggle... and a kanban/status
+toggle"). Kanban was explicitly deferred this round (see #61) rather than built thin.
+
+60. **`CdrlPathMatrixView` gains a `Detail` / `Heat Map` density toggle**, rendering the exact
+    same `buildCdrlMaturityMatrix` data two ways instead of adding a second data path. Heat
+    map colors each (discipline, event) cell by its DISTINCT CDRL count (not maturity-state
+    count — a CDRL due twice at one event, e.g. both DRAFT and FINAL, is one workload item,
+    not two), on a 5-bucket sequential navy ramp (0/1/2/3/4+, under the research's ~7-color
+    ceiling). The count is always shown as text inside the cell too, never shade alone,
+    matching the same accessibility rule the Detail view's D/F/U chips already follow.
+    Clicking a populated cell opens the same related-CDRLs modal used everywhere else,
+    scoped to every CDRL in that cell (title: "{Discipline} @ {Event}") — reuses the existing
+    `onSelect` callback with no new modal plumbing.
+
+61. **Kanban/status toggle deliberately NOT built this round.** The research frames it as a
+    *live tracking* companion ("discipline leads can track live Draft→Final→Update progress...
+    once executing") — but that requires real per-CDRL submission/approval status, which this
+    app doesn't have yet: the per-baseline status overlay is an already-documented separate
+    future phase (see the Persistence row in cdrl-path-project-brief.md and
+    `CdrlPathNodeDetail`'s own "Live program status... not yet wired up" section). Building a
+    kanban view today would just be a lower-information re-skin of the matrix's own scheduled
+    dates, not the live-tracking tool the research actually describes — flagged as a real open
+    item to build once the status-overlay data model exists, not silently dropped.
+
+    Verified: `tsc -b` clean. Playwright confirms the Heat Map toggle renders shaded, numbered
+    cells (40 populated cells in the current dataset); clicking a cell with count 4 opens
+    "Systems Engineering CDRLs @ SRR" listing exactly 4 CDRLs; toggling back to Detail restores
+    all 84 chips exactly as before; zero unexpected console/page errors.

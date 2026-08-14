@@ -1573,3 +1573,77 @@ button {
   font-size: 0.85rem;
   margin: 0.2rem 0;
 }
+
+/* Heat-map density (Stage 2 companion view, per the 2026-08-14 research: "cell color = count...
+   for executives to spot workload hot-spots and gaps"). Count is always shown as text inside
+   the cell too — shade alone is never the only signal, same accessibility rule as the D/F/U
+   chips. Sequential ramp on the navy brand color, capped at 5 buckets (well under the ~7-color
+   ceiling). */
+.cdrl-matrix-heat {
+  text-align: center;
+  cursor: default;
+  transition: filter 0.1s ease;
+}
+
+.cdrl-matrix-heat[role="button"] {
+  cursor: pointer;
+}
+
+.cdrl-matrix-heat[role="button"]:hover {
+  filter: brightness(0.92);
+}
+
+.cdrl-matrix-heat-count {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.cdrl-matrix-heat-0 {
+  background: var(--surface);
+}
+
+.cdrl-matrix-heat-1 {
+  background: #dbe3f7;
+  color: var(--navy);
+}
+
+.cdrl-matrix-heat-2 {
+  background: #b3c3ec;
+  color: var(--navy);
+}
+
+.cdrl-matrix-heat-3 {
+  background: #7f96d6;
+  color: #fff;
+}
+
+.cdrl-matrix-heat-4plus {
+  background: var(--navy);
+  color: #fff;
+}
+
+.cdrl-matrix-heat-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.cdrl-matrix-heat-swatch.cdrl-matrix-heat-0 {
+  color: var(--text-muted);
+}
+
+.cdrl-matrix-heat-swatch.cdrl-matrix-heat-1,
+.cdrl-matrix-heat-swatch.cdrl-matrix-heat-2 {
+  color: var(--navy);
+}
+
+.cdrl-matrix-heat-swatch.cdrl-matrix-heat-3,
+.cdrl-matrix-heat-swatch.cdrl-matrix-heat-4plus {
+  color: #fff;
+}
