@@ -90,7 +90,7 @@
       "id": "SE",
       "label": "Systems Engineering CDRLs",
       "color_hint": "blue",
-      "description": "System-level requirements and design artifacts — the systems engineering discipline's own deliverables, not specific to software or hardware."
+      "description": "System-level requirements and design artifacts \u2014 the systems engineering discipline's own deliverables, not specific to software or hardware."
     },
     {
       "id": "SW",
@@ -108,7 +108,7 @@
       "id": "TE",
       "label": "Test & Evaluation CDRLs",
       "color_hint": "green",
-      "description": "Verification planning, procedures, and results — including the software-numbered (IPSC) test DIDs, since their purpose is testing, not building."
+      "description": "Verification planning, procedures, and results \u2014 including the software-numbered (IPSC) test DIDs, since their purpose is testing, not building."
     },
     {
       "id": "SAFETY_RELIABILITY",
@@ -126,7 +126,7 @@
       "id": "PM_CM",
       "label": "Program Management / CM CDRLs",
       "color_hint": "gray",
-      "description": "Schedule, risk, and configuration-management administration — governs how the whole effort is planned and controlled."
+      "description": "Schedule, risk, and configuration-management administration \u2014 governs how the whole effort is planned and controlled."
     }
   ],
   "nodes": [
@@ -162,6 +162,7 @@
         "ALL"
       ],
       "influenced_by": [],
+      "derived_from": [],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "raci": {
         "responsible": null,
@@ -201,6 +202,9 @@
       "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
       "confirmed_via_did_interview": true,
       "influenced_by": [
+        "SEP"
+      ],
+      "derived_from": [
         "SEP"
       ],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
@@ -244,6 +248,9 @@
       "influenced_by": [
         "SEMP"
       ],
+      "derived_from": [
+        "SEMP"
+      ],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "raci": {
         "responsible": null,
@@ -284,6 +291,9 @@
       "influenced_by": [
         "SEMP"
       ],
+      "derived_from": [
+        "SEMP"
+      ],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "raci": {
         "responsible": null,
@@ -312,6 +322,7 @@
         "IRS"
       ],
       "influenced_by": [],
+      "derived_from": [],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "raci": {
         "responsible": null,
@@ -341,6 +352,9 @@
         "TEMP"
       ],
       "influenced_by": [
+        "CDD"
+      ],
+      "derived_from": [
         "CDD"
       ],
       "render_style": "full_station",
@@ -411,6 +425,9 @@
       "influenced_by": [
         "SSS"
       ],
+      "derived_from": [
+        "SSS"
+      ],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "raci": {
         "responsible": null,
@@ -459,6 +476,9 @@
         "IRS",
         "SSS"
       ],
+      "derived_from": [
+        "IRS"
+      ],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "raci": {
         "responsible": null,
@@ -479,6 +499,9 @@
       "baselined_at": "PDR",
       "verify_note": "Corrected - SRS baselines at SSR (Software Specification Review), not PDR. PDR baselines the hardware/system-level Allocated Baseline; SSR is the software-track equivalent milestone. If your program doesn't run SSR as a separate event, SRS baseline reverts to PDR by default.",
       "influenced_by": [
+        "SSS"
+      ],
+      "derived_from": [
         "SSS"
       ],
       "influences": [
@@ -526,6 +549,10 @@
       "drafted_at": "SFR",
       "baselined_at": "PDR (Allocated Baseline)",
       "influenced_by": [
+        "SSS",
+        "IRS"
+      ],
+      "derived_from": [
         "SSS",
         "IRS"
       ],
@@ -586,6 +613,11 @@
         "ICD",
         "SSDD"
       ],
+      "derived_from": [
+        "IRS",
+        "ICD",
+        "SSDD"
+      ],
       "render_style": "full_station",
       "maturity_states": [
         {
@@ -631,6 +663,11 @@
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
+        "SRS",
+        "SSDD",
+        "IDD"
+      ],
+      "derived_from": [
         "SRS",
         "SSDD",
         "IDD"
@@ -681,6 +718,9 @@
       "influenced_by": [
         "SDD"
       ],
+      "derived_from": [
+        "SDD"
+      ],
       "render_style": "full_station",
       "maturity_states": [
         {
@@ -723,6 +763,10 @@
       "drafted_at": "PDR",
       "baselined_at": "CDR (FINAL), PCA (AS_BUILT/Product Baseline)",
       "influenced_by": [
+        "SSDD",
+        "HW_DEV_SPEC"
+      ],
+      "derived_from": [
         "SSDD",
         "HW_DEV_SPEC"
       ],
@@ -775,6 +819,9 @@
         "SDD",
         "STR"
       ],
+      "derived_from": [
+        "SDD"
+      ],
       "render_style": "full_station",
       "maturity_states": [
         {
@@ -818,6 +865,10 @@
       "drafted_at": "CDR",
       "baselined_at": "PCA (software Product Baseline)",
       "influenced_by": [
+        "SDD",
+        "DBDD"
+      ],
+      "derived_from": [
         "SDD",
         "DBDD"
       ],
@@ -865,6 +916,11 @@
         "SRS",
         "TEMP"
       ],
+      "derived_from": [
+        "SSS",
+        "SRS",
+        "TEMP"
+      ],
       "influences": [
         "STD"
       ],
@@ -906,6 +962,10 @@
         "SDD",
         "STP"
       ],
+      "derived_from": [
+        "SDD",
+        "STP"
+      ],
       "influences": [
         "STR"
       ],
@@ -942,6 +1002,9 @@
       "drafted_at": "SVR_FCA",
       "baselined_at": "SVR_FCA",
       "influenced_by": [
+        "STD"
+      ],
+      "derived_from": [
         "STD"
       ],
       "influences": [
@@ -981,6 +1044,13 @@
       "drafted_at": "SRR",
       "baselined_at": "updated at every SETR through SVR_FCA",
       "influenced_by": [
+        "IRS",
+        "SSS",
+        "STR",
+        "HW_DEV_SPEC",
+        "SRS"
+      ],
+      "derived_from": [
         "IRS",
         "SSS",
         "STR",
@@ -1054,6 +1124,10 @@
         "SSS",
         "CDD"
       ],
+      "derived_from": [
+        "SSS",
+        "CDD"
+      ],
       "render_style": "context_marker",
       "maturity_states": [
         {
@@ -1124,6 +1198,7 @@
       "decomposition_level": "SYSTEM",
       "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
       "influenced_by": [],
+      "derived_from": [],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "confirmed_via_did_interview": true,
       "raci": {
@@ -1144,6 +1219,11 @@
       "drafted_at": "PDR",
       "baselined_at": "CDR, updated through PRR",
       "influenced_by": [
+        "SSDD",
+        "FMECA",
+        "SSHAR"
+      ],
+      "derived_from": [
         "SSDD",
         "FMECA",
         "SSHAR"
@@ -1221,6 +1301,10 @@
         "SSDD",
         "SSPP"
       ],
+      "derived_from": [
+        "SSDD",
+        "SSPP"
+      ],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "raci": {
         "responsible": null,
@@ -1259,6 +1343,7 @@
         "RM_PREDICTIONS"
       ],
       "influenced_by": [],
+      "derived_from": [],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "raci": {
         "responsible": null,
@@ -1278,6 +1363,11 @@
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
+        "SSDD",
+        "HW_DEV_SPEC",
+        "RM_PREDICTIONS"
+      ],
+      "derived_from": [
         "SSDD",
         "HW_DEV_SPEC",
         "RM_PREDICTIONS"
@@ -1321,6 +1411,10 @@
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
+        "SSS",
+        "SSDD"
+      ],
+      "derived_from": [
         "SSS",
         "SSDD"
       ],
@@ -1371,6 +1465,10 @@
         "STR",
         "FMECA"
       ],
+      "derived_from": [
+        "STR",
+        "FMECA"
+      ],
       "notes": "This was mislabeled as FMECA's DID number in the earlier draft; it's actually a distinct, later-occurring report fed by test/field failure data.",
       "render_style": "full_station",
       "maturity_states": [
@@ -1417,6 +1515,11 @@
         "SSDD",
         "LORA"
       ],
+      "derived_from": [
+        "FMECA",
+        "SSDD",
+        "LORA"
+      ],
       "render_style": "context_marker",
       "maturity_states": [
         {
@@ -1453,6 +1556,12 @@
       "drafted_at": "CDR",
       "baselined_at": "PCA",
       "influenced_by": [
+        "FMECA",
+        "ENG_DRAWINGS",
+        "LCSP",
+        "LORA"
+      ],
+      "derived_from": [
         "FMECA",
         "ENG_DRAWINGS",
         "LCSP",
@@ -1509,6 +1618,9 @@
       "influenced_by": [
         "SEMP"
       ],
+      "derived_from": [
+        "SEMP"
+      ],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "raci": {
         "responsible": null,
@@ -1548,6 +1660,14 @@
       "decomposition_level_note": "First-pass tag - review together, several of these (FMECA, ICD, drawings) legitimately recur at multiple levels and this single-value tag oversimplifies that.",
       "influences": [],
       "influenced_by": [
+        "RVTM",
+        "STR",
+        "ENG_DRAWINGS",
+        "HW_PROD_SPEC",
+        "SPS",
+        "SVD"
+      ],
+      "derived_from": [
         "RVTM",
         "STR",
         "ENG_DRAWINGS",
@@ -1606,6 +1726,10 @@
         "SSS",
         "IRS"
       ],
+      "derived_from": [
+        "SSS",
+        "IRS"
+      ],
       "relationship_assessment": "First-pass, Claude-assessed based on standard SE Vee-model logic (requirements flow-down, design flow-down, analysis-feeds-design). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, not settled fact.",
       "raci": {
         "responsible": null,
@@ -1626,6 +1750,10 @@
       "drafted_at": "CDR",
       "baselined_at": "PRR",
       "influenced_by": [
+        "HW_DEV_SPEC",
+        "ENG_DRAWINGS"
+      ],
+      "derived_from": [
         "HW_DEV_SPEC",
         "ENG_DRAWINGS"
       ],
@@ -1689,6 +1817,11 @@
         "RM_PREDICTIONS",
         "HW_DEV_SPEC"
       ],
+      "derived_from": [
+        "FMECA",
+        "RM_PREDICTIONS",
+        "HW_DEV_SPEC"
+      ],
       "influences": [
         "SSDD",
         "HW_PROD_SPEC",
@@ -1728,6 +1861,9 @@
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
+        "HW_DEV_SPEC"
+      ],
+      "derived_from": [
         "HW_DEV_SPEC"
       ],
       "influences": [
@@ -1926,7 +2062,8 @@
     "analysis_derived_docs_pattern": "LORA and CMRS (and likely other ILS/specialty-engineering analysis products) don't follow the ECP-through-PRR update cadence used by core design docs. Instead: (1) no independent update schedule, (2) if they change, it's in lockstep with an ECP against a related design input or design output document, and (3) the relationship is bidirectional - draft-stage analysis feeds design decisions (design-for-X), while final analysis content is in turn shaped by the as-designed system. Check this pattern against other analysis-type CDRLs (FMECA, RM_PREDICTIONS, SSHAR) as they come up for review, since they may follow the same logic rather than the ECP-recurring-update pattern currently assigned to them.",
     "relationship_assessment_status": "influences/influenced_by fields were populated in a single pass by Claude based on standard SE domain reasoning, not confirmed individually with Ron like the DID/event mappings were. These should be reviewed together, especially the ECP node (currently modeled as influencing/being influenced by nearly everything, which may be too broad to be useful in the actual chart) and any node where the relationship crosses from LOGISTICS/SAFETY_RELIABILITY back into DESIGN_INPUT/DESIGN_OUTPUT lines, since those cross-line edges are exactly the 'back and forth' Ron identified as the core value of this model.",
     "station_summary_generation": "station_summary_by_setr_event is now PROGRAMMATICALLY DERIVED from each node's maturity_states array, not hand-maintained. Regenerate it any time a node's maturity_states change, rather than editing both places - this eliminates the drift found during the 2026-08-08 verification pass (15 issues, mostly stale summary entries).",
-    "multi_level_maturity_pattern": "Some documents (confirmed so far: RVTM) mature at different SETR events depending on decomposition level - System-level and CI-level instances of the same document type follow different DRAFT->FINAL timing. These use 'maturity_states_by_level' (a dict keyed by decomposition level) instead of the flat 'maturity_states' array. The station_summary generator now handles both formats, rendering multi-level nodes with a level tag e.g. 'RVTM[SYS](draft)' vs 'RVTM[CI](final)'."
+    "multi_level_maturity_pattern": "Some documents (confirmed so far: RVTM) mature at different SETR events depending on decomposition level - System-level and CI-level instances of the same document type follow different DRAFT->FINAL timing. These use 'maturity_states_by_level' (a dict keyed by decomposition level) instead of the flat 'maturity_states' array. The station_summary generator now handles both formats, rendering multi-level nodes with a level tag e.g. 'RVTM[SYS](draft)' vs 'RVTM[CI](final)'.",
+    "developmental_flow_down_pattern": "First-pass, Claude-assessed: the subset of influenced_by that represents strict, directional structural derivation (this document's content is built from / decomposed from the parent's), following the same SE Vee-model flow-down logic influences/influenced_by was originally assessed with (see each node's relationship_assessment) - but curated to exclude bidirectional analysis-feedback loops (e.g. LORA/CMRS's influenced_by ties to HW_DEV_SPEC are feedback, not pure derivation - see confirmed_patterns.analysis_derived_docs_pattern) and one identified skip-level redundancy (ICD derives from IRS directly; SSS's influence on ICD is transitive through IRS, not independently structural). Not yet reviewed node-by-node with Ron - treat as a draft to challenge, same caveat as influences/influenced_by."
   },
   "superseded_dids": [
     {

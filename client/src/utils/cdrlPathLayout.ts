@@ -1,3 +1,4 @@
+import { MarkerType } from "@xyflow/react";
 import type { Edge, Node } from "@xyflow/react";
 import type { CdrlPathDecompositionLevel, CdrlPathMaturityState, CdrlPathModel, CdrlPathNode } from "../types/cdrlPath";
 import { anchorEventIndex, expandMaturityStateToMarkers, getMaturityMarkerStyle, maturityStatesForLevel } from "./cdrlPathMaturityMarkers";
@@ -88,6 +89,10 @@ export interface CdrlPathFlowOptions {
   /** Line whose full_station nodes should expand into their maturity timeline (Level 2). Null = Level 1 only. */
   expandedLineId?: string | null;
   decompositionLevel?: CdrlPathDecompositionLevel;
+  /** Draw the developmental/flow-down lineage overlay (derived_from arrows). Off by default —
+   * it's a second connector layer on top of the existing relationship-track connectors, and
+   * showing both at once reads as clutter rather than two distinct questions being answered. */
+  showLineage?: boolean;
 }
 
 // "Train stop" icon per Ron's steer: a single-domain CDRL is a hollow ring sitting on its
@@ -121,7 +126,7 @@ interface MultiDomainMeeting {
  * additionally get their full DRAFT/FINAL/UPDATE maturity timeline (angular sub-lane
  * offset, per-state marker styling) in place of the lightweight dot. */
 export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPathFlowOptions = {}): CdrlPathFlowElements {
-  const { expandedLineId = null, decompositionLevel = "SYSTEM" } = options;
+  const { expandedLineId = null, decompositionLevel = "SYSTEM", showLineage = false } = options;
   const { setr_events, cm_baselines } = model.lifecycle_lanes;
   const prrIndex = Math.max(0, setr_events.findIndex((e) => e.id === "PRR"));
   const ringCount = prrIndex + 1; // ASR(0)..PRR(prrIndex) inclusive
@@ -832,6 +837,40 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       });
     });
   });
+
+  // Developmental lineage overlay — per Ron's steer to visualize the new derived_from flow-down
+  // data (see DECISIONS.md #62), a directional arrow from each parent CDRL's real anchor point
+  // to each child's, reusing the exact same pushAnchor + type:"straight" pattern as the
+  // relationship connectors above so it lands on the same real station/hub geometry. Styled
+  // solid and dark (vs. the connectors' thin dashed gray) with an arrowhead on the child end,
+  // so "A flows down into B" reads as a distinct, directional claim rather than another
+  // undirected transfer link. Gated off by default (see CdrlPathFlowOptions.showLineage) —
+  // it's an additive second connector layer, not a replacement for the relationship tracks.
+  if (showLineage) {
+    let lineageEdgeIndex = 0;
+    fullStationNodes.forEach((cdrlNode) => {
+      (cdrlNode.derived_from ?? []).forEach((parentId) => {
+        const parent = nodeById.get(parentId);
+        if (!parent) return; // dangling reference — already surfaced by validateModel()
+        const parentPoint = nodeAnchorCenter.get(parent.id);
+        const childPoint = nodeAnchorCenter.get(cdrlNode.id);
+        if (!parentPoint || !childPoint) return;
+        const edgeId = `lineage-track-${lineageEdgeIndex++}`;
+        pushAnchor(`${edgeId}-a`, parentPoint);
+        pushAnchor(`${edgeId}-b`, childPoint);
+        edges.push({
+          id: edgeId,
+          source: `${edgeId}-a`,
+          target: `${edgeId}-b`,
+          type: "straight",
+          data: { relatedNodeIds: [parent.id, cdrlNode.id], modalTitle: `${parent.title} → ${cdrlNode.title}` },
+          zIndex: 4,
+          markerEnd: { type: MarkerType.ArrowClosed, width: 14, height: 14, color: "#2b2b2b" },
+          style: { stroke: "#2b2b2b", strokeWidth: 1.75, opacity: 0.8, cursor: "pointer" },
+        });
+      });
+    });
+  }
 
   return { nodes, edges };
 }

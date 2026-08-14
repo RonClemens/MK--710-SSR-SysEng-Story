@@ -13,6 +13,13 @@ function relatedTitles(ids: string[] | undefined, model: CdrlPathModel): string 
     .join(", ");
 }
 
+/** The reverse of derived_from — every other CDRL that lists this node as one of its parents.
+ * Not stored on the node itself (derived_from is backward-pointing, parent lookup only), so
+ * it's computed from the full model each time, same as any other derived view in this file. */
+function childrenOf(node: CdrlPathNode, model: CdrlPathModel): CdrlPathNode[] {
+  return model.nodes.filter((n) => n.derived_from?.includes(node.id));
+}
+
 // Level 3 station detail fields — per cdrl-path-project-brief.md's zoom tier model: "click a
 // node, see DID, maturity states, RACI, influences/influenced-by, decomposition level, live
 // program status + notes." Program status + notes come from the per-baseline status overlay,
@@ -81,6 +88,24 @@ export function CdrlPathNodeDetail({ model, node, decompositionLevel }: Props) {
         ) : (
           <p className="empty-row">Not on file.</p>
         )}
+      </section>
+
+      <section>
+        <h4>Developmental lineage</h4>
+        <p>
+          <strong>Derives from:</strong>{" "}
+          {node.derived_from && node.derived_from.length > 0 ? relatedTitles(node.derived_from, model) : "Root document — no parent in this model"}
+        </p>
+        <p>
+          <strong>Flows into:</strong> {(() => {
+            const children = childrenOf(node, model);
+            return children.length > 0 ? children.map((c) => c.title).join(", ") : "—";
+          })()}
+        </p>
+        <p className="hint">
+          Strict, directional structural derivation (Vee-model flow-down) — first-pass,
+          unconfirmed, distinct from the looser relationships below.
+        </p>
       </section>
 
       <section>

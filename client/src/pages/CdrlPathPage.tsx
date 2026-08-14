@@ -64,10 +64,13 @@ export function CdrlPathPage() {
   // view... keep the subway/transit-map metaphor as a secondary orientation graphic"). Both
   // views share the same model, decomposition-level filter, and related-CDRLs modal.
   const [viewMode, setViewMode] = useState<CdrlPathViewMode>("matrix");
+  // Off by default — an additive overlay on top of the existing relationship-track connectors,
+  // not a replacement, so it only adds clutter until someone specifically asks to see it.
+  const [showLineage, setShowLineage] = useState(false);
 
   const computed = useMemo(
-    () => buildCdrlPathFlowElements(model, { expandedLineId, decompositionLevel }),
-    [model, expandedLineId, decompositionLevel],
+    () => buildCdrlPathFlowElements(model, { expandedLineId, decompositionLevel, showLineage }),
+    [model, expandedLineId, decompositionLevel, showLineage],
   );
   // Routed through useNodesState/useEdgesState (React Flow's documented controlled-state
   // hooks) rather than passed as raw props — passing a fresh array directly as the `nodes`
@@ -121,6 +124,13 @@ export function CdrlPathPage() {
           Subway Map
         </button>
       </div>
+
+      {viewMode === "subway" && (
+        <label className="cdrl-badge-row cdrl-lineage-toggle">
+          <input type="checkbox" checked={showLineage} onChange={(e) => setShowLineage(e.target.checked)} />
+          Show developmental lineage (derived_from flow-down arrows)
+        </label>
+      )}
 
       <div className="cdrl-badge-row" role="group" aria-label="Decomposition level">
         {model.decomposition_dimension.levels.map((level) => (

@@ -80,6 +80,14 @@ export interface CdrlPathNode {
   decomposition_level?: CdrlPathDecompositionLevel | CdrlPathDecompositionLevel[];
   influences?: string[];
   influenced_by?: string[];
+  // Developmental/flow-down lineage — added 2026-08-14 (see DECISIONS.md), a NEW relationship
+  // distinct from influences/influenced_by: strictly directional (this node's content is
+  // structurally built from / decomposed from each listed parent's), following the SE
+  // Vee-model requirements→design→implementation→test chain. A curated subset of
+  // influenced_by (see confirmed_patterns.developmental_flow_down_pattern for what was
+  // excluded and why) — every node lists its own parent(s); an empty array means it's a root
+  // of the derivation graph (e.g. CDD, SSPP), not that it wasn't assessed.
+  derived_from?: string[];
   raci?: CdrlPathRaci;
   supersedes?: CdrlPathSupersedes[];
   confirmed_via_did_interview?: boolean;

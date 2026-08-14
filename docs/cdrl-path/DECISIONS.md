@@ -911,3 +911,60 @@ toggle"). Kanban was explicitly deferred this round (see #61) rather than built 
     cells (40 populated cells in the current dataset); clicking a cell with count 4 opens
     "Systems Engineering CDRLs @ SRR" listing exactly 4 CDRLs; toggling back to Detail restores
     all 84 chips exactly as before; zero unexpected console/page errors.
+
+## 2026-08-14 — Developmental/flow-down lineage (`derived_from`)
+
+Ron: "next, setup the assumed developmental relationships between CDRLs in the data model and
+visuals." Clarified via follow-up question: the requested relationship is flow-down/derivation
+lineage — "the standard SE chain: which CDRL's content is directly derived from / builds on
+another as part of normal development... directional (parent → child), a new relationship
+distinct from the looser influences/influenced_by tags already in the model."
+
+62. **New `derived_from: string[]` field on every node**, backward-pointing (a child lists its
+    own parent(s)), distinct from `influences`/`influenced_by`. Rather than inventing new
+    relationships from scratch, it's a curated subset of each node's existing `influenced_by`
+    list — the data model's own `relationship_assessment` field already documents that
+    `influences`/`influenced_by` was built using SE Vee-model flow-down logic, so `derived_from`
+    narrows that to the subset representing strict structural derivation. Two deliberate
+    exclusions, recorded in a new `confirmed_patterns.developmental_flow_down_pattern` entry:
+    bidirectional analysis-feedback loops (e.g. LORA/CMRS's `influenced_by` tie to
+    `HW_DEV_SPEC` is feedback, not derivation), and one skip-level redundancy (`ICD` derives
+    from `IRS` directly; `SSS`'s influence on `ICD` is transitive through `IRS`). First-pass,
+    Claude-assessed, not yet reviewed node-by-node with Ron — same "treat as a draft to
+    challenge" caveat as `influences`/`influenced_by` itself.
+
+63. **`validateCdrlPathModel` gains two new checks**: no dangling `derived_from` references
+    (no "ALL" pseudo-target allowed here, unlike `influences`/`influenced_by` — developmental
+    lineage is always a specific parent) and a three-color DFS cycle check, since a real
+    derivation lineage can't cycle back on itself.
+
+64. **`CdrlPathNodeDetail` gets a "Developmental lineage" section**, placed before the existing
+    "Relationships" section since it's the more specific, more confidently-structured claim of
+    the two. Shows "Derives from" (direct from `derived_from`) and "Flows into" (the reverse —
+    computed on the fly by scanning the model for every node whose `derived_from` includes this
+    one, since the field itself is only stored backward-pointing).
+
+65. **Subway map gets a toggleable arrow overlay**, off by default (`showLineage` on
+    `CdrlPathFlowOptions`, a checkbox next to the view-mode pills, shown only in Subway Map
+    view). Reuses the exact same `nodeAnchorCenter` + `pushAnchor` + `type: "straight"` pattern
+    as the existing relationship-connector tracks, so arrows land on each CDRL's real anchor
+    point regardless of whether it has its own marker or was folded into a shared hub — but
+    styled solid and dark (`#2b2b2b`) with a closed arrowhead on the child end, instead of the
+    connectors' thin dashed gray, so "A flows down into B" reads as a distinct, directional
+    claim rather than another undirected transfer link. Additive, not a replacement — both
+    layers can render at once. Matrix view intentionally gets no lineage indicator this round;
+    flagged as a future item if the design chat or Ron wants one, not silently scoped out.
+
+    Verified: `tsc -b` clean. Standalone script cross-check of the curated `derived_from` graph
+    (independent of the new TS validation code): 36 nodes, zero dangling references, zero
+    cycles, exactly 4 roots (`CDD`, `RPP`, `SEP`, `SSPP`). Playwright: the lineage toggle is
+    hidden in Matrix view and appears in Subway Map view; toggling it on adds 50 new edges
+    (76 → 126) styled as solid dark arrows distinct from the existing dashed-gray connectors;
+    clicking a lineage arrow (SEP → SEMP) opens the correct related-CDRLs modal; the node
+    detail panel's new "Developmental lineage" section renders correctly for SEMP ("Derives
+    from: Systems Engineering Plan" / "Flows into: Integrated Master Plan / Integrated Master
+    Schedule, Risk/Issue/Opportunity Management Plan, Contractor's Configuration Management
+    Plan"); zero unexpected console/page errors (the only console noise was pre-existing
+    502s from the unrelated `/api/*` backend, which CDRL Path doesn't depend on since it reads
+    the static JSON model directly — confirmed present on the plain homepage load too, not a
+    regression from this round).

@@ -151,5 +151,46 @@ export function validateCdrlPathModel(model: CdrlPathModel): CdrlPathValidationR
     }
   }
 
+  // 6. No dangling derived_from references. Unlike influences/influenced_by, "ALL" isn't a
+  // valid target here — developmental lineage is always a specific parent, never "everything."
+  for (const node of model.nodes) {
+    for (const parentId of node.derived_from ?? []) {
+      if (!nodeIds.has(parentId)) {
+        issues.push(`${node.id}.derived_from references unknown node "${parentId}"`);
+      }
+    }
+  }
+
+  // 7. derived_from must form a DAG — a real derivation lineage can't cycle back on itself
+  // (a document can't be built from a document that was itself built from it). Standard
+  // three-color DFS cycle detection.
+  const WHITE = 0,
+    GRAY = 1,
+    BLACK = 2;
+  const color = new Map<string, number>(model.nodes.map((n) => [n.id, WHITE]));
+  const nodeByIdForCycleCheck = new Map(model.nodes.map((n) => [n.id, n]));
+  const cycleNodesReported = new Set<string>();
+  function visit(nodeId: string, path: string[]) {
+    color.set(nodeId, GRAY);
+    const node = nodeByIdForCycleCheck.get(nodeId);
+    for (const parentId of node?.derived_from ?? []) {
+      if (!nodeIds.has(parentId)) continue; // already reported by check 6
+      const parentColor = color.get(parentId);
+      if (parentColor === GRAY) {
+        const cycleKey = [...path, nodeId, parentId].sort().join(">");
+        if (!cycleNodesReported.has(cycleKey)) {
+          cycleNodesReported.add(cycleKey);
+          issues.push(`derived_from cycle: ${[...path, nodeId, parentId].join(" → ")}`);
+        }
+      } else if (parentColor === WHITE) {
+        visit(parentId, [...path, nodeId]);
+      }
+    }
+    color.set(nodeId, BLACK);
+  }
+  for (const node of model.nodes) {
+    if (color.get(node.id) === WHITE) visit(node.id, []);
+  }
+
   return { valid: issues.length === 0, issues };
 }
