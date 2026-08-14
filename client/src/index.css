@@ -1294,3 +1294,125 @@ button {
   margin: 0.3rem 0 0;
   padding-left: 1.2rem;
 }
+
+/* React Flow renders a top/bottom connection-handle dot on every default node — meaningless
+   here since nodesConnectable is false and nothing is ever dragged into a connection, so on
+   this page they just read as two stray black dots on every station marker. */
+.cdrl-path-page .react-flow__handle {
+  display: none;
+}
+
+/* Handoff-hub diamond: drawn on a pseudo-element instead of rotating the node's own div,
+   because React Flow applies this node's positioning via an inline `transform:
+   translate(x,y)` on that same div — an inline `transform: rotate(...)` here would replace
+   it outright rather than combine with it (see cdrlPathLayout.ts's handoff-hub comment). The
+   node div is already position:absolute (React Flow's own base style), so this pseudo-element
+   only needs position:absolute + inset:0 to fill it, no separate positioning context needed. */
+.cdrl-handoff-hub-marker {
+  cursor: pointer;
+}
+.cdrl-handoff-hub-marker::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: rotate(45deg);
+  border-radius: 3px;
+  background: var(--card-bg, #fff);
+  border: 2px dashed #888;
+}
+
+.cdrl-related-modal {
+  max-width: 720px;
+}
+
+.cdrl-related-modal-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.cdrl-related-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cdrl-related-list-item-toggle {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  text-align: left;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.cdrl-related-list-item.expanded .cdrl-related-list-item-toggle {
+  border-color: var(--navy);
+  background: var(--surface);
+}
+
+.cdrl-related-list-item-title {
+  font-weight: 600;
+  flex: 1 1 auto;
+}
+
+.cdrl-related-list-item-caret {
+  color: var(--text-muted);
+}
+
+.cdrl-related-drawer {
+  flex: 0 0 320px;
+  max-width: 320px;
+  border-left: 1px solid var(--border);
+  padding-left: 1rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  animation: cdrl-related-drawer-in 0.15s ease-out;
+}
+
+@keyframes cdrl-related-drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.cdrl-related-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.cdrl-related-drawer-header h4 {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .cdrl-related-modal-layout.drawer-open {
+    flex-direction: column;
+  }
+
+  .cdrl-related-drawer {
+    flex: 1 1 auto;
+    max-width: none;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding-left: 0;
+    padding-top: 1rem;
+  }
+}

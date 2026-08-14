@@ -607,3 +607,74 @@ supposed to terminate at.
     domains currently reaching PRR) now terminate with their tip flush against the bullseye
     icon rather than stopping short of it; Level 2 (SE expanded) and Level 3 (detail panel)
     still work — zero console/page errors.
+
+## 2026-08-14 — Related-CDRLs modal with side drawer; remove the connection-handle dots
+
+Ron: "better, but needs more work. when a transfer hub or single station is clicked, CDRLs
+related to those stations should display in a modal. then, each CDRL detail page should be
+expandable in that pop-up window as a side drawer. remove the two little black dots from each
+station circle."
+
+45. **Clicking any marker now opens a related-CDRLs list, not one node's detail directly.**
+    The old `CdrlPathStationDetailPanel` jumped straight to a single node's full detail. It's
+    replaced by `CdrlPathRelatedCdrlsModal`, which lists the CDRLs relevant to whatever was
+    clicked — the clicked CDRL itself plus its `influences`/`influenced_by` (`ALL` targets
+    skipped, same rule as the relationship-rendering code) for a single station or interchange
+    hub (`station-`/`related-`/`maturity-` prefixes), or every CDRL folded into a handoff
+    hub's relationship cluster for a `handoff-hub-` click. Each list row expands into a side
+    drawer within the same modal (not a second stacked modal) showing that CDRL's full detail
+    — DID, maturity states, RACI, relationships, decomposition level, notes, live status —
+    reusing the field-rendering content extracted into a new `CdrlPathNodeDetail` component
+    (no `<Modal>` wrapper of its own, so both a station click and a handoff-hub click drive the
+    same drawer content).
+
+46. **A handoff hub's related CDRLs are computed at layout time, not in the page component.**
+    Only `cdrlPathLayout.ts` has visibility into `handoffGroups` (the domain-pair + nearest-
+    half-ring bucketing behind each hub — see #33-35), so each hub node now carries
+    `data.relatedNodeIds` (every distinct CDRL id across the group's pairs) and
+    `data.modalTitle` (e.g. "Systems Engineering CDRLs ↔ Program Management / CM CDRLs
+    handoff") baked in at creation. `CdrlPathPage.tsx`'s click handler reads these straight off
+    the clicked node for a `handoff-hub-` id; for every other id prefix it derives the same
+    shape itself via a plain `model.nodes` lookup, since that data is already available there.
+    This required changing `onNodeClick`/`onEdgeClick` to pass the full node/edge object
+    through to the handler instead of just its id string, so `data` is reachable.
+
+47. **Bug found and fixed while wiring this up: handoff-hub diamonds were invisible and
+    unclickable.** Investigating why clicking one never opened the new modal traced back to
+    `@xyflow/react`'s own `NodeWrapper`, which spreads a node's `style` object *after* its own
+    positioning `style.transform: translate(x,y)` — so the hub's `style: { transform:
+    "rotate(45deg)" }` (set to rotate the marker into a diamond) was silently clobbering React
+    Flow's placement, leaving every hub stacked at one shared off-map position with no
+    translate at all. This is the same failure mode already called out in the maturity-marker
+    code's doc comment (an explicit `transform: undefined` collapsing every marker onto one
+    position, #24-ish) — this is its sibling case, a real (non-undefined) `transform` value
+    doing the same clobbering. Fixed by drawing the diamond on a `::after` pseudo-element
+    (`.cdrl-handoff-hub-marker` in `index.css`) instead of rotating the node's own div, so the
+    node's inline `style` never sets `transform` and React Flow's own translate survives
+    untouched. Confirmed via a screenshot comparison: before the fix, no diamonds were visible
+    anywhere on the map at all despite 33 handoff-hub nodes existing in the DOM; after, they're
+    visible scattered across the map as originally intended by #33-35. The identical pattern
+    still exists in the AS_NEEDED-state diamond maturity markers (Level 2) — left as-is since
+    it's pre-existing, unrelated to this request, and not something Ron flagged; worth a fast-
+    follow if that marker type turns out to matter for a real program's data.
+
+48. **The two black dots were React Flow's default connection-`Handle` elements.** Every
+    `type: "default"` node renders a top and bottom `<Handle>` div unconditionally unless
+    CSS-suppressed — meaningless here since `nodesConnectable` is `false` and nothing is ever
+    dragged into a connection. Fixed with one CSS rule, `.cdrl-path-page .react-flow__handle {
+    display: none; }`, scoped to this page rather than global since React Flow isn't used
+    anywhere else in this app (confirmed via grep) but there's no reason to risk it.
+
+    Verified via Playwright: `.react-flow__handle` count on the page is 648 elements but 0
+    visible (confirmed by CSS, not by counting through screenshots); clicking a single-domain
+    station opens the related-CDRLs modal, clicking its one list row opens the side drawer with
+    correct DID/maturity/RACI/relationship content; clicking a multi-domain interchange hub and
+    a handoff-hub diamond each open the modal with the correct multi-row related list and
+    (for the handoff hub) the correct domain-pair title; Level 2 line-expand and its maturity-
+    marker clicks still open the modal correctly; screenshots confirm handoff-hub diamonds are
+    now visibly rendered on the map and station circles no longer show the two dots. `tsc -b`
+    clean. One pre-existing, unrelated issue surfaced during testing and left as-is: a handful
+    of `handoff-stub-*` edges log a React duplicate-key warning when the same CDRL appears as
+    both `pair.a` and `pair.b` across different pairs within one handoff group — a rendering
+    warning only, not a click-blocking or visual defect, predates this round, and out of scope
+    for what Ron asked for here.

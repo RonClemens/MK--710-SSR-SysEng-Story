@@ -774,23 +774,30 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     const hubId = `handoff-hub-${handoffHubIndex++}`;
     const half = HANDOFF_HUB_SIZE / 2;
 
+    // A handoff hub represents a CLUSTER of relationship pairs (see handoffGroups above), not
+    // one CDRL — the page component has no visibility into that grouping, so the distinct node
+    // ids it represents and a human-readable title get baked into `data` here at layout time,
+    // for CdrlPathPage's click handler to read straight off the clicked node.
+    const relatedNodeIds = Array.from(new Set(group.flatMap((pair) => [pair.a.id, pair.b.id])));
+    const modalTitle = `${model.lines[domainAIndex].label} ↔ ${model.lines[domainBIndex].label} handoff`;
+
+    // The diamond shape is drawn via the .cdrl-handoff-hub-marker::after pseudo-element (see
+    // index.css) rather than a `transform: rotate(45deg)` in this node's own inline `style`.
+    // React Flow spreads a node's `style` AFTER its own positioning `transform:
+    // translate(x,y)` (see @xyflow/react's NodeWrapper), so any `transform` key here would
+    // silently clobber that positioning — the exact bug already called out in the maturity
+    // marker comment below, and confirmed hitting this hub for real: it rendered stacked at
+    // one shared off-map position with no translate at all until this fix.
     nodes.push({
       id: hubId,
       type: "default",
       position: { x: hubPoint.x - half, y: hubPoint.y - half },
-      data: { label: "" },
+      data: { label: "", relatedNodeIds, modalTitle },
       draggable: false,
       selectable: false,
       zIndex: 4,
-      style: {
-        width: HANDOFF_HUB_SIZE,
-        height: HANDOFF_HUB_SIZE,
-        borderRadius: 3,
-        transform: "rotate(45deg)",
-        background: "var(--card-bg, #fff)",
-        border: "2px dashed #888",
-        padding: 0,
-      },
+      className: "cdrl-handoff-hub-marker",
+      style: { width: HANDOFF_HUB_SIZE, height: HANDOFF_HUB_SIZE, background: "transparent", border: "none", padding: 0 },
     });
 
     group.forEach((pair) => {

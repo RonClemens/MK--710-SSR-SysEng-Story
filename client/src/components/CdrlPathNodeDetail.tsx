@@ -1,11 +1,9 @@
-import { Modal } from "./Modal";
 import type { CdrlPathModel, CdrlPathNode } from "../types/cdrlPath";
 
 interface Props {
   model: CdrlPathModel;
   node: CdrlPathNode;
   decompositionLevel: string;
-  onClose: () => void;
 }
 
 function relatedTitles(ids: string[] | undefined, model: CdrlPathModel): string {
@@ -15,12 +13,16 @@ function relatedTitles(ids: string[] | undefined, model: CdrlPathModel): string 
     .join(", ");
 }
 
-// Level 3 station detail — per cdrl-path-project-brief.md's zoom tier model: "click a node,
-// see DID, maturity states, RACI, influences/influenced-by, decomposition level, live
+// Level 3 station detail fields — per cdrl-path-project-brief.md's zoom tier model: "click a
+// node, see DID, maturity states, RACI, influences/influenced-by, decomposition level, live
 // program status + notes." Program status + notes come from the per-baseline status overlay,
-// which is a later phase (see docs/cdrl-path/DECISIONS.md #4) — not shown here yet. This
-// panel is read-only; AtomicEditPanel (editing these fields) is Phase 4.
-export function CdrlPathStationDetailPanel({ model, node, decompositionLevel, onClose }: Props) {
+// which is a later phase (see docs/cdrl-path/DECISIONS.md #4) — not shown here yet.
+//
+// Extracted from the old standalone CdrlPathStationDetailPanel (no <Modal> wrapper of its own)
+// so the same field-rendering content can serve as CdrlPathRelatedCdrlsModal's side-drawer body
+// — a CDRL is reached by clicking a station/hub, then expanded from a list within that modal,
+// rather than opening its own separate stacked modal. Read-only; AtomicEditPanel is a later phase.
+export function CdrlPathNodeDetail({ model, node, decompositionLevel }: Props) {
   const supersedesRecord = node.supersedes?.length
     ? model.superseded_dids?.find((s) => s.superseded_by_node_id === node.id)
     : undefined;
@@ -30,7 +32,7 @@ export function CdrlPathStationDetailPanel({ model, node, decompositionLevel, on
     : (node.maturity_states ?? []);
 
   return (
-    <Modal title={node.title} onClose={onClose}>
+    <div className="cdrl-path-node-detail">
       <p className="hint">{node.id}</p>
 
       <div className="cdrl-badge-row">
@@ -110,6 +112,6 @@ export function CdrlPathStationDetailPanel({ model, node, decompositionLevel, on
         <h4>Live program status</h4>
         <p className="empty-row">Not yet wired up — status overlay persistence is a later phase.</p>
       </section>
-    </Modal>
+    </div>
   );
 }

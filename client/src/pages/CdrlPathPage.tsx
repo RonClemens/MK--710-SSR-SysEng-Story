@@ -4,15 +4,20 @@ import "@xyflow/react/dist/style.css";
 import { useCdrlPathModel } from "../hooks/useCdrlPathModel";
 import { buildCdrlPathFlowElements } from "../utils/cdrlPathLayout";
 import { EditableText } from "../components/EditableText";
-import { CdrlPathStationDetailPanel } from "../components/CdrlPathStationDetailPanel";
+import { CdrlPathRelatedCdrlsModal } from "../components/CdrlPathRelatedCdrlsModal";
 import { CdrlPathExportManager } from "../components/CdrlPathExportManager";
 import { CdrlPathModelEditor } from "../components/CdrlPathModelEditor";
 import { CdrlPathTrackEdge } from "../components/CdrlPathTrackEdge";
-import type { CdrlPathDecompositionLevel } from "../types/cdrlPath";
+import type { CdrlPathDecompositionLevel, CdrlPathModel, CdrlPathNode } from "../types/cdrlPath";
 
 const EDGE_TYPES: EdgeTypes = { cdrlPathTrack: CdrlPathTrackEdge };
 
 const LINE_ELEMENT_PREFIXES = ["line-label-", "line-edge-"];
+
+interface SelectedTarget {
+  title: string;
+  relatedNodeIds: string[];
+}
 
 function lineIdFromElementId(id: string): string | null {
   const prefix = LINE_ELEMENT_PREFIXES.find((p) => id.startsWith(p));
@@ -26,6 +31,32 @@ function nodeIdFromElementId(id: string): string | null {
   return null;
 }
 
+/** The CDRLs to list for a clicked station/interchange/ghost marker: the CDRL itself plus
+ * whatever it influences or is influenced by — "ALL" targets are skipped (see
+ * confirmed_patterns.relationship_assessment_status; too broad to list). A handoff-hub click
+ * doesn't go through this — it already carries its own relatedNodeIds/modalTitle from layout
+ * time (see cdrlPathLayout.ts), since the page has no visibility into that relationship-cluster
+ * grouping on its own. */
+function relatedIdsForNode(node: CdrlPathNode): string[] {
+  const ids = new Set<string>([node.id]);
+  (node.influences ?? []).forEach((id) => id !== "ALL" && ids.add(id));
+  (node.influenced_by ?? []).forEach((id) => id !== "ALL" && ids.add(id));
+  return Array.from(ids);
+}
+
+function targetForElement(element: Node | Edge, model: CdrlPathModel): SelectedTarget | null {
+  if (element.id.startsWith("handoff-hub-")) {
+    const data = element.data as { relatedNodeIds?: string[]; modalTitle?: string } | undefined;
+    if (!data?.relatedNodeIds?.length) return null;
+    return { title: data.modalTitle ?? "Related CDRLs", relatedNodeIds: data.relatedNodeIds };
+  }
+  const nodeId = nodeIdFromElementId(element.id);
+  if (!nodeId) return null;
+  const node = model.nodes.find((n) => n.id === nodeId);
+  if (!node) return null;
+  return { title: node.title, relatedNodeIds: relatedIdsForNode(node) };
+}
+
 // Phase 2 per docs/cdrl-path/cdrl-path-handoff.md: Level 2 (click a line, expand its
 // full_station maturity timeline) and Level 3 (click a station, see its detail). Phase 4/5
 // (atomic edit, batch import) are wired up via CdrlPathModelEditor — see its own doc comment
@@ -34,7 +65,7 @@ export function CdrlPathPage() {
   const { model, setModel, isDirty } = useCdrlPathModel();
   const [expandedLineId, setExpandedLineId] = useState<string | null>(null);
   const [decompositionLevel, setDecompositionLevel] = useState<CdrlPathDecompositionLevel>("SYSTEM");
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedTarget, setSelectedTarget] = useState<SelectedTarget | null>(null);
 
   const computed = useMemo(
     () => buildCdrlPathFlowElements(model, { expandedLineId, decompositionLevel }),
@@ -53,19 +84,17 @@ export function CdrlPathPage() {
     setEdges(computed.edges);
   }, [computed, setNodes, setEdges]);
 
-  function handleElementClick(elementId: string) {
-    const clickedNodeId = nodeIdFromElementId(elementId);
-    if (clickedNodeId) {
-      setSelectedNodeId(clickedNodeId);
+  function handleElementClick(element: Node | Edge) {
+    const target = targetForElement(element, model);
+    if (target) {
+      setSelectedTarget(target);
       return;
     }
-    const clickedLineId = lineIdFromElementId(elementId);
+    const clickedLineId = lineIdFromElementId(element.id);
     if (clickedLineId) {
       setExpandedLineId((current) => (current === clickedLineId ? null : clickedLineId));
     }
   }
-
-  const selectedNode = selectedNodeId ? model.nodes.find((n) => n.id === selectedNodeId) : undefined;
 
   return (
     <div className="cdrl-path-page">
@@ -106,8 +135,8 @@ export function CdrlPathPage() {
             nodesDraggable={false}
             fitView
             proOptions={{ hideAttribution: true }}
-            onNodeClick={(_, node: Node) => handleElementClick(node.id)}
-            onEdgeClick={(_, edge: Edge) => handleElementClick(edge.id)}
+            onNodeClick={(_, node: Node) => handleElementClick(node)}
+            onEdgeClick={(_, edge: Edge) => handleElementClick(edge)}
           >
             <Background />
             <Controls showInteractive={false} />
@@ -115,12 +144,13 @@ export function CdrlPathPage() {
         </ReactFlowProvider>
       </div>
 
-      {selectedNode && (
-        <CdrlPathStationDetailPanel
+      {selectedTarget && (
+        <CdrlPathRelatedCdrlsModal
           model={model}
-          node={selectedNode}
+          title={selectedTarget.title}
+          relatedNodeIds={selectedTarget.relatedNodeIds}
           decompositionLevel={decompositionLevel}
-          onClose={() => setSelectedNodeId(null)}
+          onClose={() => setSelectedTarget(null)}
         />
       )}
     </div>
