@@ -818,3 +818,64 @@ relationship well. what do you suggest?" — followed by: "Build it your recomme
     beneath the domain tracks; station clicks, ring-label clicks, and Level 2 line-expand all
     still work; zero unexpected console/page errors (only the pre-existing unresolved-marker
     data warnings, unrelated to this change).
+
+## 2026-08-14 — Discipline × SETR-event maturity matrix becomes the primary view
+
+The Subway Design chat delivered a research report on Ron's question above, recommending
+(TL;DR, verbatim): "Adopt a discipline-swimlane × SETR-event maturity matrix as your primary
+broad-audience view... Keep the subway/transit-map metaphor as a secondary 'orientation' or
+executive-overview graphic only, not the primary reference." Ron: "Build it your recommended
+way" — confirmed placement as a view-mode toggle within the existing CDRL Path tab (not a
+separate tab, not a full replacement of the subway map), matrix as the default.
+
+55. **New primary view: `CdrlPathMatrixView`** — rows are the 7 disciplines (matching
+    `model.lines`), columns are the SETR events in `model.lifecycle_lanes.setr_events` order,
+    cells list every CDRL with a maturity state tied to exactly that event, each as a clickable
+    chip. Any CM baseline (Functional/Allocated/Product) established at an event renders as a
+    small badge under that event's column header. A `Matrix` / `Subway Map` pill toggle sits
+    above both views, sharing the same model, decomposition-level filter, model editor, and
+    export manager — matrix defaults selected per the research's Stage 1 recommendation.
+
+56. **Maturity state is double-encoded, never color alone**, per the research's accessibility
+    guidance (color-vision deficiency affects a meaningful share of the audience): every chip
+    shows a D/F/U letter badge AND a distinct border style (dashed=Draft, solid=Final,
+    dotted=Update) — chip *color* identifies the owning discipline (matching its row and the
+    subway map's line color for continuity), not the maturity state, so color is redundant
+    with position, not the sole carrier of state information.
+
+57. **Cell placement reuses `generateStationSummaryBySetrEvent`'s existing "precise text
+    index, not a best-effort visual placement" philosophy**, extended to bucket by domain too
+    (`buildCdrlMaturityMatrix` in the new `cdrlPathMatrix.ts`) — deliberately NOT the fuzzy
+    `resolveMarkerEventIndex` resolver the subway map uses for visual positioning. A maturity
+    state only lands in a cell when its `at_event` is an EXACT SETR-event id match. Recurring
+    range cadences ("every SETR through PRR"), milestone/contract-day markers, and other
+    non-exact phrasing are real data that would misrepresent a due date if forced into one
+    column (or spammed across every column in a range) — they're listed instead in a
+    "Not tied to a single SETR event" section below the grid, one list per domain, so nothing
+    silently disappears from the primary reference. This is the same trade-off
+    `generateStationSummaryBySetrEvent` already made for its own "precise index" use case; the
+    subway map (now secondary) is still where that cadence renders as a repeating halo marker.
+
+58. **Multi-domain CDRLs appear in every one of their domains' rows** at the same event column
+    (e.g., IRS shows under both Systems Engineering and Software Engineering at SRR) —
+    deliberate duplication, consistent with standard RACI/responsibility-matrix practice for
+    shared-ownership items, not a bug to dedupe.
+
+59. **Decomposition level filters the matrix exactly as it already filtered Level 2's
+    timeline** (`maturityStatesForLevel`), not a separate flattened-with-level-tags view like
+    `generateStationSummaryBySetrEvent`'s own output — keeps the toggle's behavior consistent
+    across both CDRL Path views: selecting CI/Component/Unit changes which maturity states
+    the matrix shows the same way it already changed Level 2.
+
+    Verified: `tsc -b` clean. Playwright confirms the matrix renders as the default view (84
+    chips across the current dataset); clicking a chip opens the correct related-CDRLs modal
+    (tested: `SEMP` chip → "Systems Engineering Management Plan"); the Matrix/Subway Map toggle
+    switches cleanly in both directions with no stale state; changing decomposition level
+    changes the chip count (84 → 80 at Component level) exactly as it already did for Level 2;
+    the "not tied to a single SETR event" section renders with real entries (recurring
+    UPDATE cadences, ECP-lockstep phrasing, contract-day markers) grouped by domain; zero
+    unexpected console/page errors. A DOM-level check confirmed exactly 7 `<tr>` rows (one per
+    discipline) with chips correctly distributed across their real event columns — an initial
+    read of a compressed full-page screenshot looked like a layout bug (chip clusters
+    misread as stray extra rows) but was a screenshot-legibility artifact, not an actual
+    rendering issue.

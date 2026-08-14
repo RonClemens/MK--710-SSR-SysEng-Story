@@ -3,16 +3,20 @@ import { ReactFlow, ReactFlowProvider, Background, Controls, useNodesState, useE
 import "@xyflow/react/dist/style.css";
 import { useCdrlPathModel } from "../hooks/useCdrlPathModel";
 import { buildCdrlPathFlowElements } from "../utils/cdrlPathLayout";
+import { relatedIdsForNode } from "../utils/cdrlPathRelated";
 import { EditableText } from "../components/EditableText";
 import { CdrlPathRelatedCdrlsModal } from "../components/CdrlPathRelatedCdrlsModal";
+import { CdrlPathMatrixView } from "../components/CdrlPathMatrixView";
 import { CdrlPathExportManager } from "../components/CdrlPathExportManager";
 import { CdrlPathModelEditor } from "../components/CdrlPathModelEditor";
 import { CdrlPathTrackEdge } from "../components/CdrlPathTrackEdge";
-import type { CdrlPathDecompositionLevel, CdrlPathModel, CdrlPathNode } from "../types/cdrlPath";
+import type { CdrlPathDecompositionLevel, CdrlPathModel } from "../types/cdrlPath";
 
 const EDGE_TYPES: EdgeTypes = { cdrlPathTrack: CdrlPathTrackEdge };
 
 const LINE_ELEMENT_PREFIXES = ["line-label-", "line-edge-"];
+
+type CdrlPathViewMode = "matrix" | "subway";
 
 interface SelectedTarget {
   title: string;
@@ -28,16 +32,6 @@ function nodeIdFromElementId(id: string): string | null {
   if (id.startsWith("station-")) return id.slice("station-".length);
   if (id.startsWith("maturity-")) return id.split("-")[1];
   return null;
-}
-
-/** The CDRLs to list for a clicked station/interchange marker: the CDRL itself plus whatever
- * it influences or is influenced by — "ALL" targets are skipped (see
- * confirmed_patterns.relationship_assessment_status; too broad to list). */
-function relatedIdsForNode(node: CdrlPathNode): string[] {
-  const ids = new Set<string>([node.id]);
-  (node.influences ?? []).forEach((id) => id !== "ALL" && ids.add(id));
-  (node.influenced_by ?? []).forEach((id) => id !== "ALL" && ids.add(id));
-  return Array.from(ids);
 }
 
 /** A ring label, the PRR hub, and any terminal transfer hub all carry their own
@@ -65,6 +59,11 @@ export function CdrlPathPage() {
   const [expandedLineId, setExpandedLineId] = useState<string | null>(null);
   const [decompositionLevel, setDecompositionLevel] = useState<CdrlPathDecompositionLevel>("SYSTEM");
   const [selectedTarget, setSelectedTarget] = useState<SelectedTarget | null>(null);
+  // Matrix is the default per the Subway Design chat's 2026-08-14 research recommendation
+  // ("adopt a discipline-swimlane × SETR-event maturity matrix as your primary broad-audience
+  // view... keep the subway/transit-map metaphor as a secondary orientation graphic"). Both
+  // views share the same model, decomposition-level filter, and related-CDRLs modal.
+  const [viewMode, setViewMode] = useState<CdrlPathViewMode>("matrix");
 
   const computed = useMemo(
     () => buildCdrlPathFlowElements(model, { expandedLineId, decompositionLevel }),
@@ -99,12 +98,29 @@ export function CdrlPathPage() {
     <div className="cdrl-path-page">
       <EditableText
         contentKey="cdrlPath.intro"
-        defaultValue="Level 1 — system view: the 7 CDRL lines across the SETR sequence, with interchange stations marked. Click a line to expand its full stations (Level 2); click any station for its detail (Level 3). Use Edit Model below to make a direct edit or load a JSON file edited offline."
+        defaultValue="Matrix view: each discipline's CDRLs by SETR event and Draft/Final/Update maturity — click any chip for detail. Switch to Subway Map for the domain-track/interchange visualization. Use Edit Model below to make a direct edit or load a JSON file edited offline."
         as="p"
         className="hint"
       />
 
       <CdrlPathExportManager model={model} isDirty={isDirty} />
+
+      <div className="cdrl-badge-row" role="group" aria-label="View">
+        <button
+          type="button"
+          className={`cdrl-status-pill${viewMode === "matrix" ? " selected" : ""}`}
+          onClick={() => setViewMode("matrix")}
+        >
+          Matrix
+        </button>
+        <button
+          type="button"
+          className={`cdrl-status-pill${viewMode === "subway" ? " selected" : ""}`}
+          onClick={() => setViewMode("subway")}
+        >
+          Subway Map
+        </button>
+      </div>
 
       <div className="cdrl-badge-row" role="group" aria-label="Decomposition level">
         {model.decomposition_dimension.levels.map((level) => (
@@ -122,26 +138,30 @@ export function CdrlPathPage() {
 
       <CdrlPathModelEditor model={model} onApply={setModel} />
 
-      <div style={{ width: "100%", height: 640, border: "1px solid var(--border-color, #333)" }}>
-        <ReactFlowProvider>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            edgeTypes={EDGE_TYPES}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            nodesConnectable={false}
-            nodesDraggable={false}
-            fitView
-            proOptions={{ hideAttribution: true }}
-            onNodeClick={(_, node: Node) => handleElementClick(node)}
-            onEdgeClick={(_, edge: Edge) => handleElementClick(edge)}
-          >
-            <Background />
-            <Controls showInteractive={false} />
-          </ReactFlow>
-        </ReactFlowProvider>
-      </div>
+      {viewMode === "matrix" ? (
+        <CdrlPathMatrixView model={model} decompositionLevel={decompositionLevel} onSelect={setSelectedTarget} />
+      ) : (
+        <div style={{ width: "100%", height: 640, border: "1px solid var(--border-color, #333)" }}>
+          <ReactFlowProvider>
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              edgeTypes={EDGE_TYPES}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              nodesConnectable={false}
+              nodesDraggable={false}
+              fitView
+              proOptions={{ hideAttribution: true }}
+              onNodeClick={(_, node: Node) => handleElementClick(node)}
+              onEdgeClick={(_, edge: Edge) => handleElementClick(edge)}
+            >
+              <Background />
+              <Controls showInteractive={false} />
+            </ReactFlow>
+          </ReactFlowProvider>
+        </div>
+      )}
 
       {selectedTarget && (
         <CdrlPathRelatedCdrlsModal

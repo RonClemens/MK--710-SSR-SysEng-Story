@@ -25,12 +25,17 @@ A module within the SE Workbench, named **"CDRL Path,"** that visualizes how DID
 
 **The remaining unconfirmed content is expected to be resolved primarily via Ron's authoritative CDRL schedule JSON import (not yet available)**, not further manual interview — see the import/export architecture doc.
 
-## Zoom tier model
+## Views
+**Revised 2026-08-14** (see DECISIONS.md #55-59, following the Subway Design chat's research recommendation): CDRL Path now offers two view modes via a toggle, sharing one model/decomposition-level filter/related-CDRLs modal:
+- **Matrix (default)** — discipline swimlanes × SETR-event columns, maturity state (Draft/Final/Update) shown per cell as a double-encoded chip (letter + border style, never color alone; chip color identifies the discipline). The primary broad-audience reference view.
+- **Subway map (secondary)** — the polar dartboard described below, kept as an orientation/executive-overview graphic per the research's own recommendation, not the primary reference.
+
+### Subway map zoom tier model
 1. **Level 1 — System view (default)**: 7 lines + SETR/baseline interchange stations only.
 2. **Level 2 — Line view**: click a line, expand all `full_station` nodes on it (context markers show as small dots).
 3. **Level 3 — Station detail**: click a node, see DID, maturity states, RACI, influences/influenced-by, decomposition level, live program status + notes. This is also where `AtomicEditPanel` lives (see import/export architecture doc).
 
-Decomposition level is a **filter/toggle**, not a separate stacked map — "drilling into a CI" reveals that CI's own Dev-Spec→Product-Spec lane, consistent with the GPS zoom metaphor.
+Decomposition level is a **filter/toggle** on both views, not a separate stacked map — "drilling into a CI" reveals that CI's own maturity states, consistent with the GPS zoom metaphor.
 
 ## Confirmed technical/scope decisions
 | Topic | Decision |
