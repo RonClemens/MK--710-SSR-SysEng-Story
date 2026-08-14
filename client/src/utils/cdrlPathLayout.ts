@@ -147,6 +147,13 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
 
   const nodes: Node[] = [];
   const edges: Edge[] = [];
+  // Every CDRL's actual rendered anchor point, populated as station/hub/maturity markers are
+  // created below — used at the very end to draw a direct "extension track" between the two
+  // real stations of every cross-domain influences/influenced_by pair (see the relationship
+  // connector pass), so the connector always lands on where that CDRL genuinely is, including
+  // when it's been absorbed into a shared ring hub rather than getting its own marker.
+  const nodeAnchorCenter = new Map<string, { x: number; y: number }>();
+  const nodeById = new Map(model.nodes.map((n) => [n.id, n]));
 
   // Concentric SETR-event rings — the dartboard itself. PRR's own ring circle is skipped
   // entirely (label kept) — the explicit hub icon added below is its marker now, and drawing
@@ -555,6 +562,11 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       x: trackPoints.reduce((sum, t) => sum + t.point.x, 0) / trackPoints.length,
       y: trackPoints.reduce((sum, t) => sum + t.point.y, 0) / trackPoints.length,
     };
+    // Every CDRL whose own meeting resolved to this ring gets its anchor set here, since
+    // renderStation (below) skips drawing an individual marker for them once their ring has
+    // 2+ distinct meetings — the relationship-connector pass at the end needs this anchor
+    // regardless of whether the CDRL got its own icon or was folded into this combined one.
+    (meetingsByRing.get(ring) ?? []).forEach((m) => nodeAnchorCenter.set(m.node.id, hubPoint));
     const hubId = `ring-hub-${combinedHubIndex++}`;
     const half = HUB_MARKER_SIZE / 2;
     const eventId = setr_events[ring].id;
@@ -625,14 +637,15 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
     const meeting = meetingByNodeId.get(cdrlNode.id);
     if (!meeting) {
       const point = polarPoint(ringRadius(radiusIndex), trackAngleAt(primaryLineIndex, radiusIndex));
+      nodeAnchorCenter.set(cdrlNode.id, point);
       pushTrainStop(`station-${cdrlNode.id}`, point, STATION_MARKER_SIZE, model.lines[primaryLineIndex].color_hint, 6);
       return;
     }
     // A second, unrelated multi-domain CDRL independently resolving to this same ring would
     // otherwise get its own separate hub icon here too, rendering as a near-duplicate circle
     // right beside this one. When that happens, skip drawing this node's own icon entirely —
-    // the combined-ring-hub pass (after the track-drawing loop below) draws ONE icon for the
-    // whole ring instead, unioning every CDRL/domain converging there.
+    // the combined-ring-hub pass (before the contextMarkers/fullStationNodes passes below)
+    // already drew ONE icon for the whole ring and set this node's anchor to it.
     if ((meetingsByRing.get(meeting.ring)?.length ?? 0) > 1) return;
 
     const radius = ringRadius(meeting.ring);
@@ -730,6 +743,13 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
           const size = visual.large ? 26 : 18;
           const half = size / 2;
           const point = polarPoint(ringRadius(clampedIndex), trackAngleAt(lineIndex, clampedIndex) + angleOffset);
+          // Relationship connectors (see the pass at the end) point to one representative
+          // point per node — prefer FINAL (the "as-delivered" milestone) over whichever marker
+          // happened to be created first, and over the lightweight anchor renderStation set.
+          const isFinal = state.state.toUpperCase() === "FINAL";
+          if (isFinal || !nodeAnchorCenter.has(cdrlNode.id)) {
+            nodeAnchorCenter.set(cdrlNode.id, point);
+          }
           nodes.push({
             id: `maturity-${cdrlNode.id}-${state.state}-${eventIndex}`,
             type: "default",
@@ -767,6 +787,51 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
       // (see `meetings` above), so the expanded line's own track already runs through it.
     });
   }
+
+  // Relationship connectors — per Ron's steer, an influences/influenced_by pair needs a real
+  // "extension track" directly between the two actual stations, not a standalone floating
+  // marker with no visible connection (the earlier handoff-hub diamonds, #33-35, removed in
+  // #51 for reading unclear). Each cross-domain pair draws ONE dashed line straight from one
+  // CDRL's real anchor point (nodeAnchorCenter, set above by every station/hub/maturity-marker
+  // pass) to the other's — deliberately not routed through a synthetic midpoint hub, so it's
+  // always literally "this CDRL, connected to that CDRL," styled distinctly (thin, dashed,
+  // neutral gray) from the thick colored domain tracks so it reads as a transfer link, the way
+  // a subway map draws a walking connector between stations on different lines. Same-domain
+  // pairs are skipped (already visually adjacent on the shared track); "ALL" targets
+  // (SEMP/IMP_IMS/RMP) are skipped per confirmed_patterns.relationship_assessment_status
+  // flagging them as too broad to chart. Clicking a connector opens the same related-CDRLs
+  // modal as any station, showing just the two CDRLs on each end of that specific pair.
+  const seenRelationshipPairs = new Set<string>();
+  let relationshipEdgeIndex = 0;
+  fullStationNodes.forEach((cdrlNode) => {
+    const relationshipTargets = [...(cdrlNode.influences ?? []), ...(cdrlNode.influenced_by ?? [])];
+    relationshipTargets.forEach((targetId) => {
+      if (targetId === "ALL" || targetId === cdrlNode.id) return;
+      const target = nodeById.get(targetId);
+      if (!target) return; // dangling reference — already surfaced by validateModel()
+      const domainAIndex = model.lines.findIndex((l) => l.id === cdrlNode.domains[0]);
+      const domainBIndex = model.lines.findIndex((l) => l.id === target.domains[0]);
+      if (domainAIndex === -1 || domainBIndex === -1 || domainAIndex === domainBIndex) return;
+      const pairKey = [cdrlNode.id, targetId].sort().join("--");
+      if (seenRelationshipPairs.has(pairKey)) return;
+      seenRelationshipPairs.add(pairKey);
+      const aPoint = nodeAnchorCenter.get(cdrlNode.id);
+      const bPoint = nodeAnchorCenter.get(target.id);
+      if (!aPoint || !bPoint) return;
+      const edgeId = `relationship-track-${relationshipEdgeIndex++}`;
+      pushAnchor(`${edgeId}-a`, aPoint);
+      pushAnchor(`${edgeId}-b`, bPoint);
+      edges.push({
+        id: edgeId,
+        source: `${edgeId}-a`,
+        target: `${edgeId}-b`,
+        type: "straight",
+        data: { relatedNodeIds: [cdrlNode.id, target.id], modalTitle: `${cdrlNode.title} ↔ ${target.title}` },
+        zIndex: 3,
+        style: { stroke: "#888", strokeWidth: 1.5, strokeDasharray: "4 3", opacity: 0.65, cursor: "pointer" },
+      });
+    });
+  });
 
   return { nodes, edges };
 }

@@ -1297,9 +1297,17 @@ button {
 
 /* React Flow renders a top/bottom connection-handle dot on every default node — meaningless
    here since nodesConnectable is false and nothing is ever dragged into a connection, so on
-   this page they just read as two stray black dots on every station marker. */
+   this page they just read as two stray black dots on every station marker. `display: none`
+   was the first fix tried here, but React Flow's built-in edge types (used for every
+   pushAnchor-sourced "straight" stub/connector edge on this map) compute their endpoint
+   coordinates from the connected node's Handle elements' measured bounding rects — a
+   display:none handle measures as a zero rect, which silently collapsed every such edge onto
+   one shared stale fallback point instead of the two real anchor positions. opacity+pointer-
+   events keeps the handle in normal layout (a real, measurable rect) while still making it
+   fully invisible and non-interactive. */
 .cdrl-path-page .react-flow__handle {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Ring labels (ASR, SRR, ...) are now the click target for "what's required at this SETR

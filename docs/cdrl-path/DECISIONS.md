@@ -766,3 +766,55 @@ Last, the track channel approach without track overlap is still not working prop
     zero page/console errors beyond pre-existing unresolved-marker data warnings that predate
     this round. The pre-existing `handoff-stub-*` React duplicate-key warning noted in #48 is
     also gone as a side effect of removing that code path entirely.
+
+## 2026-08-14 — Relationships get a real connecting track; fixed a hidden edge-geometry bug
+
+Ron: "the between SETR CDRL influenced / influenced by diamonds need a separate 'extension
+track' between the relations. Existing as standalone diamonds doesnt visualize this
+relationship well. what do you suggest?" — followed by: "Build it your recommended way."
+
+53. **Every cross-domain `influences`/`influenced_by` pair now draws a direct line straight
+    between the two real CDRL stations**, not a synthetic hub with faint disconnected stubs
+    (the #33-35 design, removed in #51 for reading unclear). Styled distinctly from the thick
+    colored domain tracks — thin, dashed, neutral gray, 65% opacity — so it reads as a
+    transfer connector the way a subway map draws a walking-transfer line between stations on
+    different lines, per Ron's own framing. Deliberately NOT routed through an invented
+    midpoint: `nodeAnchorCenter` (brought back — see #54) gives every CDRL's real anchor point
+    regardless of whether it got its own marker or was folded into a shared ring hub (#49-50),
+    so the connector always runs CDRL-to-CDRL. Same-domain pairs are skipped (already visually
+    adjacent on the shared track); "ALL" targets are skipped per
+    `confirmed_patterns.relationship_assessment_status`. Clicking a connector opens the same
+    related-CDRLs modal used everywhere else on the map, showing just the two CDRLs on that
+    specific pair — reusing `CdrlPathRelatedCdrlsModal` via the same generic
+    `data.relatedNodeIds`/`data.modalTitle` mechanism #51 already established, no new click
+    plumbing needed in `CdrlPathPage.tsx`.
+
+54. **Bug found and fixed while verifying #53: EVERY `type: "straight"` edge sourced from a
+    `pushAnchor` node was silently collapsing onto one shared stale point** — not just the new
+    relationship connectors, but the pre-existing `interchange-stub-*` and `ring-hub-stub-*`
+    edges too (confirmed by comparing their rendered SVG path `d` attributes: all three showed
+    the same degenerate near-zero-length segment at the same coordinates, regardless of which
+    actual nodes they connected). Root cause: `.cdrl-path-page .react-flow__handle {
+    display: none; }` (added in #48 to remove the "two black dots" on every station) removes
+    connection-handle elements from layout entirely, and React Flow's built-in edge types
+    (unlike the custom `CdrlPathTrackEdge` domain tracks, which take explicit `data.points` and
+    never had this problem) compute an edge's endpoint coordinates from its connected node's
+    Handle DOM elements' *measured bounding rect* — a `display:none` handle measures as an
+    all-zero rect, so every such edge fell back to one shared stale default instead of the two
+    real anchor positions. This had been silently broken since #48 shipped; it went unnoticed
+    because the stub edges it affected always ran close alongside a correctly-rendered domain
+    track or hub icon, masking their absence — it only became obviously visible once this
+    round's much-longer, unmasked cross-map connectors needed the same mechanism. Fixed by
+    swapping `display: none` for `opacity: 0; pointer-events: none;` — keeps every handle in
+    normal layout (a real, measurable rect) while remaining fully invisible and inert.
+
+    Verified: `tsc -b` clean. Playwright confirms all three edge types
+    (`interchange-stub-IRS-SE`, `ring-hub-stub-ring-hub-0-SE`, `relationship-track-0`) now
+    render distinct, correct `d` paths matching their actual connected nodes' positions, where
+    before all three showed the identical degenerate path; clicking a relationship connector
+    at its true rendered midpoint opens the correct two-CDRL modal (tested: "Systems
+    Engineering Management Plan ↔ Systems Engineering Plan"); 55 relationship-track edges
+    render across the current dataset, visually reading as a distinct thin dotted layer
+    beneath the domain tracks; station clicks, ring-label clicks, and Level 2 line-expand all
+    still work; zero unexpected console/page errors (only the pre-existing unresolved-marker
+    data warnings, unrelated to this change).
