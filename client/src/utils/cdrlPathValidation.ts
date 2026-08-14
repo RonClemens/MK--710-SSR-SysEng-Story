@@ -74,6 +74,19 @@ function nodeIdFromSummaryEntry(entry: string): string {
   return bracketOrParen === -1 ? entry : entry.slice(0, bracketOrParen);
 }
 
+/** Distinct CDRL ids required at each SETR event, derived from `generateStationSummaryBySetrEvent`
+ * by stripping its per-state/per-level tags and deduplicating. Used by the map's per-ring click
+ * targets (see cdrlPathLayout.ts) to answer "what's due at this SETR event," a coarser question
+ * than the exact-state text index the summary itself renders. */
+export function getRequiredNodeIdsBySetrEvent(model: CdrlPathModel): Record<string, string[]> {
+  const summary = generateStationSummaryBySetrEvent(model);
+  const result: Record<string, string[]> = {};
+  for (const [eventId, entries] of Object.entries(summary)) {
+    result[eventId] = Array.from(new Set(entries.map(nodeIdFromSummaryEntry)));
+  }
+  return result;
+}
+
 function isPlaceholderDid(did: string | undefined): boolean {
   if (!did) return true;
   return /\[VERIFY\]/i.test(did) || /^N\/A/i.test(did.trim());

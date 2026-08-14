@@ -1302,23 +1302,12 @@ button {
   display: none;
 }
 
-/* Handoff-hub diamond: drawn on a pseudo-element instead of rotating the node's own div,
-   because React Flow applies this node's positioning via an inline `transform:
-   translate(x,y)` on that same div — an inline `transform: rotate(...)` here would replace
-   it outright rather than combine with it (see cdrlPathLayout.ts's handoff-hub comment). The
-   node div is already position:absolute (React Flow's own base style), so this pseudo-element
-   only needs position:absolute + inset:0 to fill it, no separate positioning context needed. */
-.cdrl-handoff-hub-marker {
-  cursor: pointer;
-}
-.cdrl-handoff-hub-marker::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  transform: rotate(45deg);
-  border-radius: 3px;
-  background: var(--card-bg, #fff);
-  border: 2px dashed #888;
+/* Ring labels (ASR, SRR, ...) are now the click target for "what's required at this SETR
+   event" — no separate visible marker, per Ron's steer that the old scattered dashed handoff
+   diamonds should become invisible and aligned to the label itself. The underline-on-hover is
+   the only visual cue that they're clickable. */
+.cdrl-ring-label:hover {
+  text-decoration: underline;
 }
 
 .cdrl-related-modal {

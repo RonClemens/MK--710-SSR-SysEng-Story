@@ -678,3 +678,91 @@ station circle."
     both `pair.a` and `pair.b` across different pairs within one handoff group — a rendering
     warning only, not a click-blocking or visual defect, predates this round, and out of scope
     for what Ron asked for here.
+
+## 2026-08-14 — Transfer hubs absorb stray tracks; SETR-event click replaces handoff diamonds; lane offset goes rank-based
+
+Ron, from a phone screenshot of the SVR_FCA area: "if a track ends on a SETR ring, it needs to
+be on the transfer hub with other tracks, unless it is the only CDRL required at that SETR,
+which I doubt ever happens. Also, thise clickable dashed diamond boxes should be invisible and
+aligned to the SETR Event label, if they popup the full listing of SETR Event CDRLs required.
+Last, the track channel approach without track overlap is still not working properly."
+
+49. **Every SETR ring's transfer point is now exactly ONE hub, not one per CDRL that happens to
+    meet there.** The screenshot showed a small stray circle sitting right beside — not merged
+    into — the SVR_FCA interchange hub. Root cause: two *different* multi-domain CDRLs (e.g.
+    IRS and RVTM) independently resolving to the same ring each drew their own hub icon via
+    `renderStation`, since hub rendering was keyed to one specific CDRL node, not to the ring.
+    Fixed with `meetingsByRing` (groups `meetings` — see #12-16 — by ring) plus a new
+    `combinedRingHubs` pass: when 2+ *distinct* meetings land on the same ring,
+    `renderStation` now skips drawing its own icon for each of them and a single combined hub,
+    unioning every domain converging there, is drawn once instead. A ring with only ONE
+    meeting is unaffected — still gets its own hub exactly as before (#31), preserving the
+    existing "click a specific CDRL's hub, see that CDRL's relationships" behavior for the
+    common case.
+
+50. **A domain's track literally ending on a ring with no CDRL meeting to explain it also joins
+    a hub, not a lone circle.** Per Ron's steer: "if a track ends on a SETR ring, it needs to
+    be on the transfer hub with other tracks." `extraAbsorbedByMeetingRing` handles the case
+    where exactly one meeting already owns that ring (the terminating domain becomes an extra
+    spoke of that same hub); `terminalOnlyByRing` — folded into the same `combinedRingHubs` pass
+    as #49 — handles 2+ domains terminating at a ring with no meeting at all, drawing one new
+    shared hub for just them. A ring where only ONE domain's track ends, with nothing else
+    converging there, is left as a plain train stop — Ron's own "unless it's the only CDRL
+    required at that SETR" carve-out. PRR is excluded from both mechanisms; it already has its
+    own dedicated `prr-hub` icon that every PRR-terminating track lands on exactly (ring radius
+    0 for all of them — see #44).
+
+51. **The scattered dashed handoff-hub diamonds (#33-35) are gone, replaced by the SETR ring
+    label itself as an invisible click target.** Per Ron's literal ask — "those clickable
+    dashed diamond boxes should be invisible and aligned to the SETR Event label, if they popup
+    the full listing of SETR Event CDRLs required" — every `ring-label-{event}` node (already
+    positioned exactly where the label sits) now carries `data.relatedNodeIds` /
+    `data.modalTitle` sourced from a new `getRequiredNodeIdsBySetrEvent()` in
+    `cdrlPathValidation.ts` (dedupes `generateStationSummaryBySetrEvent`'s per-state entries
+    down to distinct CDRL ids per event), with `cursor: pointer` and an underline-on-hover for
+    the only visual affordance. The PRR hub and every combined ring-hub (#49-50) open the same
+    per-event listing, unifying every non-single-CDRL click target on the map around one
+    consistent semantic: "what's required at this SETR event," rather than mixing that with the
+    old per-domain-pair "handoff" framing. This is a real removal, not a re-skin: the whole
+    `handoffPairs`/`handoffGroups`/`ghostAnchorFor` machinery and the `related-` ghost-dot
+    nodes it drew for relationship targets are deleted, along with `nodeAnchorCenter` (nothing
+    reads it anymore once ghost anchors are gone). **Trade-off flagged for Ron's review**: this
+    means `influences`/`influenced_by` no longer has ANY dedicated visual on the map (previously
+    the dashed diamond+stub lines, #6/#22/#33-35's whole throughline) — replaced by the
+    per-event summary rather than kept alongside it. If that relationship visualization still
+    matters on its own terms, it needs to come back as an explicit ask in a future round; this
+    round took Ron's message as fully superseding it rather than layering on top.
+
+52. **Lane offset is now ranked per-ring, not fixed per-domain.** Three prior rounds (#24, #36,
+    #44's sibling work) tuned the SAME constant-based lane-offset formula — `laneSign =
+    lineIndex - (domainCount-1)/2`, a domain's FIXED position in `model.lines` — and still left
+    Ron reporting overlap. Root cause, finally identified: a domain's Dijkstra-solved angle
+    (#22) can end up anywhere relative to its neighbors at a given ring, since it bends toward
+    whatever meetings it needs to reach — but the offset direction was keyed to the domain's
+    static list position, not its actual angular position at that ring. A domain with a
+    "high" lane number could end up offset toward a neighbor it was supposed to be offset away
+    from, at whichever rings its solved angle happened to cross another domain's. Fixed by
+    ranking domains at EACH ring by their own solved angle there (`laneRankByLineAndRing`) and
+    keying the offset to that rank instead — so the offset direction always matches the real
+    left-to-right ordering at that specific ring. At the outermost ring every domain sits at
+    its own evenly-spaced home angle, so rank order equals the old fixed order there and
+    nothing changes visually at the map's edge; the fix only diverges from the old behavior
+    where domains' relative order actually shifts approaching a meeting, which is exactly
+    where the old formula was wrong. Not a total guarantee against every possible crossing —
+    two domains' underlying (pre-offset) solved angles can still cross each other between
+    adjacent rings, which would need joint multi-domain path optimization to fully rule out —
+    but it eliminates the specific "fixed lane number doesn't match local position" failure
+    mode that was the likely dominant cause given three rounds of otherwise-ineffective
+    constant tuning.
+
+    Verified: `tsc -b` clean. Playwright confirms the previously-stray circle beside the
+    SVR_FCA hub is now a single merged icon (screenshot diff before/after); clicking any ring
+    label (tested ASR and via the PRR hub) opens a "{EVENT} — CDRLs required" modal with the
+    correct deduped CDRL list; the two rings in the current dataset with a genuine multi-meeting
+    collision (`ring-hub-0` → PDR, 15 CDRLs; `ring-hub-1` → SVR_FCA, 3 CDRLs) each render as one
+    combined hub and open the correct listing; a non-colliding multi-domain hub (ICD) still
+    renders individually and still opens its own CDRL's detail, confirming the common-case
+    behavior from #31 is unchanged; Level 2 line-expand and maturity-marker clicks still work;
+    zero page/console errors beyond pre-existing unresolved-marker data warnings that predate
+    this round. The pre-existing `handoff-stub-*` React duplicate-key warning noted in #48 is
+    also gone as a side effect of removing that code path entirely.

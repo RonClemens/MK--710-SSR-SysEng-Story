@@ -26,17 +26,13 @@ function lineIdFromElementId(id: string): string | null {
 
 function nodeIdFromElementId(id: string): string | null {
   if (id.startsWith("station-")) return id.slice("station-".length);
-  if (id.startsWith("related-")) return id.slice("related-".length);
   if (id.startsWith("maturity-")) return id.split("-")[1];
   return null;
 }
 
-/** The CDRLs to list for a clicked station/interchange/ghost marker: the CDRL itself plus
- * whatever it influences or is influenced by — "ALL" targets are skipped (see
- * confirmed_patterns.relationship_assessment_status; too broad to list). A handoff-hub click
- * doesn't go through this — it already carries its own relatedNodeIds/modalTitle from layout
- * time (see cdrlPathLayout.ts), since the page has no visibility into that relationship-cluster
- * grouping on its own. */
+/** The CDRLs to list for a clicked station/interchange marker: the CDRL itself plus whatever
+ * it influences or is influenced by — "ALL" targets are skipped (see
+ * confirmed_patterns.relationship_assessment_status; too broad to list). */
 function relatedIdsForNode(node: CdrlPathNode): string[] {
   const ids = new Set<string>([node.id]);
   (node.influences ?? []).forEach((id) => id !== "ALL" && ids.add(id));
@@ -44,11 +40,14 @@ function relatedIdsForNode(node: CdrlPathNode): string[] {
   return Array.from(ids);
 }
 
+/** A ring label, the PRR hub, and any terminal transfer hub all carry their own
+ * relatedNodeIds/modalTitle straight from layout time (see cdrlPathLayout.ts) — they represent
+ * "everything required at this SETR event," not one specific CDRL, so the page can't derive
+ * that list from the element's id the way it can for a single CDRL's own station marker. */
 function targetForElement(element: Node | Edge, model: CdrlPathModel): SelectedTarget | null {
-  if (element.id.startsWith("handoff-hub-")) {
-    const data = element.data as { relatedNodeIds?: string[]; modalTitle?: string } | undefined;
-    if (!data?.relatedNodeIds?.length) return null;
-    return { title: data.modalTitle ?? "Related CDRLs", relatedNodeIds: data.relatedNodeIds };
+  const data = (element as Node).data as { relatedNodeIds?: string[]; modalTitle?: string } | undefined;
+  if (data?.relatedNodeIds && data?.modalTitle) {
+    return { title: data.modalTitle, relatedNodeIds: data.relatedNodeIds };
   }
   const nodeId = nodeIdFromElementId(element.id);
   if (!nodeId) return null;
