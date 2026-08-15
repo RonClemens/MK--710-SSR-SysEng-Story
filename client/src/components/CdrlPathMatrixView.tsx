@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
-import type { CdrlPathDecompositionLevel, CdrlPathModel } from "../types/cdrlPath";
+import type { CdrlPathDecompositionLevel, CdrlPathModel, CdrlPathWorkflowOverlay } from "../types/cdrlPath";
 import { buildCdrlMaturityMatrix } from "../utils/cdrlPathMatrix";
 import { relatedIdsForNode } from "../utils/cdrlPathRelated";
+import { blockedReasonText, computeReadiness } from "../utils/cdrlPathReadiness";
 
 interface Props {
   model: CdrlPathModel;
   decompositionLevel: CdrlPathDecompositionLevel;
+  workflowOverlay: CdrlPathWorkflowOverlay;
   onSelect: (target: { title: string; relatedNodeIds: string[] }) => void;
 }
 
@@ -32,10 +34,21 @@ function heatBucket(count: number): string {
  * (a D/F/U letter plus a distinct border style — solid/dashed/dotted) rather than by color
  * alone, per the same research's accessibility guidance; color in this view identifies the
  * owning domain (matching its row and the subway map's line color), not the state. */
-export function CdrlPathMatrixView({ model, decompositionLevel, onSelect }: Props) {
+export function CdrlPathMatrixView({ model, decompositionLevel, workflowOverlay, onSelect }: Props) {
   const [density, setDensity] = useState<DensityMode>("detail");
   const matrix = useMemo(() => buildCdrlMaturityMatrix(model, decompositionLevel), [model, decompositionLevel]);
   const nodeById = useMemo(() => new Map(model.nodes.map((n) => [n.id, n])), [model]);
+  // Per-node readiness (BLOCKED/READY/IN_PROGRESS/COMPLETE), computed once per render rather
+  // than per chip — a node can appear as multiple chips (once per due maturity state) but its
+  // readiness is a property of the node, not the individual state entry. Only BLOCKED gets a
+  // visual treatment here (muted/locked, per the design chat's suggestion) — the other three
+  // states don't change how a chip looks, to keep the primary Detail view's existing
+  // D/F/U-and-discipline-color encoding from getting more crowded than this first pass needs.
+  const readinessByNodeId = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof computeReadiness>>();
+    model.nodes.forEach((n) => map.set(n.id, computeReadiness(n, model, workflowOverlay)));
+    return map;
+  }, [model, workflowOverlay]);
   const baselineByEvent = useMemo(() => {
     const map = new Map<string, string[]>();
     model.lifecycle_lanes.cm_baselines.forEach((b) => {
@@ -123,21 +136,27 @@ export function CdrlPathMatrixView({ model, decompositionLevel, onSelect }: Prop
                   }
                   return (
                     <td key={eventId} className="cdrl-matrix-cell">
-                      {cellEntries.map((entry, i) => (
-                        <button
-                          key={`${entry.nodeId}-${entry.state}-${i}`}
-                          type="button"
-                          className={`cdrl-matrix-chip cdrl-matrix-chip-${entry.state.toLowerCase()}`}
-                          style={{ borderColor: line.color_hint, color: line.color_hint }}
-                          title={`${entry.title}${entry.did ? ` — ${entry.did}` : ""} (${entry.state})`}
-                          onClick={() => handleChipClick(entry.nodeId)}
-                        >
-                          <span className="cdrl-matrix-chip-code">{entry.nodeId}</span>
-                          <span className="cdrl-matrix-chip-state" aria-hidden="true">
-                            {STATE_LETTER[entry.state] ?? entry.state[0]}
-                          </span>
-                        </button>
-                      ))}
+                      {cellEntries.map((entry, i) => {
+                        const node = nodeById.get(entry.nodeId);
+                        const isBlocked = readinessByNodeId.get(entry.nodeId) === "BLOCKED";
+                        const reason = node ? blockedReasonText(node, model, workflowOverlay) : null;
+                        return (
+                          <button
+                            key={`${entry.nodeId}-${entry.state}-${i}`}
+                            type="button"
+                            className={`cdrl-matrix-chip cdrl-matrix-chip-${entry.state.toLowerCase()}${isBlocked ? " cdrl-matrix-chip-blocked" : ""}`}
+                            style={{ borderColor: line.color_hint, color: line.color_hint }}
+                            title={`${entry.title}${entry.did ? ` — ${entry.did}` : ""} (${entry.state})${reason ? ` — ${reason}` : ""}`}
+                            onClick={() => handleChipClick(entry.nodeId)}
+                          >
+                            {isBlocked && <span className="cdrl-matrix-chip-lock" aria-hidden="true">🔒</span>}
+                            <span className="cdrl-matrix-chip-code">{entry.nodeId}</span>
+                            <span className="cdrl-matrix-chip-state" aria-hidden="true">
+                              {STATE_LETTER[entry.state] ?? entry.state[0]}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </td>
                   );
                 })}
@@ -159,7 +178,10 @@ export function CdrlPathMatrixView({ model, decompositionLevel, onSelect }: Prop
           <span className="cdrl-matrix-chip cdrl-matrix-chip-update cdrl-matrix-legend-chip">
             <span className="cdrl-matrix-chip-state" aria-hidden="true">U</span> Update
           </span>
-          <span className="hint cdrl-matrix-legend-note">Chip color identifies the owning discipline (see row labels), not the maturity state.</span>
+          <span className="hint cdrl-matrix-legend-note">
+            Chip color identifies the owning discipline (see row labels), not the maturity state. 🔒 = blocked — a derived_from parent
+            hasn't reached its required maturity yet (click the chip for detail).
+          </span>
         </div>
       ) : (
         <div className="cdrl-matrix-legend">

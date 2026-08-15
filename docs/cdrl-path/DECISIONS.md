@@ -968,3 +968,82 @@ distinct from the looser influences/influenced_by tags already in the model."
     502s from the unrelated `/api/*` backend, which CDRL Path doesn't depend on since it reads
     the static JSON model directly — confirmed present on the plain homepage load too, not a
     regression from this round).
+
+## 2026-08-15 — Computed readiness (BLOCKED/READY/IN_PROGRESS/COMPLETE)
+
+The Subway Design chat relayed a request for "the missing dynamic layer" — RACI is static
+(one role-set per CDRL), so nothing until now answered "whose turn is it right now, and can
+this CDRL actually start given where its `derived_from` parents currently stand?" Their
+message proposed two schema additions split along the same static/dynamic line as everything
+else in this model, plus a computed (not stored) readiness function, and left UI placement to
+our judgment. Ron confirmed building the full round in one pass (schema + function + both UI
+touchpoints) rather than splitting it across rounds.
+
+66. **`derived_from` restructured from `string[]` to `{parent, min_parent_maturity_to_start}[]`
+    edge objects** — a breaking change to the reference model, migrated across all 36 nodes.
+    Every existing edge defaulted to `min_parent_maturity_to_start: "DRAFT"` (the most
+    permissive gate) per the design chat's own suggestion, since there's no principled,
+    node-by-node reason yet to require a stricter gate on any specific edge — recorded in a new
+    `confirmed_patterns.readiness_gate_default_pattern` entry alongside the existing
+    `developmental_flow_down_pattern`, same "draft to challenge" caveat. `validateCdrlPathModel`
+    checks 6/7 updated for the new shape; a new check 8 validates every
+    `min_parent_maturity_to_start` is a real maturity level (DRAFT/FINAL/UPDATE).
+
+67. **New `CdrlPathWorkflowStatus` type** (`current_maturity_target` + `workflow_state`, four
+    stages: WORKING → UNDER_REVIEW → APPROVED → NOTIFIED, per the design chat's RACI-driven
+    description) is the dynamic counterpart to RACI. Per the design chat's own scoping, it lives
+    in the per-baseline status overlay (`program-status-{baseline_id}.json`), never in the
+    shared reference model — but that overlay's real persistence is still the same documented
+    future phase it's always been (see the Persistence row in the project brief, and the
+    station detail panel's pre-existing "Live program status... not yet wired up" note). Rather
+    than block this round on that unbuilt persistence layer, or fake it with invented backend
+    wiring, `CDRL_PATH_DEMO_WORKFLOW_OVERLAY` (`cdrlPathDemoWorkflowOverlay.ts`) is a small
+    hardcoded sample — same "Illustrative/demo data only" category as the rest of this
+    reference model, not a stand-in for real tracking. It tells one coherent story rather than
+    being random: SEP is APPROVED/done, SEMP has started since its only parent cleared the gate,
+    SSS is UNDER_REVIEW (not yet approved) — so most of the graph downstream of SSS sits
+    BLOCKED, which is exactly the cascading-dependency case this feature exists to surface.
+
+68. **`cdrlPathReadiness.ts`**, a pure-function module computed at render time from the model +
+    overlay — never a stored field, same principle `generateStationSummaryBySetrEvent` already
+    established (a derivable value that's hand-set will drift). `computeReadiness` returns
+    BLOCKED if any `derived_from` parent hasn't reached its edge's required maturity (a parent
+    counts as having "achieved" a level only once APPROVED/NOTIFIED — WORKING/UNDER_REVIEW
+    toward a target doesn't count as reached yet, per the design chat's own stage semantics);
+    READY if unblocked but not yet started; IN_PROGRESS if started but short of its own highest
+    *non-recurring* required maturity level (recurring UPDATE cadences are ongoing post-baseline
+    maintenance, not a one-time completion gate); COMPLETE otherwise. A parent with no maturity
+    data of its own (e.g. `CDD` — a government-provided input with nothing to track) is always
+    treated as a satisfied dependency rather than blocking everything downstream forever.
+    `blockedReasonText` renders the human-readable "Blocked — waiting on X, Y to reach Z" string
+    the station detail panel and matrix tooltips both share verbatim.
+
+69. **Station detail panel** gets a readiness badge (🔒 BLOCKED / READY / IN_PROGRESS /
+    COMPLETE) and, when an overlay entry exists, a workflow-stage badge (✎ Working / 🔍 Under
+    review / ✓ Approved / 🔔 Notified per the design chat's stage descriptions) next to the
+    existing DID badge, plus the blocked-reason sentence inline in the Developmental lineage
+    section. **Matrix Detail view** mutes/locks any chip whose node is BLOCKED (dimmed +
+    🔒, tooltip includes the reason) — deliberately BLOCKED-only rather than a full four-state
+    treatment, to keep the primary D/F/U-and-discipline-color encoding from getting more
+    crowded than this first pass needs; still clickable, since the modal is where the reason is
+    explained. Heat Map density and the subway map's lineage arrows are unchanged this round —
+    extending readiness there is a flaggable future item, not silently folded in. Badge/status
+    colors reuse the app's existing restrained navy/amber/danger/ice palette (no new green
+    introduced) and are always paired with a text label, consistent with the matrix's own
+    "never color alone" rule.
+
+70. **`workflowOverlay` threaded as an explicit prop** (`CdrlPathPage` → `CdrlPathMatrixView` /
+    `CdrlPathRelatedCdrlsModal` → `CdrlPathNodeDetail`) rather than imported ad hoc at each call
+    site, so swapping the demo constant for a real per-baseline overlay later is a one-line
+    change at the top of the page, not a hunt through every consumer.
+
+    Verified: `tsc -b` clean. Playwright: "Model valid" still shows after the breaking
+    `derived_from` restructure; 74 of the matrix's chips render muted/locked (everything
+    downstream of SSS, as the demo overlay intends); SSS's drawer shows readiness IN_PROGRESS
+    and workflow badge "🔍 Under review"; IRS's drawer shows readiness "🔒 BLOCKED" and reason
+    text "Blocked — waiting on System/Subsystem Specification to reach DRAFT" (SSS is its only
+    `derived_from` parent, gated at DRAFT, and SSS hasn't been APPROVED yet — correct). Subway
+    map regression check: lineage toggle still adds exactly 50 edges (76 → 126) and a lineage
+    arrow click still opens the correct modal, confirming the edge-object migration didn't
+    change which edges render. Zero unexpected console/page errors in either check (only the
+    same pre-existing, unrelated `/api/*` 502 noise already documented in the prior round).

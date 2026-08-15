@@ -10,6 +10,7 @@ import { CdrlPathMatrixView } from "../components/CdrlPathMatrixView";
 import { CdrlPathExportManager } from "../components/CdrlPathExportManager";
 import { CdrlPathModelEditor } from "../components/CdrlPathModelEditor";
 import { CdrlPathTrackEdge } from "../components/CdrlPathTrackEdge";
+import { CDRL_PATH_DEMO_WORKFLOW_OVERLAY } from "../utils/cdrlPathDemoWorkflowOverlay";
 import type { CdrlPathDecompositionLevel, CdrlPathModel } from "../types/cdrlPath";
 
 const EDGE_TYPES: EdgeTypes = { cdrlPathTrack: CdrlPathTrackEdge };
@@ -149,7 +150,12 @@ export function CdrlPathPage() {
       <CdrlPathModelEditor model={model} onApply={setModel} />
 
       {viewMode === "matrix" ? (
-        <CdrlPathMatrixView model={model} decompositionLevel={decompositionLevel} onSelect={setSelectedTarget} />
+        <CdrlPathMatrixView
+          model={model}
+          decompositionLevel={decompositionLevel}
+          workflowOverlay={CDRL_PATH_DEMO_WORKFLOW_OVERLAY}
+          onSelect={setSelectedTarget}
+        />
       ) : (
         <div style={{ width: "100%", height: 640, border: "1px solid var(--border-color, #333)" }}>
           <ReactFlowProvider>
@@ -179,6 +185,7 @@ export function CdrlPathPage() {
           title={selectedTarget.title}
           relatedNodeIds={selectedTarget.relatedNodeIds}
           decompositionLevel={decompositionLevel}
+          workflowOverlay={CDRL_PATH_DEMO_WORKFLOW_OVERLAY}
           onClose={() => setSelectedTarget(null)}
         />
       )}

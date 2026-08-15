@@ -557,6 +557,41 @@ button {
   color: var(--amber);
 }
 
+/* Readiness (computed) and workflow-stage (the live RACI-driven cycle it's derived from) —
+   same restrained navy/amber/danger/ice palette the rest of this app's status pills already
+   use, rather than introducing a new green, to stay consistent and colorblind-safe. Text label
+   is always present alongside the color, same double-encoding principle as the matrix chips. */
+.cdrl-readiness-badge.cdrl-readiness-blocked {
+  background: #fbe2e0;
+  color: var(--danger);
+}
+
+.cdrl-readiness-badge.cdrl-readiness-ready {
+  background: var(--ice-light);
+  color: var(--navy);
+}
+
+.cdrl-readiness-badge.cdrl-readiness-in_progress {
+  background: #fbe9dd;
+  color: var(--amber);
+}
+
+.cdrl-readiness-badge.cdrl-readiness-complete {
+  background: var(--navy);
+  color: white;
+}
+
+.cdrl-workflow-badge {
+  background: var(--ice-light);
+  color: var(--navy-dark);
+}
+
+.cdrl-readiness-reason {
+  font-size: 0.82rem;
+  color: var(--danger);
+  margin: 0.3rem 0;
+}
+
 .detail-grid {
   display: grid;
   grid-template-columns: 160px 1fr;
@@ -1533,6 +1568,19 @@ button {
 
 .cdrl-matrix-chip-update {
   border-style: dotted;
+}
+
+/* Blocked is layered on top of the draft/final/update border style, not a replacement for it —
+   a chip can be both "due as a DRAFT" and "blocked" at once. Muted opacity + a lock glyph, per
+   the design chat's "muted/locked until dependency clears" suggestion; still clickable (the
+   related-CDRLs modal is exactly where the blocked reason is explained). */
+.cdrl-matrix-chip-blocked {
+  opacity: 0.55;
+  filter: grayscale(35%);
+}
+
+.cdrl-matrix-chip-lock {
+  font-size: 0.7rem;
 }
 
 .cdrl-matrix-chip-state {

@@ -849,8 +849,8 @@ export function buildCdrlPathFlowElements(model: CdrlPathModel, options: CdrlPat
   if (showLineage) {
     let lineageEdgeIndex = 0;
     fullStationNodes.forEach((cdrlNode) => {
-      (cdrlNode.derived_from ?? []).forEach((parentId) => {
-        const parent = nodeById.get(parentId);
+      (cdrlNode.derived_from ?? []).forEach((edge) => {
+        const parent = nodeById.get(edge.parent);
         if (!parent) return; // dangling reference — already surfaced by validateModel()
         const parentPoint = nodeAnchorCenter.get(parent.id);
         const childPoint = nodeAnchorCenter.get(cdrlNode.id);

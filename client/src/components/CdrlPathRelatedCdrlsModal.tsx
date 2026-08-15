@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Modal } from "./Modal";
 import { CdrlPathNodeDetail } from "./CdrlPathNodeDetail";
-import type { CdrlPathModel } from "../types/cdrlPath";
+import type { CdrlPathModel, CdrlPathWorkflowOverlay } from "../types/cdrlPath";
 
 interface Props {
   model: CdrlPathModel;
   title: string;
   relatedNodeIds: string[];
   decompositionLevel: string;
+  workflowOverlay: CdrlPathWorkflowOverlay;
   onClose: () => void;
 }
 
@@ -17,7 +18,7 @@ interface Props {
 // cluster (see relatedNodeIds/modalTitle baked into handoff-hub nodes in cdrlPathLayout.ts) —
 // rather than jumping straight to one node's own detail. Each list entry expands as a side
 // drawer INSIDE this same modal, not a second stacked modal.
-export function CdrlPathRelatedCdrlsModal({ model, title, relatedNodeIds, decompositionLevel, onClose }: Props) {
+export function CdrlPathRelatedCdrlsModal({ model, title, relatedNodeIds, decompositionLevel, workflowOverlay, onClose }: Props) {
   const [drawerNodeId, setDrawerNodeId] = useState<string | null>(null);
   const relatedNodes = relatedNodeIds
     .map((id) => model.nodes.find((n) => n.id === id))
@@ -57,7 +58,7 @@ export function CdrlPathRelatedCdrlsModal({ model, title, relatedNodeIds, decomp
               </button>
             </div>
             <div className="cdrl-related-drawer-body">
-              <CdrlPathNodeDetail model={model} node={drawerNode} decompositionLevel={decompositionLevel} />
+              <CdrlPathNodeDetail model={model} node={drawerNode} decompositionLevel={decompositionLevel} workflowOverlay={workflowOverlay} />
             </div>
           </div>
         )}

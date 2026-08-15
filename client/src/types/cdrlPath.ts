@@ -51,6 +51,39 @@ export interface CdrlPathRaci {
   informed: string[];
 }
 
+// Shared maturity vocabulary — matches CdrlPathMaturityState.state's actual values in the data
+// (see confirmed_patterns in the JSON). Ordered DRAFT < FINAL < UPDATE for readiness comparisons.
+export type CdrlPathMaturityLevel = "DRAFT" | "FINAL" | "UPDATE";
+
+// A derived_from parent edge — restructured 2026-08-15 (see DECISIONS.md and
+// confirmed_patterns.readiness_gate_default_pattern) from a plain parent-id string to this
+// object, so how early a child can start is configurable per relationship rather than one
+// global rule. min_parent_maturity_to_start is the gate cdrlPathReadiness.ts reads: the parent
+// must have achieved at least this maturity level before the child counts as unblocked.
+export interface CdrlPathDerivedFromEdge {
+  parent: string;
+  min_parent_maturity_to_start: CdrlPathMaturityLevel;
+}
+
+// The dynamic counterpart to RACI (static, one set per CDRL) — whose turn it is right now.
+// Lives in the per-baseline status overlay (program-status-{baseline_id}.json), never in the
+// reference model — see cdrlPathReadiness.ts for the computed BLOCKED/READY/IN_PROGRESS/COMPLETE
+// state this drives. Persistence for that overlay is still a documented future phase (see
+// cdrl-path-project-brief.md's Persistence row); until it exists, the app sources this from a
+// small illustrative client-side dataset (cdrlPathDemoWorkflowOverlay.ts), the same "Illustrative
+// demo data only" category as the rest of this reference model.
+export type CdrlPathWorkflowStage = "WORKING" | "UNDER_REVIEW" | "APPROVED" | "NOTIFIED";
+
+export interface CdrlPathWorkflowStatus {
+  current_maturity_target: CdrlPathMaturityLevel;
+  workflow_state: CdrlPathWorkflowStage;
+}
+
+// nodeId -> status. A missing entry means the node hasn't started work yet (not an error).
+export type CdrlPathWorkflowOverlay = Record<string, CdrlPathWorkflowStatus>;
+
+export type CdrlPathReadiness = "BLOCKED" | "READY" | "IN_PROGRESS" | "COMPLETE";
+
 export interface CdrlPathSupersedes {
   did: string;
   title: string;
@@ -86,8 +119,10 @@ export interface CdrlPathNode {
   // Vee-model requirements→design→implementation→test chain. A curated subset of
   // influenced_by (see confirmed_patterns.developmental_flow_down_pattern for what was
   // excluded and why) — every node lists its own parent(s); an empty array means it's a root
-  // of the derivation graph (e.g. CDD, SSPP), not that it wasn't assessed.
-  derived_from?: string[];
+  // of the derivation graph (e.g. CDD, SSPP), not that it wasn't assessed. Restructured
+  // 2026-08-15 from string[] to CdrlPathDerivedFromEdge[] (see that type's doc comment) to
+  // carry a per-edge readiness gate.
+  derived_from?: CdrlPathDerivedFromEdge[];
   raci?: CdrlPathRaci;
   supersedes?: CdrlPathSupersedes[];
   confirmed_via_did_interview?: boolean;

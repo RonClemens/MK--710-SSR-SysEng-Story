@@ -154,9 +154,9 @@ export function validateCdrlPathModel(model: CdrlPathModel): CdrlPathValidationR
   // 6. No dangling derived_from references. Unlike influences/influenced_by, "ALL" isn't a
   // valid target here — developmental lineage is always a specific parent, never "everything."
   for (const node of model.nodes) {
-    for (const parentId of node.derived_from ?? []) {
-      if (!nodeIds.has(parentId)) {
-        issues.push(`${node.id}.derived_from references unknown node "${parentId}"`);
+    for (const edge of node.derived_from ?? []) {
+      if (!nodeIds.has(edge.parent)) {
+        issues.push(`${node.id}.derived_from references unknown node "${edge.parent}"`);
       }
     }
   }
@@ -173,23 +173,33 @@ export function validateCdrlPathModel(model: CdrlPathModel): CdrlPathValidationR
   function visit(nodeId: string, path: string[]) {
     color.set(nodeId, GRAY);
     const node = nodeByIdForCycleCheck.get(nodeId);
-    for (const parentId of node?.derived_from ?? []) {
-      if (!nodeIds.has(parentId)) continue; // already reported by check 6
-      const parentColor = color.get(parentId);
+    for (const edge of node?.derived_from ?? []) {
+      if (!nodeIds.has(edge.parent)) continue; // already reported by check 6
+      const parentColor = color.get(edge.parent);
       if (parentColor === GRAY) {
-        const cycleKey = [...path, nodeId, parentId].sort().join(">");
+        const cycleKey = [...path, nodeId, edge.parent].sort().join(">");
         if (!cycleNodesReported.has(cycleKey)) {
           cycleNodesReported.add(cycleKey);
-          issues.push(`derived_from cycle: ${[...path, nodeId, parentId].join(" → ")}`);
+          issues.push(`derived_from cycle: ${[...path, nodeId, edge.parent].join(" → ")}`);
         }
       } else if (parentColor === WHITE) {
-        visit(parentId, [...path, nodeId]);
+        visit(edge.parent, [...path, nodeId]);
       }
     }
     color.set(nodeId, BLACK);
   }
   for (const node of model.nodes) {
     if (color.get(node.id) === WHITE) visit(node.id, []);
+  }
+
+  // 8. derived_from edges must use a real maturity level for their gate.
+  const VALID_MATURITY_LEVELS = new Set(["DRAFT", "FINAL", "UPDATE"]);
+  for (const node of model.nodes) {
+    for (const edge of node.derived_from ?? []) {
+      if (!VALID_MATURITY_LEVELS.has(edge.min_parent_maturity_to_start)) {
+        issues.push(`${node.id}.derived_from["${edge.parent}"].min_parent_maturity_to_start "${edge.min_parent_maturity_to_start}" is not DRAFT/FINAL/UPDATE`);
+      }
+    }
   }
 
   return { valid: issues.length === 0, issues };
