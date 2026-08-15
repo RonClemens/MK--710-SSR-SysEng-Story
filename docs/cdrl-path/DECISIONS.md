@@ -1127,3 +1127,74 @@ shouldn't need border-style parsing to tell apart at a glance.
     computes to `rgb(202, 220, 252)` (`--ice`) instead of the old amber, while ICD's readiness
     badge (READY_VOLATILE) still computes to `rgb(251, 233, 221)` (amber) — the collision is
     gone and amber's exclusivity is intact. Zero console/page errors.
+
+75. **CDD's domain resolved as `SE`, confirmed by Ron via the design chat.** Was flagged as an
+    unreviewed coin-flip when the discipline taxonomy migration landed (#11); the live data
+    already had `SE`, so this closes the open item rather than changing anything.
+
+## 2026-08-15 — Discipline Guide + All-Stakeholder Orientation Guide export
+
+The design chat prototyped two exportable Markdown+Mermaid documents against their own copy of
+the reference model — a per-discipline technical guide (using Safety & Reliability as the
+worked example: CDRL table, Mermaid gantt, upstream/downstream dependency sections, a Mermaid
+dependency graph) and a single org-wide plain-language orientation guide covering all
+stakeholders including the customer, built around the same "unstable parent document = downstream
+rework" narrative the readiness work exists to characterize. Ron confirmed the format (Markdown +
+Mermaid, not PDF/PPTX) and the two-tier concept before the prototypes were built.
+
+Two clarifying threads resolved before the build: (1) which discipline taxonomy is live —
+confirmed `domains[]`/`model.lines` (SE/SW/HW/TE/SAFETY_RELIABILITY/ILS/PM_CM), not the JSON's
+stale `$schema_notes` description of the pre-#11 `line` field; the design chat re-migrated their
+own copy to match. (2) how the generator should source live data given the design chat has never
+had direct repo access — confirmed as an in-app feature reading the live `model`/`workflowOverlay`
+state directly, not a live export endpoint or a periodically-synced copy, so there's nothing to
+keep in sync by construction.
+
+76. **`cdrlPathGuideGenerator.ts`**, two pure functions producing Markdown+Mermaid strings
+    straight from live model state — `generateDisciplineGuide(model, domainId, overlay)` and
+    `generateOrientationGuide(model)`. Discipline Guide sections: role framing, a CDRL table
+    (title/DID/Draft/Final/Update via the existing `maturityStatesForLevel` helper, SYSTEM
+    level), a Mermaid gantt grouped by the model's own `lifecycle_lanes.phases` (not
+    hand-invented phase buckets), upstream/downstream cross-domain relationship bullets (
+    `derived_from` + `influenced_by`/`influences`, filtered to edges where the other end's
+    `domains[]` doesn't include this domain), a Mermaid dependency graph (this domain's nodes
+    amber-highlighted, cross-domain parents/children gray, matching the prototype's own
+    convention), and Special Considerations (every maturity-state `note` and node-level `notes`
+    field verbatim, plus live `computeReadiness`/`readinessReasonText` flags for any of the
+    domain's own CDRLs currently BLOCKED or READY_VOLATILE — the "FMECA is currently
+    READY_VOLATILE — waiting on SSDD..." enrichment the spec asked for, reusing the readiness
+    module's own text rather than generating new phrasing). Same "precise index, don't
+    force-place" principle as `generateStationSummaryBySetrEvent`/`buildCdrlMaturityMatrix`:
+    a maturity state whose `at_event` isn't an exact SETR-event id is listed separately under
+    "Not tied to a single SETR event," never guessed onto the gantt.
+
+77. **Two placeholder decisions, both explicit and consistent with each other.** Ron confirmed
+    "placeholder now, decide later" for the Orientation Guide's per-domain "what they contribute"
+    prose (institutional framing, not derivable from CDRL titles). The Discipline Guide's own
+    "Your role in the System Development Lifecycle" paragraph has the identical problem — not in
+    the design chat's spec as an explicit open question, but structurally the same kind of
+    non-derivable copy — so it got the same placeholder treatment for consistency rather than
+    inventing prose Ron didn't ask for. By contrast, the Orientation Guide's phase-flow diagram
+    labels (Early Planning / Requirements & Design Approach / Building & Testing / Production &
+    Fielding / In Service & Sustained, mapped from `lifecycle_lanes.phases`) were written directly,
+    not placeholdered — those are standard DoD acquisition-phase meanings (MSA/TMRR/EMD/P&D/O&S),
+    public terminology rather than this-program-specific institutional knowledge. Flag to Ron if
+    any read wrong for this program's actual phase tailoring.
+
+78. **`CdrlPathGuideExport.tsx`** sits next to the existing `CdrlPathExportManager` (Export JSON)
+    on the CDRL Path page — a domain `<select>`, an "Export Discipline Guide" button, and an
+    "Export Orientation Guide" button, all using the exact same Blob + object-URL + anchor-click
+    download mechanism the JSON export already uses. Reads `model` and
+    `CDRL_PATH_DEMO_WORKFLOW_OVERLAY` directly from `CdrlPathPage`'s existing state — no new data
+    plumbing, no new persistence, nothing to keep in sync.
+
+    Verified: `tsc -b` clean. Playwright: selected Safety & Reliability in the domain picker,
+    downloaded both files, and read them back directly (not just visually) — the Discipline
+    Guide correctly lists all 7 S&R CDRLs, correctly excludes same-domain edges from the
+    upstream/downstream sections (SSDD/SSS/HW_DEV_SPEC/STR appear only as external gray nodes,
+    never counted as this domain's own), and correctly surfaces 5 of the 7 CDRLs as
+    live-flagged 🔒 BLOCKED (matching the current demo workflow overlay's real state — SSDD,
+    HW_DEV_SPEC, and STR have no overlay entries yet, so anything gated on them is genuinely
+    blocked, not a generator bug). The Orientation Guide correctly omits all DID numbers and
+    SETR acronyms from body text and renders all 7 domain-contribution placeholders plus the
+    phase flowchart. Zero unexpected console/page errors.

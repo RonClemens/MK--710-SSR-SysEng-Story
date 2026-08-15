@@ -8,6 +8,7 @@ import { EditableText } from "../components/EditableText";
 import { CdrlPathRelatedCdrlsModal } from "../components/CdrlPathRelatedCdrlsModal";
 import { CdrlPathMatrixView } from "../components/CdrlPathMatrixView";
 import { CdrlPathExportManager } from "../components/CdrlPathExportManager";
+import { CdrlPathGuideExport } from "../components/CdrlPathGuideExport";
 import { CdrlPathModelEditor } from "../components/CdrlPathModelEditor";
 import { CdrlPathTrackEdge } from "../components/CdrlPathTrackEdge";
 import { CDRL_PATH_DEMO_WORKFLOW_OVERLAY } from "../utils/cdrlPathDemoWorkflowOverlay";
@@ -108,6 +109,7 @@ export function CdrlPathPage() {
       />
 
       <CdrlPathExportManager model={model} isDirty={isDirty} />
+      <CdrlPathGuideExport model={model} workflowOverlay={CDRL_PATH_DEMO_WORKFLOW_OVERLAY} />
 
       <div className="cdrl-badge-row" role="group" aria-label="View">
         <button
