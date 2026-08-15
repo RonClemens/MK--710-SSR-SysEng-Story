@@ -1198,3 +1198,11 @@ keep in sync by construction.
     blocked, not a generator bug). The Orientation Guide correctly omits all DID numbers and
     SETR acronyms from body text and renders all 7 domain-contribution placeholders plus the
     phase flowchart. Zero unexpected console/page errors.
+
+78. **EMD's plain-language phase label corrected: "Building & Testing" → "Detailed Design &
+    Build."** The design chat's content-review pass caught it: PDR and CDR both fall inside EMD
+    in this model's own `lifecycle_lanes`, so "Building & Testing" undersold the design-maturation
+    work happening there and risked a lay reader assuming design was already finished by the
+    time this phase starts. The other four phase labels held up as sound, per the design chat's
+    own review — MSA/TMRR/P&D/O&S unchanged. Verified `tsc -b` clean and the corrected label
+    renders in the regenerated Orientation Guide's Mermaid flowchart.

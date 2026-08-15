@@ -31,10 +31,14 @@ function domainBlurbPlaceholder(kind: "role-framing" | "contribution"): string {
 // terminology, not org-specific institutional knowledge, so unlike the domain-contribution
 // blurbs above these are safe to author directly rather than placeholder. Flag to Ron/the
 // design chat if any read wrong for this program's actual phase tailoring.
+//
+// EMD's label was "Building & Testing" until the design chat flagged it (2026-08-15): PDR and
+// CDR both fall inside EMD in this model's own lifecycle_lanes, so that label undersold the
+// design-maturation work happening there and risked implying design was already finished.
 const PHASE_PLAIN_LABELS: Record<string, string> = {
   MSA: "Early Planning",
   TMRR: "Requirements & Design Approach",
-  EMD: "Building & Testing",
+  EMD: "Detailed Design & Build",
   "P&D": "Production & Fielding",
   "O&S": "In Service & Sustained",
 };
