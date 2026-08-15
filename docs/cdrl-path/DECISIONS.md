@@ -1128,11 +1128,11 @@ shouldn't need border-style parsing to tell apart at a glance.
     badge (READY_VOLATILE) still computes to `rgb(251, 233, 221)` (amber) — the collision is
     gone and amber's exclusivity is intact. Zero console/page errors.
 
-75. **CDD's domain resolved as `SE`, confirmed by Ron via the design chat.** Was flagged as an
-    unreviewed coin-flip when the discipline taxonomy migration landed (#11); the live data
-    already had `SE`, so this closes the open item rather than changing anything.
-
 ## 2026-08-15 — Discipline Guide + All-Stakeholder Orientation Guide export
+
+CDD's domain (flagged as an unreviewed coin-flip when the discipline taxonomy migration landed,
+#11) was also resolved this round — confirmed `SE` by Ron via the design chat, closing the open
+item (see #11's own text above, updated in place rather than restated as a separate entry).
 
 The design chat prototyped two exportable Markdown+Mermaid documents against their own copy of
 the reference model — a per-discipline technical guide (using Safety & Reliability as the
@@ -1150,7 +1150,7 @@ had direct repo access — confirmed as an in-app feature reading the live `mode
 state directly, not a live export endpoint or a periodically-synced copy, so there's nothing to
 keep in sync by construction.
 
-76. **`cdrlPathGuideGenerator.ts`**, two pure functions producing Markdown+Mermaid strings
+75. **`cdrlPathGuideGenerator.ts`**, two pure functions producing Markdown+Mermaid strings
     straight from live model state — `generateDisciplineGuide(model, domainId, overlay)` and
     `generateOrientationGuide(model)`. Discipline Guide sections: role framing, a CDRL table
     (title/DID/Draft/Final/Update via the existing `maturityStatesForLevel` helper, SYSTEM
@@ -1168,7 +1168,7 @@ keep in sync by construction.
     a maturity state whose `at_event` isn't an exact SETR-event id is listed separately under
     "Not tied to a single SETR event," never guessed onto the gantt.
 
-77. **Two placeholder decisions, both explicit and consistent with each other.** Ron confirmed
+76. **Two placeholder decisions, both explicit and consistent with each other.** Ron confirmed
     "placeholder now, decide later" for the Orientation Guide's per-domain "what they contribute"
     prose (institutional framing, not derivable from CDRL titles). The Discipline Guide's own
     "Your role in the System Development Lifecycle" paragraph has the identical problem — not in
@@ -1181,7 +1181,7 @@ keep in sync by construction.
     public terminology rather than this-program-specific institutional knowledge. Flag to Ron if
     any read wrong for this program's actual phase tailoring.
 
-78. **`CdrlPathGuideExport.tsx`** sits next to the existing `CdrlPathExportManager` (Export JSON)
+77. **`CdrlPathGuideExport.tsx`** sits next to the existing `CdrlPathExportManager` (Export JSON)
     on the CDRL Path page — a domain `<select>`, an "Export Discipline Guide" button, and an
     "Export Orientation Guide" button, all using the exact same Blob + object-URL + anchor-click
     download mechanism the JSON export already uses. Reads `model` and
