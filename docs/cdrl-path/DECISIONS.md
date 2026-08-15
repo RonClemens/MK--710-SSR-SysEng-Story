@@ -1101,3 +1101,27 @@ it — low risk), leaving BLOCKED (parent hasn't started at all) and IN_PROGRESS
     distinction the demo data was extended to demonstrate. Zero unexpected console/page errors
     (only the same pre-existing, unrelated `/api/*` 502 noise already documented in prior
     rounds).
+
+## 2026-08-15 — Amber reserved exclusively for READY_VOLATILE
+
+The design chat flagged the same-day sanity-check note above as a real problem, not just a
+flag: IN_PROGRESS and READY_VOLATILE sharing amber undermines the matrix's whole
+pre-attentive-scanning premise (from the original visualization research) — "my own work is
+underway" and "you're building on ground that might shift under you" have different stakes and
+shouldn't need border-style parsing to tell apart at a glance.
+
+74. **`.cdrl-readiness-badge.cdrl-readiness-in_progress` reassigned from amber to `var(--ice)` /
+    `var(--navy-dark)`** — no new color added, per the design chat's constraint. The three
+    non-BLOCKED, non-VOLATILE states now form a light→medium→solid navy/ice weight progression
+    instead of separate hues: READY_STABLE (`--ice-light`, lightest — not started) →
+    IN_PROGRESS (`--ice`, medium — underway) → COMPLETE (`--navy` solid, white text — done).
+    That progression is a bonus, not the goal: the actual fix is that amber now means exactly
+    one thing across the whole readiness badge/chip system — churn risk from something outside
+    your control — which is what the design chat's pre-attentive-scanning argument called for.
+    Matrix chips were unaffected (IN_PROGRESS never had its own chip treatment, only BLOCKED and
+    READY_VOLATILE do — see #72), so this was a station-detail-panel-only, CSS-only change.
+
+    Verified: `tsc -b` clean. Playwright confirms SSS's readiness badge (IN_PROGRESS) now
+    computes to `rgb(202, 220, 252)` (`--ice`) instead of the old amber, while ICD's readiness
+    badge (READY_VOLATILE) still computes to `rgb(251, 233, 221)` (amber) — the collision is
+    gone and amber's exclusivity is intact. Zero console/page errors.

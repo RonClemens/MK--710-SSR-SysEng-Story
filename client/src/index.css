@@ -560,16 +560,22 @@ button {
 /* Readiness (computed) and workflow-stage (the live RACI-driven cycle it's derived from) —
    same restrained navy/amber/danger/ice palette the rest of this app's status pills already
    use, rather than introducing a new green, to stay consistent and colorblind-safe. Text label
-   is always present alongside the color, same double-encoding principle as the matrix chips. */
+   is always present alongside the color, same double-encoding principle as the matrix chips.
+   Amber is reserved exclusively for READY_VOLATILE (2026-08-15 revision, per the design chat:
+   IN_PROGRESS sharing amber's slot undermined the matrix's pre-attentive-scanning premise —
+   "my own work is underway" and "you're building on ground that might shift under you" have
+   fundamentally different stakes and shouldn't share a hue a lead has to stop and parse). The
+   other three non-blocked states form a light→medium→solid navy/ice weight progression instead
+   of separate hues, which doubles as a visual "how far along" cue: READY_STABLE (lightest, not
+   started) → IN_PROGRESS (medium) → COMPLETE (solid, done). */
 .cdrl-readiness-badge.cdrl-readiness-blocked {
   background: #fbe2e0;
   color: var(--danger);
 }
 
-/* READY_VOLATILE gets amber, same family as IN_PROGRESS, but a dashed border marks it as a
-   distinct "proceed with caution" signal rather than plain in-progress work — per the design
-   chat's steer that this is the single most valuable signal this layer surfaces, so it must not
-   read as a clean go. READY_STABLE keeps the old plain "ready" treatment. */
+/* READY_VOLATILE is the one and only amber state now — a dashed border keeps it distinct from a
+   plain filled badge, per the design chat's steer that this is the single most valuable signal
+   this layer surfaces, so it must not read as a clean go. */
 .cdrl-readiness-badge.cdrl-readiness-ready_volatile {
   background: #fbe9dd;
   color: var(--amber);
@@ -582,8 +588,8 @@ button {
 }
 
 .cdrl-readiness-badge.cdrl-readiness-in_progress {
-  background: #fbe9dd;
-  color: var(--amber);
+  background: var(--ice);
+  color: var(--navy-dark);
 }
 
 .cdrl-readiness-badge.cdrl-readiness-complete {
