@@ -130,16 +130,26 @@ function clausesFor(gates: CdrlPathParentGate[]): string {
     .join("; ");
 }
 
-/** Human-readable reason text for the station detail panel and matrix chip tooltips to share
- * verbatim — "Blocked — waiting on X to reach Y" when a parent hasn't started at all, or
- * "Ready, but volatile — ..." when every parent has started but at least one hasn't reached the
- * required maturity yet (the churn-risk case). Null when there's nothing to flag (READY_STABLE,
- * IN_PROGRESS, or COMPLETE). */
+/** Human-readable reason text for the station detail panel, matrix chip tooltips, and the guide
+ * generator's live risk flags to share verbatim — "Blocked — waiting on X to reach Y" when a
+ * parent hasn't started at all, or "Ready, but volatile — ..." when every parent has started but
+ * at least one hasn't reached the required maturity yet (the churn-risk case). Null when there's
+ * nothing to flag (READY_STABLE, IN_PROGRESS, or COMPLETE).
+ *
+ * A node with multiple parents can have a MIX of gate states (e.g. one parent BLOCKED, another
+ * merely READY_VOLATILE) — the design chat's 2026-08-15 content review caught this function
+ * silently dropping the volatile parent(s) whenever a blocked one was also present, since the
+ * old version short-circuited on the first non-empty filter. Both are real, unmet dependencies;
+ * both are named here now. */
 export function readinessReasonText(node: CdrlPathNode, model: CdrlPathModel, overlay: CdrlPathWorkflowOverlay): string | null {
   const gates = parentGates(node, model, overlay);
   const blocked = gates.filter((g) => g.gate === "BLOCKED");
-  if (blocked.length > 0) return `Blocked — waiting on ${clausesFor(blocked)}`;
   const volatile = gates.filter((g) => g.gate === "READY_VOLATILE");
+  if (blocked.length > 0) {
+    const clauses = [`Blocked — waiting on ${clausesFor(blocked)}`];
+    if (volatile.length > 0) clauses.push(`also waiting on ${clausesFor(volatile)} (in progress, not yet approved)`);
+    return clauses.join("; ");
+  }
   if (volatile.length > 0) {
     return `Ready, but volatile — waiting on ${clausesFor(volatile)} (in progress, not yet approved); starting now risks rework if it changes first.`;
   }

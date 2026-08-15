@@ -109,6 +109,14 @@ export interface CdrlPathNode {
   drafted_at?: string;
   baselined_at?: string;
   notes?: string;
+  // Distinct from `notes` — added 2026-08-15 per the design chat's content-review finding that
+  // `notes` (internal model-curation history: "added node," "was mislabeled," commentary
+  // referencing Ron/earlier drafts) was leaking into exported guides with no context an external
+  // reader would have. This field is the vetted subset safe to show team-facing: undefined until
+  // a hand-curation pass populates it — cdrlPathGuideGenerator.ts reads only from this field for
+  // its Special Considerations section, never from `notes`, and simply omits the line when empty
+  // rather than falling back to `notes` or inventing a substitute.
+  team_facing_note?: string;
   render_style?: CdrlPathRenderStyle;
   maturity_states?: CdrlPathMaturityState[];
   // RVTM-style multi-level maturity, keyed by CdrlPathDecompositionLevel. When present,

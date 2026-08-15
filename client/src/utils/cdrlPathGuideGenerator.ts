@@ -20,6 +20,12 @@ import { computeReadiness, readinessReasonText } from "./cdrlPathReadiness";
 //    (placeholder now, decide authorship later), both the Discipline Guide's role-framing
 //    paragraph and the Orientation Guide's per-domain contribution blurbs render a clearly
 //    marked placeholder rather than invented copy.
+// 3. `notes` (internal model-curation history — "added node," "was mislabeled," commentary
+//    referencing Ron/earlier drafts) is never shown here — per the design chat's 2026-08-15
+//    content-review finding, it was leaking into exported guides with no context an external
+//    reader would have. Special Considerations reads only `team_facing_note`, a separate field
+//    (see its doc comment in cdrlPath.ts) that's undefined until a hand-curation pass populates
+//    it — same placeholder-now-author-later treatment as #2, just silent rather than a marker.
 
 function domainBlurbPlaceholder(kind: "role-framing" | "contribution"): string {
   return kind === "role-framing"
@@ -134,52 +140,90 @@ function sortedRelations(map: Map<string, CrossDomainRelation>): CrossDomainRela
   return Array.from(map.values()).sort((a, b) => a.external.title.localeCompare(b.external.title));
 }
 
-/** derived_from parents + influenced_by targets, filtered to nodes NOT in this domain — "what
- * you need from others before you can start." */
-function crossDomainUpstream(model: CdrlPathModel, domainId: string, domainNodes: CdrlPathNode[]): CrossDomainRelation[] {
+interface CrossDomainSections {
+  /** derived_from-sourced — the same edges cdrlPathReadiness.ts gates on, so this list and the
+   * live risk flags below always agree on what's actually blocking/volatile. */
+  direct: CrossDomainRelation[];
+  /** influenced_by/influences-sourced, MINUS any pair already counted in `direct` — real
+   * relationship content this domain should be aware of, but doesn't gate readiness. derived_from
+   * is a curated subset of influenced_by (see confirmed_patterns.developmental_flow_down_pattern
+   * in the JSON), so most pairs land in `direct`; a handful of nodes (e.g. ICD, SVD) have a
+   * genuinely broader influenced_by than derived_from, which is exactly what this list surfaces. */
+  broader: CrossDomainRelation[];
+}
+
+function pairKey(externalId: string, localId: string): string {
+  return `${externalId}::${localId}`;
+}
+
+function pairKeysOf(relations: CrossDomainRelation[]): Set<string> {
+  const keys = new Set<string>();
+  relations.forEach((r) => r.localNodes.forEach((l) => keys.add(pairKey(r.external.id, l.id))));
+  return keys;
+}
+
+/** "What you need from others before you can start" — split into direct developmental
+ * dependencies (derived_from) and broader influences (influenced_by only). Per the design
+ * chat's 2026-08-15 content-review finding: these two edge sources can genuinely diverge
+ * (confirmed for ICD and SVD elsewhere in the model), and a single merged list left readers
+ * unable to tell why this section's count might not match the live risk flags below, which
+ * only ever gate on derived_from. */
+function crossDomainUpstream(model: CdrlPathModel, domainId: string, domainNodes: CdrlPathNode[]): CrossDomainSections {
   const nodeById = new Map(model.nodes.map((n) => [n.id, n]));
-  const map = new Map<string, CrossDomainRelation>();
+  const directMap = new Map<string, CrossDomainRelation>();
   domainNodes.forEach((local) => {
     (local.derived_from ?? []).forEach((edge) => {
       const parent = nodeById.get(edge.parent);
-      if (parent && !parent.domains.includes(domainId)) addRelation(map, parent, local);
+      if (parent && !parent.domains.includes(domainId)) addRelation(directMap, parent, local);
     });
+  });
+  const direct = sortedRelations(directMap);
+  const directPairs = pairKeysOf(direct);
+
+  const broaderMap = new Map<string, CrossDomainRelation>();
+  domainNodes.forEach((local) => {
     (local.influenced_by ?? []).forEach((id) => {
       if (id === "ALL") return;
       const target = nodeById.get(id);
-      if (target && !target.domains.includes(domainId)) addRelation(map, target, local);
+      if (!target || target.domains.includes(domainId)) return;
+      if (directPairs.has(pairKey(target.id, local.id))) return;
+      addRelation(broaderMap, target, local);
     });
   });
-  return sortedRelations(map);
+  return { direct, broader: sortedRelations(broaderMap) };
 }
 
-/** The reverse — every other node that derives from, or is influenced by, this domain's own
- * CDRLs — "who's counting on your output." */
-function crossDomainDownstream(model: CdrlPathModel, domainId: string, domainNodes: CdrlPathNode[]): CrossDomainRelation[] {
+/** The reverse — "who's counting on your output," same direct/broader split (derived_from
+ * children vs. influences-only). */
+function crossDomainDownstream(model: CdrlPathModel, domainId: string, domainNodes: CdrlPathNode[]): CrossDomainSections {
   const localIds = new Set(domainNodes.map((n) => n.id));
   const localById = new Map(domainNodes.map((n) => [n.id, n]));
-  const map = new Map<string, CrossDomainRelation>();
+  const directMap = new Map<string, CrossDomainRelation>();
   model.nodes.forEach((other) => {
     if (localIds.has(other.id) || other.domains.includes(domainId)) return;
     (other.derived_from ?? []).forEach((edge) => {
       const local = localById.get(edge.parent);
-      if (local) addRelation(map, other, local);
+      if (local) addRelation(directMap, other, local);
     });
   });
+  const direct = sortedRelations(directMap);
+  const directPairs = pairKeysOf(direct);
+
+  const broaderMap = new Map<string, CrossDomainRelation>();
   domainNodes.forEach((local) => {
     (local.influences ?? []).forEach((id) => {
       if (id === "ALL") return;
       const external = model.nodes.find((n) => n.id === id);
-      if (external && !external.domains.includes(domainId)) addRelation(map, external, local);
+      if (!external || external.domains.includes(domainId)) return;
+      if (directPairs.has(pairKey(external.id, local.id))) return;
+      addRelation(broaderMap, external, local);
     });
   });
-  return sortedRelations(map);
+  return { direct, broader: sortedRelations(broaderMap) };
 }
 
 function relationBullets(model: CdrlPathModel, relations: CrossDomainRelation[], direction: "upstream" | "downstream"): string[] {
-  if (relations.length === 0) {
-    return [`No cross-discipline ${direction === "upstream" ? "upstream dependencies" : "downstream consumers"} on file for this domain.`];
-  }
+  if (relations.length === 0) return ["- None on file."];
   return relations.map(({ external, localNodes }) => {
     const otherDomains = external.domains.map((d) => domainShortLabel(model.lines.find((l) => l.id === d)?.label ?? d)).join("/");
     const localList = localNodes.map((n) => n.title).join(", ");
@@ -189,6 +233,16 @@ function relationBullets(model: CdrlPathModel, relations: CrossDomainRelation[],
         : `depends on ${localList}.`;
     return `- **${external.title}** (${external.id}, ${otherDomains}) — ${clause}`;
   });
+}
+
+function relationSectionLines(model: CdrlPathModel, sections: CrossDomainSections, direction: "upstream" | "downstream"): string[] {
+  return [
+    "**Direct developmental dependencies** (drives the readiness status above):",
+    ...relationBullets(model, sections.direct, direction),
+    "",
+    "**Broader influences** (informs the work, doesn't gate readiness):",
+    ...relationBullets(model, sections.broader, direction),
+  ];
 }
 
 /** Mermaid graph of every derived_from/influences edge touching this domain — this domain's own
@@ -248,7 +302,10 @@ function specialConsiderationsSection(model: CdrlPathModel, domainNodes: CdrlPat
     maturityStatesForLevel(node, "SYSTEM").forEach((state) => {
       if (state.note) out.push(`- **${node.title} (${state.state})** — ${state.note}`);
     });
-    if (node.notes) out.push(`- **${node.title}** — ${node.notes}`);
+    // team_facing_note, never `notes` — see that field's doc comment in cdrlPath.ts. Silently
+    // omitted (not a placeholder) when absent, since most nodes legitimately have nothing to
+    // flag here and a placeholder per node would just be noise.
+    if (node.team_facing_note) out.push(`- **${node.title}** — ${node.team_facing_note}`);
   });
   const flagged = domainNodes
     .map((node) => ({ node, readiness: computeReadiness(node, model, overlay) }))
@@ -293,11 +350,11 @@ export function generateDisciplineGuide(model: CdrlPathModel, domainId: string, 
     "",
     "## What you need from others before you can start",
     "",
-    ...relationBullets(model, crossDomainUpstream(model, domainId, domainNodes), "upstream"),
+    ...relationSectionLines(model, crossDomainUpstream(model, domainId, domainNodes), "upstream"),
     "",
     "## Who's counting on your output",
     "",
-    ...relationBullets(model, crossDomainDownstream(model, domainId, domainNodes), "downstream"),
+    ...relationSectionLines(model, crossDomainDownstream(model, domainId, domainNodes), "downstream"),
     "",
     "## Cross-discipline dependency map",
     "",

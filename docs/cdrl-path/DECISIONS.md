@@ -1206,3 +1206,58 @@ keep in sync by construction.
     time this phase starts. The other four phase labels held up as sound, per the design chat's
     own review — MSA/TMRR/P&D/O&S unchanged. Verified `tsc -b` clean and the corrected label
     renders in the regenerated Orientation Guide's Mermaid flowchart.
+
+## 2026-08-15 — Content-review findings: a real readiness bug, and internal notes leaking into guides
+
+The design chat's full content-review pass on the live-generated S&R Discipline Guide and
+Orientation Guide surfaced two findings. Both were investigated against the actual data before
+fixing — one turned out to be a different (and more consequential) bug than diagnosed; one was
+exactly as diagnosed.
+
+79. **`readinessReasonText` completeness bug, found via the design chat's RM_PREDICTIONS
+    example.** They observed the "What you need from others" prose listing both SSS and SSDD as
+    needed for RM_PREDICTIONS, while the live risk flag cited only SSDD, and hypothesized the two
+    sections were reading from different edge sources (`influenced_by` vs. `derived_from`).
+    Checked directly against the JSON: for all 7 S&R nodes, `derived_from` and `influenced_by`
+    are identical sets — that wasn't the cause. The actual bug was in `cdrlPathReadiness.ts`:
+    `readinessReasonText` filtered for BLOCKED gates first and returned immediately if any
+    existed, silently dropping any READY_VOLATILE gates on the same node. RM_PREDICTIONS has two
+    `derived_from` parents — SSDD (no workflow overlay entry → BLOCKED) and SSS (has an entry,
+    UNDER_REVIEW toward DRAFT → READY_VOLATILE) — so the old code reported only SSDD. Fixed to
+    report both: "Blocked — waiting on X to reach Y; also waiting on Z to reach Y (in progress,
+    not yet approved)." This is a core `cdrlPathReadiness.ts` fix, not guide-generator-specific —
+    it also corrects the station detail panel and matrix chip tooltips for any node with mixed
+    parent-gate states, not just the guide export.
+
+80. **The `derived_from`/`influenced_by` divergence the design chat hypothesized is real, just
+    not present in the S&R data they happened to review.** Checked across all 36 nodes: `ICD`
+    and `SVD` both have an `influenced_by` entry with no matching `derived_from` edge. Split
+    "What you need from others" and "Who's counting on your output" into two labeled
+    sub-sections per their suggestion — **"Direct developmental dependencies"** (`derived_from`
+    only, the same edges `cdrlPathReadiness.ts` gates on) and **"Broader influences"**
+    (`influenced_by`/`influences` entries not already covered as direct, so nothing is listed
+    twice) — so a reader can now see why a broader-influence count might exceed the
+    readiness-relevant one, for domains where that actually happens.
+
+81. **New `team_facing_note?: string` field on `CdrlPathNode`, distinct from `notes`.** The
+    design chat quoted three live examples of internal model-curation commentary appearing
+    verbatim in exported guide output — "This was mislabeled as FMECA's DID number in the
+    earlier draft," "wasn't in the original draft," "Ron's 'RPR' and 'MPD' both resolve to this
+    same node" — content with no context an external reader would have. `notes` stays exactly as
+    it was (still shown in the in-app station detail panel, where "first-pass, Claude-assessed"
+    and "confirmed by Ron" framing is normal and expected throughout this whole app).
+    `cdrlPathGuideGenerator.ts`'s Special Considerations section now reads only
+    `team_facing_note`, silently omitting the line when absent rather than falling back to
+    `notes` — same placeholder-now-author-later treatment as the role-framing/domain-blurb
+    placeholders, just without a per-node marker (most nodes legitimately have nothing to flag).
+    Per the design chat's own framing, actually curating which existing `notes` content is worth
+    promoting to `team_facing_note` (e.g., RM_PREDICTIONS's DID-cancellation fact) is explicit
+    follow-up work, not done this round — every node's `team_facing_note` is unset for now, so
+    Special Considerations currently shows only maturity-state `note` text and live risk flags.
+
+    Verified: `tsc -b` clean. Playwright: regenerated the S&R Discipline Guide and confirmed all
+    three fixes in the actual output — RM_PREDICTIONS's risk flag now names both SSDD (blocked)
+    and SSS (volatile); the downstream section shows LCSP split correctly across Direct (via
+    FMECA) and Broader (via SAR/RM_PREDICTIONS/FAILURE_SUMMARY_REPORT, which only influence LCSP
+    without SSDD/HW_DEV_SPEC-style direct derivation); Special Considerations no longer contains
+    any of the three quoted internal-commentary strings. Zero console/page errors.
