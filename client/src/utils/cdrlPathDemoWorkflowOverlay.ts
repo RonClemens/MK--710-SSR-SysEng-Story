@@ -9,15 +9,22 @@ import type { CdrlPathWorkflowOverlay } from "../types/cdrlPath";
 // compute against — same "Illustrative/demo data only" category as the rest of this reference
 // model, not a stand-in for actual program tracking.
 //
-// Deliberately tells one coherent story rather than being random: SSS (the top of the
-// requirements chain) is still under review, so most of the graph sits BLOCKED behind it —
-// exactly the cascading-dependency case this feature exists to surface. SEP is APPROVED/done
-// (COMPLETE), SEMP has started (IN_PROGRESS) since its only parent (SEP) already cleared the
-// DRAFT gate, and the two other untouched roots (RPP, SSPP) show READY. CDD isn't listed here
-// at all — it has no maturity data of its own (see highestRequiredMaturityIndex), so it reads
-// as COMPLETE/always-available without needing an entry.
+// Deliberately tells one coherent story rather than being random, two tiers deep so the
+// three-way parent gate (see the 2026-08-15 revision in cdrlPathReadiness.ts) has real variety
+// to show, not just a root and its immediate children: SEP is APPROVED/done (COMPLETE). SSS,
+// IRS, and SRS are each mid-cycle (WORKING/UNDER_REVIEW) — real artifacts that exist but haven't
+// reached the required maturity, so THEIR children read READY_VOLATILE: allowed to start, but
+// flagged as churn risk, exactly the case this feature exists to surface. SEMP is IN_PROGRESS
+// off SEP (already stable). Nodes two tiers below SSS (ICD/SSDD's own children, e.g. IDD, SDD)
+// still read BLOCKED — their direct parents haven't started yet either, which is a real and
+// correct signal, not an artifact of sparse demo data: readiness only ever reports on the
+// parents actually recorded here. RPP/SSPP (untouched roots) show READY_STABLE. CDD isn't
+// listed at all — it has no maturity data of its own (see highestRequiredMaturityIndex), so it
+// reads as COMPLETE/always-available without needing an entry.
 export const CDRL_PATH_DEMO_WORKFLOW_OVERLAY: CdrlPathWorkflowOverlay = {
   SEP: { current_maturity_target: "FINAL", workflow_state: "APPROVED" },
   SEMP: { current_maturity_target: "FINAL", workflow_state: "WORKING" },
   SSS: { current_maturity_target: "DRAFT", workflow_state: "UNDER_REVIEW" },
+  IRS: { current_maturity_target: "DRAFT", workflow_state: "UNDER_REVIEW" },
+  SRS: { current_maturity_target: "DRAFT", workflow_state: "WORKING" },
 };

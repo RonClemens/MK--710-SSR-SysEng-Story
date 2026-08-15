@@ -82,7 +82,11 @@ export interface CdrlPathWorkflowStatus {
 // nodeId -> status. A missing entry means the node hasn't started work yet (not an error).
 export type CdrlPathWorkflowOverlay = Record<string, CdrlPathWorkflowStatus>;
 
-export type CdrlPathReadiness = "BLOCKED" | "READY" | "IN_PROGRESS" | "COMPLETE";
+// READY split into READY_VOLATILE/READY_STABLE 2026-08-15 (see DECISIONS.md) at the design
+// chat's steer: collapsing "parent has anything" and "parent is stable" into one READY state
+// hid the exact churn-risk signal (starting downstream work off an unreleased parent artifact)
+// this tool exists to surface. BLOCKED still means a parent hasn't started at all.
+export type CdrlPathReadiness = "BLOCKED" | "READY_VOLATILE" | "READY_STABLE" | "IN_PROGRESS" | "COMPLETE";
 
 export interface CdrlPathSupersedes {
   did: string;

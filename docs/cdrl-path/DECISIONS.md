@@ -1047,3 +1047,57 @@ touchpoints) rather than splitting it across rounds.
     arrow click still opens the correct modal, confirming the edge-object migration didn't
     change which edges render. Zero unexpected console/page errors in either check (only the
     same pre-existing, unrelated `/api/*` 502 noise already documented in the prior round).
+
+## 2026-08-15 — Readiness revised to a three-way parent gate (BLOCKED/READY_VOLATILE/READY_STABLE)
+
+The design chat confirmed the 74-chip lockout above was a real semantics bug, not a display
+issue — but held off on the simple fix ("just loosen the threshold"). Root cause: requiring
+full APPROVED/NOTIFIED before a parent counted as reaching DRAFT applied FINAL-baseline rigor
+to what a draft gate is supposed to mean. Their point: the fix isn't just loosening the gate,
+it's a signal this layer was missing entirely — an engineer starting downstream work off a
+parent that's still WORKING/UNDER_REVIEW in a PLM system is exposed to real, well-known churn
+risk (near-daily changes to an unreleased document forcing rework downstream). Collapsing
+"parent has anything" and "parent is stable" into one undifferentiated READY would trade
+over-blocking for false confidence — the opposite direction of the same mistake. Their
+proposed fix, confirmed and built as described: split READY into READY_VOLATILE (parent exists,
+hasn't reached the required maturity — proceed, but flagged) and READY_STABLE (parent reached
+it — low risk), leaving BLOCKED (parent hasn't started at all) and IN_PROGRESS/COMPLETE
+(describing the child's own state) as-is.
+
+71. **`CdrlPathReadiness` is now five states, not four**: `BLOCKED | READY_VOLATILE |
+    READY_STABLE | IN_PROGRESS | COMPLETE`. `cdrlPathReadiness.ts`'s parent-gating logic became
+    a three-way `parentGates()` per derived_from edge (BLOCKED if the parent has no overlay
+    entry at all — no artifact exists yet; READY_VOLATILE if the parent has an entry but hasn't
+    reached the edge's required maturity — an artifact exists but can still change; READY_STABLE
+    if it has reached that maturity, or the parent is maturity-exempt like CDD and therefore
+    never volatile), aggregated worst-of across every parent (one BLOCKED parent blocks the
+    child outright; otherwise one READY_VOLATILE parent makes the whole thing volatile). This
+    was, as the design chat predicted, a third branch rather than a rebuild — `computeReadiness`
+    and the renamed `readinessReasonText` (was `blockedReasonText`, now also renders the
+    "Ready, but volatile — ..." case) both grew one branch each, no other logic changed.
+
+72. **UI**: the station detail readiness badge gets a distinct amber/dashed treatment plus a ⚠️
+    glyph for READY_VOLATILE (vs. 🔒 red for BLOCKED and a plain navy fill for COMPLETE) — per
+    the design chat's steer that this is "probably the single most valuable signal this whole
+    readiness layer can surface," so it must not read as a plain green go. The matrix Detail
+    view's chip treatment was extended to match: BLOCKED stays muted/grayed-out with a 🔒;
+    READY_VOLATILE gets a dashed amber outline and a ⚠️ corner glyph at full opacity (still
+    fully "go," just flagged) — READY_STABLE, IN_PROGRESS, and COMPLETE still don't change how a
+    chip looks, same crowding rationale as before. The matrix legend text was updated to explain
+    both glyphs.
+
+73. **Demo overlay dataset extended** (`cdrlPathDemoWorkflowOverlay.ts`) from 3 entries to 5 —
+    added IRS (UNDER_REVIEW/DRAFT) and SRS (WORKING/DRAFT) alongside the existing SEP/SEMP/SSS —
+    so the new three-way distinction has two tiers of real variety to show (e.g. ICD reads
+    READY_VOLATILE off IRS; IDD, two tiers down, still correctly reads BLOCKED since its direct
+    parents ICD/SSDD haven't started themselves) rather than the whole graph beyond SSS reading
+    as one undifferentiated bucket.
+
+    Verified: `tsc -b` clean. Playwright: matrix chip counts moved from 74 blocked / 0 flagged
+    (previous round) to 52 blocked / 14 READY_VOLATILE (this round, with the extended demo
+    overlay) — a real, visible split, not just a relabeling. ICD's drawer confirmed
+    "⚠️ READY (VOLATILE)" (its only parent, IRS, has started but isn't approved); IDD's drawer
+    confirmed "🔒 BLOCKED" (its parents ICD/SSDD haven't started at all) — exactly the two-tier
+    distinction the demo data was extended to demonstrate. Zero unexpected console/page errors
+    (only the same pre-existing, unrelated `/api/*` 502 noise already documented in prior
+    rounds).

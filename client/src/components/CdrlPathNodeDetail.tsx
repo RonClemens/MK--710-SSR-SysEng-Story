@@ -1,5 +1,5 @@
-import type { CdrlPathModel, CdrlPathNode, CdrlPathWorkflowOverlay, CdrlPathWorkflowStage } from "../types/cdrlPath";
-import { blockedReasonText, computeReadiness } from "../utils/cdrlPathReadiness";
+import type { CdrlPathModel, CdrlPathNode, CdrlPathReadiness, CdrlPathWorkflowOverlay, CdrlPathWorkflowStage } from "../types/cdrlPath";
+import { computeReadiness, readinessReasonText } from "../utils/cdrlPathReadiness";
 
 interface Props {
   model: CdrlPathModel;
@@ -24,6 +24,22 @@ const WORKFLOW_STAGE_LABEL: Record<CdrlPathWorkflowStage, string> = {
   UNDER_REVIEW: "Under review",
   APPROVED: "Approved",
   NOTIFIED: "Notified",
+};
+
+// READY_VOLATILE gets its own caution glyph (⚠) distinct from BLOCKED's lock and COMPLETE's
+// implicit "done" — per the design chat's steer that this is "probably the single most valuable
+// signal this whole readiness layer can surface," it shouldn't read as a plain green go.
+const READINESS_ICON: Partial<Record<CdrlPathReadiness, string>> = {
+  BLOCKED: "🔒",
+  READY_VOLATILE: "⚠️",
+};
+
+const READINESS_LABEL: Record<CdrlPathReadiness, string> = {
+  BLOCKED: "BLOCKED",
+  READY_VOLATILE: "READY (VOLATILE)",
+  READY_STABLE: "READY (STABLE)",
+  IN_PROGRESS: "IN PROGRESS",
+  COMPLETE: "COMPLETE",
 };
 
 function relatedTitles(ids: string[] | undefined, model: CdrlPathModel): string {
@@ -63,7 +79,7 @@ export function CdrlPathNodeDetail({ model, node, decompositionLevel, workflowOv
 
   const ownWorkflow = workflowOverlay[node.id];
   const readiness = computeReadiness(node, model, workflowOverlay);
-  const blockedReason = blockedReasonText(node, model, workflowOverlay);
+  const readinessReason = readinessReasonText(node, model, workflowOverlay);
 
   return (
     <div className="cdrl-path-node-detail">
@@ -72,9 +88,9 @@ export function CdrlPathNodeDetail({ model, node, decompositionLevel, workflowOv
       <div className="cdrl-badge-row">
         <span className="badge">{node.did ?? "DID not on file"}</span>
         {node.confirmed_via_did_interview && <span className="badge badge-info">Confirmed via DID interview</span>}
-        <span className={`badge cdrl-readiness-badge cdrl-readiness-${readiness.toLowerCase()}`} title={blockedReason ?? undefined}>
-          {readiness === "BLOCKED" ? "🔒 " : ""}
-          {readiness}
+        <span className={`badge cdrl-readiness-badge cdrl-readiness-${readiness.toLowerCase()}`} title={readinessReason ?? undefined}>
+          {READINESS_ICON[readiness] ? `${READINESS_ICON[readiness]} ` : ""}
+          {READINESS_LABEL[readiness]}
         </span>
         {ownWorkflow && (
           <span className="badge cdrl-workflow-badge" title={`Workflow: ${WORKFLOW_STAGE_LABEL[ownWorkflow.workflow_state]} toward ${ownWorkflow.current_maturity_target}`}>
@@ -134,8 +150,10 @@ export function CdrlPathNodeDetail({ model, node, decompositionLevel, workflowOv
             ? relatedTitles(node.derived_from.map((edge) => edge.parent), model)
             : "Root document — no parent in this model"}
         </p>
-        {blockedReason && (
-          <p className="cdrl-readiness-reason">{blockedReason}</p>
+        {readinessReason && (
+          <p className={`cdrl-readiness-reason${readiness === "READY_VOLATILE" ? " cdrl-readiness-reason-volatile" : ""}`}>
+            {readinessReason}
+          </p>
         )}
         <p>
           <strong>Flows into:</strong> {(() => {

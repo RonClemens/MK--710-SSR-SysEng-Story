@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type { CdrlPathDecompositionLevel, CdrlPathModel, CdrlPathWorkflowOverlay } from "../types/cdrlPath";
 import { buildCdrlMaturityMatrix } from "../utils/cdrlPathMatrix";
 import { relatedIdsForNode } from "../utils/cdrlPathRelated";
-import { blockedReasonText, computeReadiness } from "../utils/cdrlPathReadiness";
+import { computeReadiness, readinessReasonText } from "../utils/cdrlPathReadiness";
 
 interface Props {
   model: CdrlPathModel;
@@ -38,12 +38,14 @@ export function CdrlPathMatrixView({ model, decompositionLevel, workflowOverlay,
   const [density, setDensity] = useState<DensityMode>("detail");
   const matrix = useMemo(() => buildCdrlMaturityMatrix(model, decompositionLevel), [model, decompositionLevel]);
   const nodeById = useMemo(() => new Map(model.nodes.map((n) => [n.id, n])), [model]);
-  // Per-node readiness (BLOCKED/READY/IN_PROGRESS/COMPLETE), computed once per render rather
-  // than per chip — a node can appear as multiple chips (once per due maturity state) but its
-  // readiness is a property of the node, not the individual state entry. Only BLOCKED gets a
-  // visual treatment here (muted/locked, per the design chat's suggestion) — the other three
-  // states don't change how a chip looks, to keep the primary Detail view's existing
-  // D/F/U-and-discipline-color encoding from getting more crowded than this first pass needs.
+  // Per-node readiness, computed once per render rather than per chip — a node can appear as
+  // multiple chips (once per due maturity state) but its readiness is a property of the node,
+  // not the individual state entry. Two of the five states get a visual treatment: BLOCKED
+  // (muted/locked — nothing to build on yet) and READY_VOLATILE (a caution flag — building on
+  // this now is allowed but risks rework, per the design chat's steer that this is "probably the
+  // single most valuable signal this whole readiness layer can surface"). READY_STABLE,
+  // IN_PROGRESS, and COMPLETE don't change how a chip looks, to keep the primary Detail view's
+  // existing D/F/U-and-discipline-color encoding from getting more crowded than it needs to.
   const readinessByNodeId = useMemo(() => {
     const map = new Map<string, ReturnType<typeof computeReadiness>>();
     model.nodes.forEach((n) => map.set(n.id, computeReadiness(n, model, workflowOverlay)));
@@ -138,18 +140,21 @@ export function CdrlPathMatrixView({ model, decompositionLevel, workflowOverlay,
                     <td key={eventId} className="cdrl-matrix-cell">
                       {cellEntries.map((entry, i) => {
                         const node = nodeById.get(entry.nodeId);
-                        const isBlocked = readinessByNodeId.get(entry.nodeId) === "BLOCKED";
-                        const reason = node ? blockedReasonText(node, model, workflowOverlay) : null;
+                        const readiness = readinessByNodeId.get(entry.nodeId);
+                        const isBlocked = readiness === "BLOCKED";
+                        const isVolatile = readiness === "READY_VOLATILE";
+                        const reason = node ? readinessReasonText(node, model, workflowOverlay) : null;
                         return (
                           <button
                             key={`${entry.nodeId}-${entry.state}-${i}`}
                             type="button"
-                            className={`cdrl-matrix-chip cdrl-matrix-chip-${entry.state.toLowerCase()}${isBlocked ? " cdrl-matrix-chip-blocked" : ""}`}
+                            className={`cdrl-matrix-chip cdrl-matrix-chip-${entry.state.toLowerCase()}${isBlocked ? " cdrl-matrix-chip-blocked" : ""}${isVolatile ? " cdrl-matrix-chip-volatile" : ""}`}
                             style={{ borderColor: line.color_hint, color: line.color_hint }}
                             title={`${entry.title}${entry.did ? ` — ${entry.did}` : ""} (${entry.state})${reason ? ` — ${reason}` : ""}`}
                             onClick={() => handleChipClick(entry.nodeId)}
                           >
                             {isBlocked && <span className="cdrl-matrix-chip-lock" aria-hidden="true">🔒</span>}
+                            {isVolatile && <span className="cdrl-matrix-chip-caution" aria-hidden="true">⚠️</span>}
                             <span className="cdrl-matrix-chip-code">{entry.nodeId}</span>
                             <span className="cdrl-matrix-chip-state" aria-hidden="true">
                               {STATE_LETTER[entry.state] ?? entry.state[0]}
@@ -180,7 +185,8 @@ export function CdrlPathMatrixView({ model, decompositionLevel, workflowOverlay,
           </span>
           <span className="hint cdrl-matrix-legend-note">
             Chip color identifies the owning discipline (see row labels), not the maturity state. 🔒 = blocked — a derived_from parent
-            hasn't reached its required maturity yet (click the chip for detail).
+            hasn't started at all yet. ⚠️ = ready, but volatile — every parent has started, but at least one hasn't reached its
+            required maturity, so building on it now risks rework (click the chip for detail).
           </span>
         </div>
       ) : (

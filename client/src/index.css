@@ -566,7 +566,17 @@ button {
   color: var(--danger);
 }
 
-.cdrl-readiness-badge.cdrl-readiness-ready {
+/* READY_VOLATILE gets amber, same family as IN_PROGRESS, but a dashed border marks it as a
+   distinct "proceed with caution" signal rather than plain in-progress work — per the design
+   chat's steer that this is the single most valuable signal this layer surfaces, so it must not
+   read as a clean go. READY_STABLE keeps the old plain "ready" treatment. */
+.cdrl-readiness-badge.cdrl-readiness-ready_volatile {
+  background: #fbe9dd;
+  color: var(--amber);
+  border: 1px dashed var(--amber);
+}
+
+.cdrl-readiness-badge.cdrl-readiness-ready_stable {
   background: var(--ice-light);
   color: var(--navy);
 }
@@ -590,6 +600,10 @@ button {
   font-size: 0.82rem;
   color: var(--danger);
   margin: 0.3rem 0;
+}
+
+.cdrl-readiness-reason-volatile {
+  color: var(--amber);
 }
 
 .detail-grid {
@@ -1580,6 +1594,19 @@ button {
 }
 
 .cdrl-matrix-chip-lock {
+  font-size: 0.7rem;
+}
+
+/* READY_VOLATILE isn't muted like blocked — the work is genuinely allowed to start — but gets a
+   caution glyph and an amber dashed outline so a discipline lead can spot at a glance which of
+   their unblocked items are actually stable versus likely to cost rework (2026-08-15 revision,
+   see cdrlPathReadiness.ts). Full opacity, unlike blocked, since this isn't a "don't touch" cue. */
+.cdrl-matrix-chip-volatile {
+  outline: 1px dashed var(--amber);
+  outline-offset: 1px;
+}
+
+.cdrl-matrix-chip-caution {
   font-size: 0.7rem;
 }
 
