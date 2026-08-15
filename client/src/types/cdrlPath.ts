@@ -166,6 +166,17 @@ export interface CdrlPathModel {
     cm_baselines: CdrlPathCmBaseline[];
   };
   lines: CdrlPathLine[];
+  // Authored, domain-level prose the guide generator can't derive from CDRL data — "what does
+  // this discipline contribute," in two audiences (technical role-framing vs. a broad/customer
+  // one-liner). Added 2026-08-15, authored by the Subway Design chat and approved by Ron as-is
+  // (see DECISIONS.md) — the same "placeholder now, decide authorship later" content
+  // `cdrlPathGuideGenerator.ts` had been rendering for both sections until this landed. Optional
+  // because older/imported models won't have it yet — the generator falls back to its own
+  // placeholder text when a domain id is missing here, same as before this field existed.
+  domain_content?: {
+    role_framing_paragraphs: Record<string, string>;
+    contribution_blurbs: Record<string, string>;
+  };
   nodes: CdrlPathNode[];
   decomposition_dimension: {
     levels: CdrlPathDecompositionLevelDef[];

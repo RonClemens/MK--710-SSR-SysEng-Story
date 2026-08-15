@@ -1288,3 +1288,39 @@ diff against the live model.
     round. Zero console/page errors. The Discipline Guide's role-framing paragraphs (×7) and the
     Orientation Guide's per-domain contribution blurbs (×7) remain placeholder — this round was
     `team_facing_note` only, per what the design chat actually delivered.
+
+## 2026-08-15 — Discipline Guide role framing + Orientation Guide contribution blurbs authored
+
+The design chat's second authorship round — the two content sets deferred since the guide export
+feature first shipped. Delivered as a markdown review doc (the JSON with the actual
+`domain_content` section didn't come through on the first attempt; the content was complete and
+unambiguous in the markdown, so it was transcribed directly into the live model rather than
+blocking a second time on a file that may not have attached).
+
+83. **New `domain_content` section** in the reference model (`role_framing_paragraphs` and
+    `contribution_blurbs`, both keyed by the same 7 domain ids as `model.lines` — verified they
+    match exactly before transcribing). Ron approved both sets as-is per the design chat's relay;
+    three call-outs worth remembering if the content is ever revisited: SE's paragraph makes an
+    intentionally strong claim ("nearly everything else traces back to something you wrote
+    first") justified by the DAG's actual root structure; ILS's paragraph notes it's structurally
+    often the last discipline to finalize details, a factual consequence of where LCSP/
+    PROVISIONING sit in the dependency graph, not a complaint; PM_CM's paragraph is deliberately
+    structured differently from the other six (governs process rather than producing technical
+    content), since that's a genuine, not cosmetic, difference in how that discipline relates to
+    the rest.
+
+84. **`cdrlPathGuideGenerator.ts` wired to read `domain_content` with a placeholder fallback,
+    not a hard requirement.** `roleFramingParagraph`/`contributionBlurb` replace the old
+    unconditional-placeholder `domainBlurbPlaceholder` helper — same placeholder text as before
+    for any domain id missing from `domain_content` (e.g. a future 8th domain, or an older
+    imported model that predates this field), so the fallback path is still exercised, not dead
+    code. `CdrlPathModel.domain_content` is optional in the type for the same reason.
+
+    Verified: `tsc -b` clean. `validateCdrlPathModel` still "Model valid." Playwright: regenerated
+    the Program Management/CM Discipline Guide (the one with the deliberately-different paragraph
+    structure) and the Orientation Guide — grepped both for the literal string "PLACEHOLDER" and
+    found zero occurrences across either document; the contribution table renders all 7 domains'
+    one-line blurbs correctly. Zero console/page errors. Both authorship rounds the design chat
+    flagged as outstanding (`team_facing_note` in the prior entry, `domain_content` here) are now
+    closed — Special Considerations, role framing, and contribution blurbs are all populated
+    end to end.

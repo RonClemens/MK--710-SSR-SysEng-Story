@@ -129,6 +129,27 @@
       "description": "Schedule, risk, and configuration-management administration \u2014 governs how the whole effort is planned and controlled."
     }
   ],
+  "domain_content": {
+    "_source": "Authored by the Subway Design chat, approved by Ron as-is 2026-08-15 - see docs/cdrl-path/DECISIONS.md.",
+    "role_framing_paragraphs": {
+      "SE": "Systems Engineering exists to make sure the whole system actually works as one coherent thing, not just as a collection of parts that were each built correctly in isolation. Your artifacts \u2014 starting with the top-level specification and carrying through the design descriptions \u2014 set the requirements everyone else builds against, and you're the discipline responsible for catching it when two other disciplines' work doesn't actually fit together. Nearly everything else in this program traces back to something you wrote first.",
+      "SW": "Software Engineering takes the system's requirements and turns them into the code that actually makes the system function. Your artifacts trace a direct line from what the system needs to do (requirements) through how it's designed (design descriptions) to what actually gets delivered (the product specification) \u2014 and because software tends to be one of the last things fully proven out, your schedule pressure often reflects delays that started upstream in requirements or design, not in your own work.",
+      "HW": "Hardware Engineering designs and specifies the physical components of the system \u2014 the parts that exist in the real world, not just in code. Like software, your work matures from an early requirements-and-development specification into a final production specification, and what you build has to satisfy the same top-level system requirements that software does, just in a different form. Coordination with Software and Systems Engineering on shared interfaces is where most of your cross-discipline risk lives.",
+      "TE": "Test & Evaluation exists to prove \u2014 with real evidence, not assumption \u2014 that the system actually does what everyone else said it would do. Your test plans and procedures have to be ready well before the system is fully built, because testing can't start the moment something is 'done'; it has to be planned in parallel with design. Your results feed directly into whether the system is allowed to move forward at several major program checkpoints.",
+      "SAFETY_RELIABILITY": "The Safety & Reliability discipline exists to answer two questions across the entire program: 'can this system hurt someone or something it shouldn't,' and 'how long will it keep working, and how do we know.' Your artifacts don't stand alone \u2014 they're a continuous thread that starts before requirements are even final and doesn't stop until the system is retired. Early on, you set the ground rules for how safety and reliability will be managed at all; through design, you analyze what the engineers are actually building and feed back what needs to change; by production, your findings shape how the system gets supported and maintained for its entire service life.",
+      "ILS": "Integrated Logistics Support plans how the system will actually be maintained, repaired, and supported once it's fielded \u2014 work that starts well before the system is finished being built. Your analyses depend heavily on what Safety & Reliability discovers (which parts are likely to fail, and how) and what Hardware and Software actually deliver, so your own planning is often the last discipline able to finalize its details, even though the questions you're answering matter for the entire life of the system afterward.",
+      "PM_CM": "Program Management and Configuration Management keep the whole effort coordinated, on schedule, and under control. You don't produce technical content the way other disciplines do \u2014 instead, you own the plans that govern how everyone else's work gets managed, reviewed, and changed after it's approved. Nearly every other discipline's document, once baselined, only changes because of a process your discipline owns and controls."
+    },
+    "contribution_blurbs": {
+      "SE": "Defines what the system needs to do, and makes sure every other discipline's work fits together into one coherent whole.",
+      "SW": "Designs and builds the code that makes the system function.",
+      "HW": "Designs and builds the physical components of the system.",
+      "TE": "Proves \u2014 with real evidence \u2014 that the system actually does what it was supposed to do.",
+      "SAFETY_RELIABILITY": "Makes sure the system won't hurt anyone and will keep working as long as it needs to.",
+      "ILS": "Plans how the system will be maintained, repaired, and supported for its entire life in the field.",
+      "PM_CM": "Keeps the whole effort on schedule, on budget, coordinated, and properly controlled as changes happen."
+    }
+  },
   "nodes": [
     {
       "id": "SEP",

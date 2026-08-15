@@ -16,10 +16,11 @@ import { computeReadiness, readinessReasonText } from "./cdrlPathReadiness";
 //    generateStationSummaryBySetrEvent and buildCdrlMaturityMatrix already established. It's
 //    listed separately instead.
 // 2. Plain-language "what does this discipline contribute" prose isn't derivable from CDRL
-//    titles — it's institutional framing, not structured data. Per Ron's 2026-08-15 call
-//    (placeholder now, decide authorship later), both the Discipline Guide's role-framing
-//    paragraph and the Orientation Guide's per-domain contribution blurbs render a clearly
-//    marked placeholder rather than invented copy.
+//    titles — it's institutional framing, not structured data. Read from `model.domain_content`
+//    (authored by the Subway Design chat, approved by Ron as-is, 2026-08-15) when present;
+//    falls back to a clearly marked placeholder for any domain missing from it, rather than
+//    inventing copy — same principle as before this content existed, just no longer the
+//    default path for the 7 domains it now covers.
 // 3. `notes` (internal model-curation history — "added node," "was mislabeled," commentary
 //    referencing Ron/earlier drafts) is never shown here — per the design chat's 2026-08-15
 //    content-review finding, it was leaking into exported guides with no context an external
@@ -27,10 +28,18 @@ import { computeReadiness, readinessReasonText } from "./cdrlPathReadiness";
 //    (see its doc comment in cdrlPath.ts) that's undefined until a hand-curation pass populates
 //    it — same placeholder-now-author-later treatment as #2, just silent rather than a marker.
 
-function domainBlurbPlaceholder(kind: "role-framing" | "contribution"): string {
-  return kind === "role-framing"
-    ? "[PLACEHOLDER — this discipline's role-framing paragraph hasn't been authored yet. See docs/cdrl-path/DECISIONS.md: placeholder now, authorship sequenced separately.]"
-    : "[PLACEHOLDER — plain-language description of what this discipline contributes hasn't been authored yet.]";
+function roleFramingParagraph(model: CdrlPathModel, domainId: string): string {
+  return (
+    model.domain_content?.role_framing_paragraphs[domainId] ??
+    "[PLACEHOLDER — this discipline's role-framing paragraph hasn't been authored yet. See docs/cdrl-path/DECISIONS.md: placeholder now, authorship sequenced separately.]"
+  );
+}
+
+function contributionBlurb(model: CdrlPathModel, domainId: string): string {
+  return (
+    model.domain_content?.contribution_blurbs[domainId] ??
+    "[PLACEHOLDER — plain-language description of what this discipline contributes hasn't been authored yet.]"
+  );
 }
 
 // Standard DoD acquisition-phase meanings (MSA/TMRR/EMD/P&D/O&S) — public, well-established
@@ -338,7 +347,7 @@ export function generateDisciplineGuide(model: CdrlPathModel, domainId: string, 
     "",
     "## Your role in the System Development Lifecycle",
     "",
-    domainBlurbPlaceholder("role-framing"),
+    roleFramingParagraph(model, domainId),
     "",
     "## Your CDRLs at a glance",
     "",
@@ -378,7 +387,7 @@ export function generateOrientationGuide(model: CdrlPathModel): string {
   flowchart.push("```");
 
   const contributionRows = model.lines.map(
-    (line) => `| **${domainShortLabel(line.label)}** | ${domainBlurbPlaceholder("contribution")} |`,
+    (line) => `| **${domainShortLabel(line.label)}** | ${contributionBlurb(model, line.id)} |`,
   );
 
   return [
