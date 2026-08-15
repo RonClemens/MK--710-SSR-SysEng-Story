@@ -1261,3 +1261,30 @@ exactly as diagnosed.
     FMECA) and Broader (via SAR/RM_PREDICTIONS/FAILURE_SUMMARY_REPORT, which only influence LCSP
     without SSDD/HW_DEV_SPEC-style direct derivation); Special Considerations no longer contains
     any of the three quoted internal-commentary strings. Zero console/page errors.
+
+## 2026-08-15 — `team_facing_note` authored for all 36 nodes
+
+The design chat completed the deferred authorship pass in one round and delivered both a
+human-readable review doc and a JSON with all 36 `team_facing_note` values populated, ready to
+diff against the live model.
+
+82. **All 36 nodes' `team_facing_note` merged from the design chat's authored JSON**, matched
+    strictly by node id (verified the id sets are identical, 36/36, before merging — no
+    surprises either direction) and inserted immediately after each node's existing `notes`
+    field, leaving every other field in the live reference model untouched. 35 of 36 nodes got
+    real content; `STD` was deliberately left blank, matching the design chat's own call that it
+    had nothing beyond its maturity table worth saying — not a gap, an honest "nothing to add."
+    Before merging, scanned every value for the exact leaked-commentary patterns the original
+    finding quoted (`Ron`, `earlier draft`, `original draft`, `mislabeled`, `RPR`, `MPD`, "design
+    chat," "Claude") — zero matches across all 36 values, confirming the curation pass actually
+    delivered on stripping internal framing, not just relabeling it.
+
+    Verified: `tsc -b` clean, `validateCdrlPathModel` still returns "Model valid" (a data-only
+    change, but worth confirming nothing about the merge broke the existing 8 validation checks).
+    Playwright: regenerated the S&R Discipline Guide's Special Considerations section — it now
+    shows real, useful team-facing content (SSHAR's three-names-one-document explanation,
+    RM_PREDICTIONS's DID-consolidation history rewritten without the "Ron's RPR/MPD" framing,
+    FMECA's downstream-impact note) instead of the near-empty placeholder state from the prior
+    round. Zero console/page errors. The Discipline Guide's role-framing paragraphs (×7) and the
+    Orientation Guide's per-domain contribution blurbs (×7) remain placeholder — this round was
+    `team_facing_note` only, per what the design chat actually delivered.

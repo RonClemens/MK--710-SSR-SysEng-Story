@@ -140,6 +140,7 @@
       "drafted_at": "MSA",
       "baselined_at": "each Milestone",
       "notes": "Government-authored; sets the SEMP's required content mapping. Include as a 'station marker' even though it's not a contractor CDRL.",
+      "team_facing_note": "Government-authored, not a contractor deliverable \u2014 but it's included here because it sets the structure your SEMP has to follow.",
       "render_style": "context_marker",
       "maturity_states": [
         {
@@ -185,6 +186,7 @@
         "ALL"
       ],
       "notes": "The document this whole diagram lives in - shown as the spine/backbone line, not a station.",
+      "team_facing_note": "Delivered as Final starting at SRR \u2014 there's no separate draft milestone before that. It gets revisited at every subsequent SETR event, so treat it as a living document for the life of the program, not a one-time deliverable.",
       "render_style": "full_station",
       "maturity_states": [
         {
@@ -229,6 +231,7 @@
       "drafted_at": "SRR",
       "baselined_at": "each SETR",
       "notes": "Event-driven IMP entry/exit criteria should mirror the SETR stations on this map.",
+      "team_facing_note": "Same pattern as SEMP: delivered Final at SRR, then updated at every subsequent SETR event. Your schedule's entry/exit criteria should mirror this SETR sequence directly.",
       "render_style": "full_station",
       "maturity_states": [
         {
@@ -273,6 +276,7 @@
       "domains": [
         "PM_CM"
       ],
+      "team_facing_note": "Delivered Final at SRR, then updated at every subsequent SETR event \u2014 same pattern as SEMP and IMP/IMS.",
       "drafted_at": "SRR",
       "baselined_at": "SRR",
       "render_style": "full_station",
@@ -322,6 +326,7 @@
       "drafted_at": "pre-MSA",
       "baselined_at": "Milestone A/B",
       "notes": "Government-provided top-level input; anchors the input line before SRR.",
+      "team_facing_note": "Provided by the government, not produced by the program team \u2014 it's the top-level capability need everything else in this program ultimately traces back to.",
       "render_style": "context_marker",
       "maturity_states": [],
       "decomposition_level": "SYSTEM",
@@ -348,6 +353,7 @@
       "domains": [
         "SE"
       ],
+      "team_facing_note": "Reaching Final at SFR establishes the program's Functional Baseline. This is one of the most heavily-referenced documents in the whole program \u2014 changes here, via ECP, ripple into nearly every other discipline's work.",
       "drafted_at": "SRR",
       "baselined_at": "SFR (Functional Baseline)",
       "influences": [
@@ -408,6 +414,7 @@
         "SW",
         "HW"
       ],
+      "team_facing_note": "Same post-baseline pattern as SSS \u2014 changes after Final go through ECP and get reviewed at every SETR event through PRR.",
       "drafted_at": "SRR",
       "baselined_at": "SFR",
       "influences": [
@@ -461,6 +468,7 @@
         "SW",
         "HW"
       ],
+      "team_facing_note": "Finalizes at CDR, later than you might expect given drafting starts at SFR \u2014 interface details take the full design period to lock down. Post-baseline changes follow the same ECP pattern as SSS and IRS.",
       "drafted_at": "SFR",
       "baselined_at": "CDR",
       "influences": [
@@ -513,6 +521,7 @@
       "domains": [
         "SW"
       ],
+      "team_facing_note": "Drafts at SSR (Software Specification Review) but doesn't finalize until PDR \u2014 SSR is where the draft gets scrutinized, PDR is where it's actually baselined. Don't mistake SSR for the baseline point.",
       "drafted_at": "SSR",
       "baselined_at": "PDR",
       "verify_note": "Corrected - SRS baselines at SSR (Software Specification Review), not PDR. PDR baselines the hardware/system-level Allocated Baseline; SSR is the software-track equivalent milestone. If your program doesn't run SSR as a separate event, SRS baseline reverts to PDR by default.",
@@ -567,6 +576,7 @@
       "domains": [
         "SE"
       ],
+      "team_facing_note": "Reaching Final at PDR establishes the Allocated Baseline \u2014 the point where system design responsibility is formally divided among Configuration Items.",
       "drafted_at": "SFR",
       "baselined_at": "PDR (Allocated Baseline)",
       "influenced_by": [
@@ -633,6 +643,7 @@
         "SW",
         "HW"
       ],
+      "team_facing_note": "Drafts earlier than some other design documents \u2014 at SFR rather than PDR \u2014 but finalizes at PDR alongside SSDD. Interfaces lock down relatively early in the design sequence.",
       "drafted_at": "SFR",
       "baselined_at": "PDR",
       "influenced_by": [
@@ -696,6 +707,7 @@
       "domains": [
         "SW"
       ],
+      "team_facing_note": "Follows the standard CI-level pattern: drafts at PDR, finalizes at CDR alongside most other detailed design documents.",
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
@@ -758,6 +770,7 @@
       "domains": [
         "SW"
       ],
+      "team_facing_note": "Tracks closely with the Software Design Description it's derived from \u2014 same Draft-at-PDR, Final-at-CDR timing.",
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
@@ -808,6 +821,7 @@
       "domains": [
         "HW"
       ],
+      "team_facing_note": "There's no separate 'as-built' milestone \u2014 PCA is simply the last point in the normal update cycle, not a distinct release. Preliminary drawings can appear as early as PDR.",
       "drafted_at": "PDR",
       "baselined_at": "CDR (FINAL), PCA (AS_BUILT/Product Baseline)",
       "influenced_by": [
@@ -867,6 +881,7 @@
       "domains": [
         "SW"
       ],
+      "team_facing_note": "Finalizes at PRR \u2014 despite the similar name, don't confuse its timing with the SVR/FCA SETR event.",
       "drafted_at": "TRR",
       "baselined_at": "PRR",
       "influenced_by": [
@@ -919,6 +934,7 @@
       "domains": [
         "SW"
       ],
+      "team_facing_note": "Timing here (Draft at CDR, Final at PCA) is still being confirmed for this program \u2014 treat these dates as provisional until your actual CDRL schedule verifies them.",
       "drafted_at": "CDR",
       "baselined_at": "PCA (software Product Baseline)",
       "influenced_by": [
@@ -972,6 +988,7 @@
       "domains": [
         "TE"
       ],
+      "team_facing_note": "Drafts at PDR and finalizes at CDR \u2014 earlier than software implementation typically wraps up, since test planning has to be ready well before testing itself starts.",
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
@@ -1077,6 +1094,7 @@
       "domains": [
         "TE"
       ],
+      "team_facing_note": "A one-time report of actual test results, not something that goes through draft/update revisions \u2014 it reflects what testing found, once, not an evolving plan.",
       "drafted_at": "SVR_FCA",
       "baselined_at": "SVR_FCA",
       "influenced_by": [
@@ -1157,6 +1175,7 @@
         "FCA_PCA_evidence"
       ],
       "notes": "This is the natural 'interchange station' artifact - it literally records where Design Input and Design Output lines cross at each review. Confirmed via search: no universal standard DID exists for this; it's almost always contract- or SEMP-tailored. Worth deciding whether to show it as its own CDRL line item on your program, or as a sub-artifact of the SEMP/STP.",
+      "team_facing_note": "There's no standard DID for this document \u2014 it's typically tailored per program or contract. It tracks at two different levels: once for the whole System (drafts SRR, finalizes SFR) and again separately for each individual Configuration Item (drafts PDR, finalizes CDR). Make sure you know which level you're looking at.",
       "render_style": "full_station",
       "decomposition_level": [
         "SYSTEM",
@@ -1214,6 +1233,7 @@
       "domains": [
         "TE"
       ],
+      "team_facing_note": "Its real baseline is tied to acquisition Milestones (A/B/C), not SETR events \u2014 SFR is used here as the closest event-based approximation. Check your actual Milestone schedule for the true due date, not just this map.",
       "drafted_at": "MSA/SRR",
       "baselined_at": "each Milestone",
       "influenced_by": [
@@ -1270,6 +1290,7 @@
       "domains": [
         "SAFETY_RELIABILITY"
       ],
+      "team_facing_note": "Draft is due 3 months after contract award \u2014 well before your first SETR event. Updates aren't tied to SETR events at all; they're paced by external safety review boards (WSESRB and SSSTRP), which loosely precede SRR, CDR, and PRR but run on their own board calendar. Coordinate directly against the board schedule.",
       "drafted_at": "SRR",
       "baselined_at": "SRR",
       "influences": [
@@ -1318,6 +1339,7 @@
       "domains": [
         "SAFETY_RELIABILITY"
       ],
+      "team_facing_note": "Draws directly on FMECA and the hazard analysis (SSHAR) findings \u2014 expect this document's content to shift if either of those changes.",
       "drafted_at": "PDR",
       "baselined_at": "CDR, updated through PRR",
       "influenced_by": [
@@ -1387,6 +1409,7 @@
       ],
       "verified": true,
       "notes": "Added node - this is the actual hazard-tracking artifact that feeds the SAR; wasn't in the original draft.",
+      "team_facing_note": "This is one document evolving under three different names as the program matures: Preliminary Hazard Analysis (PHA) at SRR, System Hazard Analysis (SHA) at CDR, and Operating & Support Hazard Analysis (O&SHA) at PRR. If you hear any of those three names, they all refer to this same CDRL.",
       "render_style": "full_station",
       "maturity_states": [
         {
@@ -1438,6 +1461,7 @@
       "domains": [
         "SAFETY_RELIABILITY"
       ],
+      "team_facing_note": "Sets the overall reliability and maintainability program approach early \u2014 the detailed analysis that follows (FMECA, R&M Predictions) builds on what's established here.",
       "drafted_at": "SRR",
       "baselined_at": "SRR",
       "verified": true,
@@ -1477,6 +1501,7 @@
       "domains": [
         "SAFETY_RELIABILITY"
       ],
+      "team_facing_note": "Findings here directly shape sustainment planning (LCSP) and repair-level decisions (LORA) \u2014 this analysis has real consequences well beyond your own discipline.",
       "drafted_at": "PDR",
       "baselined_at": "CDR",
       "influenced_by": [
@@ -1551,6 +1576,7 @@
         }
       ],
       "notes": "Added node - quantitative RAM prediction report, distinct from FMECA and often shown as its own station. Historical note: a separate Maintainability Predictions Report DID (DI-MNTY-81602, aka 'MPR') once existed but was CANCELED per DoD R&M tailoring guidance and consolidated into this combined R&M Predictions DID. Ron's 'RPR' and 'MPD' both resolve to this same node - no separate node needed.",
+      "team_facing_note": "A separate 'Maintainability Predictions Report' DID once existed but was formally canceled and consolidated into this combined Reliability & Maintainability Predictions document. If you see a reference to an 'MPR' or a standalone maintainability-only prediction report, this is where that content now lives.",
       "render_style": "full_station",
       "maturity_states": [
         {
@@ -1608,6 +1634,7 @@
         }
       ],
       "notes": "This was mislabeled as FMECA's DID number in the earlier draft; it's actually a distinct, later-occurring report fed by test/field failure data.",
+      "team_facing_note": "A distinct report from FMECA \u2014 produced later in the program, using real test and field failure data rather than upfront analysis. Don't confuse the two.",
       "render_style": "full_station",
       "maturity_states": [
         {
@@ -1646,6 +1673,7 @@
       "domains": [
         "ILS"
       ],
+      "team_facing_note": "Pulls together findings from Safety & Reliability's FMECA, SAR, and R&M Predictions analyses into an actionable sustainment approach \u2014 if any of those change, expect this plan to need revisiting.",
       "drafted_at": "PDR",
       "baselined_at": "each Milestone",
       "influenced_by": [
@@ -1700,6 +1728,7 @@
       "domains": [
         "ILS"
       ],
+      "team_facing_note": "Determines what spare parts and repair stock the program will need, based directly on FMECA's failure analysis.",
       "drafted_at": "CDR",
       "baselined_at": "PCA",
       "influenced_by": [
@@ -1756,6 +1785,7 @@
       "domains": [
         "PM_CM"
       ],
+      "team_facing_note": "Defines how the program controls and approves changes \u2014 this is the plan that governs the ECP process referenced throughout most other CDRLs' update cycles.",
       "drafted_at": "SRR",
       "baselined_at": "SRR",
       "verified": true,
@@ -1805,6 +1835,7 @@
       "drafted_at": "SVR_FCA / PCA",
       "baselined_at": "SVR_FCA (Functional), PCA (Product)",
       "notes": "This is the terminal interchange station - Design Input line (via RVTM) and Design Output line (via ENG_DRAWINGS/SPS) formally converge here.",
+      "team_facing_note": "This is where the Design Input side of the program (via RVTM) and the Design Output side (via drawings and specs) formally come together. The Functional Configuration Audit confirms the system does what was required; the Physical Configuration Audit confirms it was built as designed.",
       "render_style": "context_marker",
       "maturity_states": [
         {
@@ -1894,6 +1925,7 @@
       ],
       "matures_into": "HW_PROD_SPEC",
       "notes": "This is the node that was missing entirely - the hardware-CI-level equivalent of what SRS/SDD already do for CSCIs. Recurs once per HWCI, not once per program. DID corrected/confirmed to DI-IPSC-82259 (SHRS) per Ron - covers combined SW/HW requirements at system/subsystem/CI level, used as basis for design and qualification testing.",
+      "team_facing_note": "Covers both hardware and software requirements together at the Configuration Item level \u2014 one instance per CI, not once for the whole program. Matures into the Hardware Product Specification after CDR.",
       "confirmed_via_did_interview": true,
       "influences": [
         "SSDD",
@@ -1966,6 +1998,7 @@
         }
       ],
       "notes": "The 'production specification' Ron referenced - matured from HW_DEV_SPEC. This is the exact Type B -> Type C progression the Vee model requires and the previous flat model had no place for.",
+      "team_facing_note": "The hardware equivalent of what the Software Product Specification does for software \u2014 the 'as it will be produced' version of a Configuration Item's specification, matured from the earlier Development Specification.",
       "confirmed_via_did_interview": true,
       "influences": [
         "PROVISIONING",
@@ -1989,6 +2022,7 @@
       ],
       "decomposition_level": "CONFIGURATION_ITEM",
       "notes": "Companion input-data DID: DI-SESS-81873 (LORA Input Data), used when the government furnishes LORA data for contractor analysis rather than the contractor delivering the full report. SETR event placement not yet interviewed.",
+      "team_facing_note": "Determines whether a failed component gets repaired at the organizational, intermediate, or depot level \u2014 a decision with real cost and logistics footprint. Like CMRS, it doesn't update on its own schedule; if it changes, it's because a related design document changed first.",
       "confirmed_via_did_interview": true,
       "maturity_states": [
         {
@@ -2046,6 +2080,7 @@
       ],
       "decomposition_level": "CONFIGURATION_ITEM",
       "notes": "Ties to MIL-STD-1839 - details TMDE and calibration standards required to support the system. SETR event placement not yet interviewed.",
+      "team_facing_note": "Defines what calibration and test equipment (TMDE) will be needed to support and maintain the system, tied to MIL-STD-1839. Doesn't update on its own schedule \u2014 changes here follow changes to the related design documents.",
       "confirmed_via_did_interview": true,
       "maturity_states": [
         {
