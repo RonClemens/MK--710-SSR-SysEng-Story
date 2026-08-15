@@ -135,8 +135,10 @@ is a grouping of types of CDRLs, which we should probably refine the definition 
     data needed this time, since the migration itself produced genuine multi-domain content.
 
     **Open/next:** the polar/dartboard geometry itself (#10's actual deliverable) hasn't been built yet — this
-    entry only covers the prerequisite domain redefinition. Also open: whether `CDD` belongs in `SE` or `PM_CM`
-    (flagged as a coin flip in the draft proposal, not specifically confirmed either way).
+    entry only covers the prerequisite domain redefinition. Whether `CDD` belongs in `SE` or `PM_CM` was
+    flagged as a coin flip in the draft proposal — **resolved 2026-08-15, confirmed by Ron via the Subway
+    Design chat: `SE`.** No longer an open item; the live data already had it as `SE`, so this is a
+    confirmation of existing content, not a change.
 
 ## 2026-08-12 — Polar/dartboard layout built
 
